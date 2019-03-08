@@ -10,8 +10,8 @@ import {
   Button,
   Modal,
   message,
-  Search,
-  Table
+  Table,
+  Popconfirm
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -19,6 +19,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './DiseaseMana.less';
 
 const FormItem = Form.Item;
+const {Search} = Input;
 FormItem.className = styles["ant-form-item"];
 const getValue = obj =>
   Object.keys(obj)
@@ -71,28 +72,122 @@ const ClearDisease = {
   CreatedAt: ""
 };
 
+@connect(({ rule, loading }) => ({
+  rule,
+  loading: loading.models.rule,
+}))
 @Form.create()
 class UpdateForm extends PureComponent {
   static defaultProps = {
-    handleUpdate: () => {},
-    handleUpdateModalVisible: () => {},
-    values: {},
   };
 
-  constructor(props) {
+  constructor(props){
     super(props);
-    const { DiseaseIn } = this.props;
     this.state = {
-      Disease:DiseaseIn,
+      Disease:this.props.DiseaseIn,
       datal:[],
       data2:[]
     };
-
+    this.columns1= [
+      {
+        title: '证型名称',
+        dataIndex: 'Name',
+        align: 'center',
+      },{
+        title: '证型拼音',
+        dataIndex: 'PinYin',
+        align: 'center',
+      },{
+        title: '操作',
+        dataIndex: 'operate',
+        key: 'operate',
+        align: 'center',
+        render: (text,record)=>(
+          this.state.data1.length >= 1
+            ? (
+              <Popconfirm title="确认删除?" onConfirm={()=>this.deleteSyn(record)} okText="确认" cancelText="取消">
+                <Button>删除</Button>
+              </Popconfirm>
+            ):null
+        ),
+      }];
+    this.columns2=[
+      {
+        title: '证型名称',
+        dataIndex: 'Name',
+        align: 'center',
+      }, {
+        title: '证型拼音',
+        dataIndex: 'PinYin',
+        align: 'center',
+      },{
+        title: '操作',
+        dataIndex: 'operate',
+        key: 'operate',
+        align: 'center',
+        render: (text,record)=>(
+          this.state.data2.length >= 1
+            ? (
+              <Popconfirm title="确认添加?" onConfirm={()=>this.addSyn(record)} okText="确认" cancelText="取消">
+                <Button>添加</Button>
+              </Popconfirm>
+            ):null
+        ),
+      }];
     this.formLayout = {
       labelCol: { span: 7 },
       wrapperCol: { span: 13 },
     };
   }
+
+
+  addSyn = ( record ) => {
+    let { data1, data2 } = this.state;
+    let repeat =false;
+    data1.map(data =>{
+      if (data.Id ===record.Id){
+        repeat =true
+      }
+    });
+    if (!repeat){
+      data1.push(record)
+    } else {
+      message.warning("Already Relate");
+      return
+    }
+
+    data2 = data2.filter(item=>{
+      return item.Id !==record.Id
+    });
+
+    this.setState({
+      data1:data1,
+      data2:data2,
+    });
+  };
+
+  deleteSyn = ( record ) => {
+    let {data1,data2} = this.state;
+    data2.push( record );
+    data1 = data1.filter(item => item.Id !== record.Id);
+    this.setState({
+      data1: data1,
+      data2:data2,
+    });
+  };
+
+  searchSyndrome = (value) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'rule/fetchDisease',
+      payload: {
+        searchKey:value,
+      },
+    },(res) => {
+      console.log("res",res)
+      this.setState({data2:res.list})
+    });
+  };
 
   render() {
     const { ModalVisible, handleManaVisible,handRelate } = this.props;
@@ -122,11 +217,11 @@ class UpdateForm extends PureComponent {
           <Col span={12} className="breadcrumb-title">
             <div className="syndrome-title">
               <span>未关联证型</span>
-              {/*<Search*/}
-                {/*placeholder="根据疾病名称或疾病首字母搜索证型"*/}
-                {/*onSearch={value => this.searchSyndrome(value)}*/}
-                {/*style={{ width: 300, marginLeft: 180 }}*/}
-              {/*/>*/}
+              <Search
+                placeholder="根据疾病名称或疾病首字母搜索证型"
+                onSearch={value => this.searchSyndrome(value)}
+                style={{ width: 300, marginLeft: 180 }}
+              />
             </div>
             <Table
               pagination={{
