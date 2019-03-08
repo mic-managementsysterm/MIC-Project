@@ -21,6 +21,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './TableList.less';
 
 const FormItem = Form.Item;
+FormItem.className = styles["ant-form-item"];
 const { Option } = Select;
 const RadioGroup = Radio.Group;
 const getValue = obj =>
@@ -46,6 +47,7 @@ const CreateForm = Form.create()(props => {
   return (
     <Modal
       destroyOnClose
+      width={640}
       title="新建规则"
       visible={modalVisible}
       onOk={okHandle}
@@ -56,42 +58,49 @@ const CreateForm = Form.create()(props => {
           rules: [{ required: true, message: '请输入姓名！', min: 1 }],
         })(<Input placeholder="请输入姓名" />)}
       </FormItem>
-      <RadioGroup
-        onChange={value => {Visit.Gender = value.target.value}}
-        defaultValue={0}
-      >
-        <Radio value={1}>男</Radio>
-        <Radio value={0}>女</Radio>
-      </RadioGroup>
-      <DatePicker
-        placeholder="请选择患者出生日期"
-        onChange={value => {Visit.Born = value.format("YYYY-MM-DD")}}
-        style={{paddingBottom: 5}}
-      />
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
+        <RadioGroup
+          onChange={value => {Visit.Gender = value.target.value}}
+          defaultValue={0}
+        >
+          <Radio value={1}>男</Radio>
+          <Radio value={0}>女</Radio>
+        </RadioGroup>
+      </FormItem>
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
+        <DatePicker
+          placeholder="请选择患者出生日期"
+          onChange={value => {Visit.Born = value.format("YYYY-MM-DD")}}
+        />
+      </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="教育程度">
         {form.getFieldDecorator('Education', {
           rules: [{ message: '请输入教育程度'}],
         })(<Input placeholder="请输入教育程度" />)}
       </FormItem>
-      <Select
-        defaultValue={0}
-        style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
-        placeholder="请选择患者婚姻状况"
-        onChange={value => {Visit.MaritalStatus = value}}
-      >
-        <Option value={0}>未婚</Option>
-        <Option value={1}>已婚</Option>
-      </Select>
-      <Select
-        defaultValue={0}
-        style={{ width: 120,paddingBottom: 10}}
-        placeholder="请选择患者居住状况"
-        onChange={value => {Visit.DwellingStatus = value}}
-      >
-        <Option value={0}>独自居住</Option>
-        <Option value={1}>夫妻同居</Option>
-        <Option value={2}>子女同居</Option>
-      </Select>
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="婚姻状况">
+        <Select
+          defaultValue={0}
+          style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
+          placeholder="请选择患者婚姻状况"
+          onChange={value => {Visit.MaritalStatus = value}}
+        >
+          <Option value={0}>未婚</Option>
+          <Option value={1}>已婚</Option>
+        </Select>
+      </FormItem>
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="居住状况">
+        <Select
+          defaultValue={0}
+          style={{ width: 120,paddingBottom: 10}}
+          placeholder="请选择患者居住状况"
+          onChange={value => {Visit.DwellingStatus = value}}
+        >
+          <Option value={0}>独自居住</Option>
+          <Option value={1}>夫妻同居</Option>
+          <Option value={2}>子女同居</Option>
+        </Select>
+      </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="爱好">
         {form.getFieldDecorator('Hobby', {
           rules: [{ message: '请输入爱好' }],
@@ -172,42 +181,50 @@ class UpdateForm extends PureComponent {
             rules: [{ required: true, message: '请输入姓名！', min: 1 }],
           })(<Input placeholder="请输入姓名" />)}
         </FormItem>
-        <RadioGroup
-          onChange={value => {Respondent.Gender = value.target.value}}
-          defaultValue={0}
-        >
-          <Radio value={1}>男</Radio>
-          <Radio value={0}>女</Radio>
-        </RadioGroup>
-        <DatePicker
-          placeholder="请选择患者出生日期"
-          onChange={value => {Respondent.Born = value && value.format("YYYY-MM-DD")}}
-          style={{paddingBottom: 5}}
-        />
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
+          <RadioGroup
+            onChange={value => {Respondent.Gender = value.target.value}}
+            defaultValue={0}
+          >
+            <Radio value={1}>男</Radio>
+            <Radio value={0}>女</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
+          <DatePicker
+            placeholder="请选择患者出生日期"
+            onChange={value => {Respondent.Born = value && value.format("YYYY-MM-DD")}}
+            style={{paddingBottom: 5}}
+          />
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="教育程度">
           {form.getFieldDecorator('Education', {
             rules: [{ message: '请输入教育程度'}],
           })(<Input placeholder="请输入教育程度" />)}
         </FormItem>
-        <Select
-          defaultValue={0}
-          style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
-          placeholder="请选择患者婚姻状况"
-          onChange={value => {Respondent.MaritalStatus = value}}
-        >
-          <Option value={0}>未婚</Option>
-          <Option value={1}>已婚</Option>
-        </Select>
-        <Select
-          defaultValue={0}
-          style={{ width: 120,paddingBottom: 10}}
-          placeholder="请选择患者居住状况"
-          onChange={value => {Respondent.DwellingStatus = value}}
-        >
-          <Option value={0}>独自居住</Option>
-          <Option value={1}>夫妻同居</Option>
-          <Option value={2}>子女同居</Option>
-        </Select>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="婚姻状况">
+          <Select
+            defaultValue={0}
+            style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
+            placeholder="请选择患者婚姻状况"
+            onChange={value => {Respondent.MaritalStatus = value}}
+          >
+            <Option value={0}>未婚</Option>
+            <Option value={1}>已婚</Option>
+          </Select>
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="居住状况">
+          <Select
+            defaultValue={0}
+            style={{ width: 120,paddingBottom: 10}}
+            placeholder="请选择患者居住状况"
+            onChange={value => {Respondent.DwellingStatus = value}}
+          >
+            <Option value={0}>独自居住</Option>
+            <Option value={1}>夫妻同居</Option>
+            <Option value={2}>子女同居</Option>
+          </Select>
+        </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="爱好">
           {form.getFieldDecorator('Hobby', {
             rules: [{ message: '请输入爱好' }],
