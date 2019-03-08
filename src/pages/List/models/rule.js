@@ -1,4 +1,4 @@
-import { queryRule, removeRule, addRule, updateRule } from '@/services/api';
+import { queryRule, removeRule, addRule, updateRule, queryDisease, removeDisease, addDisease, updateDisease,} from '@/services/api';
 
 export default {
   namespace: 'rule',
@@ -36,6 +36,38 @@ export default {
     },
     *update({ payload, callback }, { call, put }) {
       const response = yield call(updateRule, payload);
+      yield put({
+        type: 'save',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+
+    *fetchDisease({ payload }, { call, put }) {
+      const response = yield call(queryDisease, payload);
+      yield put({
+        type: 'save',
+        payload: response,
+      });
+    },
+    *addDisease({ payload, callback }, { call, put }) {
+      const response = yield call(addDisease, payload);
+      yield put({
+        type: 'save',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *removeDisease({ payload, callback }, { call, put }) {
+      const response = yield call(removeDisease, payload);
+      yield put({
+        type: 'save',
+        payload: response,
+      });
+      if (callback) callback();
+    },
+    *updateDisease({ payload, callback }, { call, put }) {
+      const response = yield call(updateDisease, payload);
       yield put({
         type: 'save',
         payload: response,

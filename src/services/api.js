@@ -43,6 +43,42 @@ export async function updateRule(params = {}) {
   });
 }
 
+
+export async function queryDisease(params) {
+  return request(`/api/disease?${stringify(params)}`);
+}
+
+export async function removeDisease(params) {
+  return request('/api/disease', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'delete',
+    },
+  });
+}
+
+export async function addDisease(params) {
+  return request('/api/disease', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function updateDisease(params = {}) {
+  return request(`/api/disease?${stringify(params.query)}`, {
+    method: 'POST',
+    body: {
+      ...params.body,
+      method: 'update',
+    },
+  });
+}
+
+
 export async function fakeSubmitForm(params) {
   return request('/api/forms', {
     method: 'POST',

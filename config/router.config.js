@@ -112,6 +112,11 @@ export default [
             component: './List/CardList',
           },
           {
+            path: '/list/disease-mana',
+            name: 'diseaseMana',
+            component: './List/DiseaseMana',
+          },
+          {
             path: '/list/search',
             name: 'searchlist',
             component: './List/List',

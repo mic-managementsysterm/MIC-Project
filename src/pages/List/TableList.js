@@ -48,7 +48,7 @@ const CreateForm = Form.create()(props => {
     <Modal
       destroyOnClose
       width={640}
-      title="新建规则"
+      title="新增患者"
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleModalVisible()}

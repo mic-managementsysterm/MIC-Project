@@ -19,6 +19,7 @@ export default {
   'menu.list.basiclist': 'Basic List',
   'menu.list.cardlist': 'Card List',
   'menu.list.searchlist': 'Search List',
+  'menu.list.diseaseMana': 'Disease Mana',
   'menu.list.searchlist.articles': 'Search List(articles)',
   'menu.list.searchlist.projects': 'Search List(projects)',
   'menu.list.searchlist.applications': 'Search List(applications)',
