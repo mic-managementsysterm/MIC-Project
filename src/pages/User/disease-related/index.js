@@ -120,7 +120,7 @@ const EditableFormRow = Form.create()(EditableRow);
 }
 @connect(({ disease, loading }) => ({  // 连接disease.js文件
   disease,
-  loading: loading.models.home,
+  loading: loading.models.disease,
 }))
  class Content extends React.Component {
     constructor(props) {

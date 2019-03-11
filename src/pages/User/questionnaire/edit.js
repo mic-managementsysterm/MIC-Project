@@ -10,7 +10,7 @@ const Data=[
                 name:'选择一个工具',
                 type:0,
                 // score:5,
-                pic:require('../../assets/img/cognition.jpg'),
+                pic:require('../../../assets/img/cognition.jpg'),
                 select:[
                     {
                         name:'锤子',
@@ -91,7 +91,7 @@ class Edit extends React.Component {
     }
 
     componentWillMount(){
-        const data=this.props.location.state.data
+        const data=this.props.match.params.data
         console.log('@data',data)
         this.setState({
             questions:data
@@ -297,11 +297,11 @@ class Edit extends React.Component {
     getTitle() {
         return (
             this.state.titleEditable ? (
-                <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 3, textAlign: 'center' }} onClick={this.handleTitleClick}>
+                <div className="editTitle" style={{ margin: '0px 20px 20px 20px', padding: 3, textAlign: 'center' }} onClick={this.handleTitleClick}>
                     <Input style={{ fontSize: 18, fontWeight: 'bold', padding: 30, textAlign: 'center' }} value={this.state.questions[0].title} onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} />
                 </div>
             ) : (
-                <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 20, textAlign: 'center' }} onClick={this.handleTitleClick}>
+                <div className="editTitle" style={{ margin: '0px 20px 20px 20px', padding: 20, textAlign: 'center' }} onClick={this.handleTitleClick}>
                     <h2><strong>{this.state.questions[0].title}</strong></h2>
                 </div>
             )

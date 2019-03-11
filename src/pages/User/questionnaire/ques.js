@@ -22,7 +22,7 @@ const Data=[
                 name:'选择一个工具',
                 type:0,
                 // score:5,
-                pic:require('../../assets/img/cognition.jpg'),
+                pic:require('../../../assets/img/cognition.jpg'),
                 options:[
                     {
                         text:'锤子',
@@ -82,7 +82,7 @@ export  default class Index extends Component{
                         this.state.data.length>=1?
                             (   <div className='operation'>
                                     <Link to={{
-                                        pathname:'/edit',
+                                        pathname:'/list/question/edit',
                                         state:{data:Data}
                                     }}>
                                     <Button className='btn'>编辑</Button>
@@ -100,7 +100,7 @@ export  default class Index extends Component{
     render(){
         return(
             <div>
-                <Link to={'/add'}>
+                <Link to={{pathname:'/list/question/add',state:{data:data}}}>
                 <Button style={{marginBottom:5,float:'right'}}>添加</Button>
                 </Link>
                 <Table align={'center'} columns={this.state.columns} dataSource={this.state.data}></Table>

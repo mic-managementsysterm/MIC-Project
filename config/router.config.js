@@ -101,11 +101,21 @@ export default [
             name: 'searchtable',
             component: './User/disease-related',
           },
-          // {
-          //   path: '/list/question',
-          //   name: 'question',
-          //   component: './User/questionnaire/ques',
-          // },
+          {
+            path: '/list/question',
+            name: 'question',
+            component: './User/questionnaire/ques',
+          },
+          {
+            path: '/list/question/edit',
+            // name: 'questionEdit',
+            component: './User/questionnaire/edit',
+          },
+          {
+            path: '/list/question/add',
+            // name: 'questionAdd',
+            component: './User/questionnaire/add',
+          },
           {
             path: '/list/basic-list',
             name: 'basiclist',
