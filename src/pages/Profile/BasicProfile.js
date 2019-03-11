@@ -4,7 +4,7 @@ import { Card, Badge, Table, Divider } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './BasicProfile.less';
+import styles from  './BasicProfile.less';
 
 const { Description } = DescriptionList;
 
@@ -34,6 +34,7 @@ class BasicProfile extends Component {
       cognitionData = {},
     } = profile;
     console.log('@diagnosisData', diagnosisData);
+    // @ts-ignore
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
@@ -68,6 +69,26 @@ class BasicProfile extends Component {
             </Description>
           </DescriptionDetail>
           <Divider style={{ marginBottom: 32 }} />
+          <div>{cognitionData.Infos ? cognitionData.Infos.map((item,index) =>{
+            return (
+              <div key={index}>
+                <div className={styles.cognitionContentName}>
+                  <div className={styles.cognitionContentGroupname}>
+                    {(index>0 && cognitionData.Infos[index-1].TopicInfo.GroupName == item.TopicInfo.GroupName)?
+                      null:item.TopicInfo.GroupName}
+                  </div>
+                  <div className={styles.cognitionContentDetail}>
+                    <ul className={styles.cognitionContentDetailTitle}>
+                      <li>{item.TopicInfo.Order}.{item.TopicInfo.Title}</li>
+                    </ul>
+                    <ul className={styles.cognitionContentDetailScore}>
+                      <li>{item.Score}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )
+          }) :null }</div>
         </Card>
       </PageHeaderWrapper>
     );

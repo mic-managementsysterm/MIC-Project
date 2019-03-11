@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Card, Button, Icon, List, Popconfirm } from 'antd';
-import { Link } from 'react-router-dom';
+import Link from 'umi/link';
+import router from 'umi/router';
 import Ellipsis from '@/components/Ellipsis';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -43,9 +44,9 @@ class CardList extends PureComponent {
                     hoverable
                     className={styles.card}
                     actions={[
-                      <Link to="/profile/basic">
-                        <Button>查看</Button>
-                      </Link>,
+                        <Button onClick={() => {
+                          router.push('/profile/basic')
+                        }}>查看</Button>,
                       <Popconfirm title="确认删除？" okText="确认" cancelText="取消">
                         <Button>删除</Button>
                       </Popconfirm>,
@@ -66,7 +67,7 @@ class CardList extends PureComponent {
                 <List.Item>
                   <Link to="/form/step-form">
                     <Button type="dashed" className={styles.newButton}>
-                      <Icon type="plus" /> 添加记录
+                      <Icon type="plus" /> 新增记录
                     </Button>
                   </Link>
                 </List.Item>

@@ -148,7 +148,6 @@ const getProfileAdvancedData = {
   advancedOperation3,
 };
 
-//四诊数据
 const diagnosisData = [
   {
     Id: 'b9d6c4fe-69f7-42f9-ab64-318af8e7f62a',
@@ -211,7 +210,6 @@ const diagnosisData = [
   },
 ];
 
-//认知筛查量表
 const cognitionData = [
   {
     Id: '0c7523d0-d157-4918-9ba6-ecfa7bed8527',
@@ -378,7 +376,6 @@ const cognitionData = [
   },
 ];
 
-//MMSE量表
 
 const { Random } = mockjs;
 
