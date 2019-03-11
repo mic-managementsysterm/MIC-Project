@@ -81,7 +81,7 @@ export default {
   },
   // proxy: {
   //   '/server/api/': {
-  //     target: 'https://preview.pro.ant.design/',
+  //     target: 'https://192.168.56.1:8000/',
   //     changeOrigin: true,
   //     pathRewrite: { '^/server': '' },
   //   },
