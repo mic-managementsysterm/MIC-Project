@@ -606,11 +606,11 @@ export default {
       Images: [],
     };
     const userInfo = {
-      name: Random.cname(),
-      tel: '18100000000',
-      delivery: '菜鸟物流',
-      addr: '浙江省杭州市西湖区万塘路18号',
-      remark: '备注',
+        name: Random.cname(),
+        tel: '18100000000',
+        delivery: '菜鸟物流',
+        addr: '浙江省杭州市西湖区万塘路18号',
+        remark: '备注',
     };
     res.json({
       userInfo,

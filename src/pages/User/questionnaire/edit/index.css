@@ -1,0 +1,24 @@
+.editTitle:hover {
+    background: #ecf6fd;
+}
+
+.addQuestion:hover {
+    cursor: pointer;
+}
+
+.questionsWrap:hover {
+    background: #ecf6fd;
+}
+
+.deleteOption:hover {
+    cursor: pointer;
+}
+
+.addOption:hover {
+    border: 1px dotted #7ec2f3;
+    cursor: pointer;
+}
+
+.questionOperate:hover {
+    cursor: pointer;
+}

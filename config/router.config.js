@@ -99,8 +99,13 @@ export default [
           {
             path: '/list/table-list',
             name: 'searchtable',
-            component: './List/TableList',
+            component: './User/disease-related',
           },
+          // {
+          //   path: '/list/question',
+          //   name: 'question',
+          //   component: './User/questionnaire/ques',
+          // },
           {
             path: '/list/basic-list',
             name: 'basiclist',
