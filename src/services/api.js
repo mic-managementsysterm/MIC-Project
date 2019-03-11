@@ -1,9 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-export async function getDisease() {
-  return request('/api/disease')
-}
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }
@@ -126,4 +123,8 @@ export async function queryNotices(params = {}) {
 
 export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
+}
+
+export async function addRecord() {
+  return request(`/api/profile/record`);
 }

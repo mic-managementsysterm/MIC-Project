@@ -308,20 +308,7 @@ const getActivities = [
 function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
 }
-const getDiease=[
-  {
-    Name:'感冒',
-    PinYin:'gm'
-  },
-  {
-    Name:'发烧',
-    PinYin:'fs'
-  },
-  {
-    Name:'发烧',
-    PinYin:'fashao'
-  },
-]
+
 export default {
   'GET /api/project/notice': getNotice,
   'GET /api/activities': getActivities,
@@ -334,5 +321,4 @@ export default {
   'GET /api/fake_list': getFakeList,
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
-  'Get /api/disease':getDiease,
 };

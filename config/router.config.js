@@ -99,13 +99,8 @@ export default [
           {
             path: '/list/table-list',
             name: 'searchtable',
-            component: './User/disease-related',
+            component: './List/TableList',
           },
-          // {
-          //   path: '/list/question',
-          //   name: 'question',
-          //   component: './User/questionnaire/ques',
-          // },
           {
             path: '/list/basic-list',
             name: 'basiclist',
@@ -160,6 +155,23 @@ export default [
             name: 'basic',
             hideInMenu: true,
             component: './Profile/BasicProfile',
+          },
+          {
+            name: '新增记录',
+            path: '/profile/record',
+            component: './Profile/AddRecord',
+          },{
+            name: 'MMSE',
+            path: '/profile/mmse',
+            component: './Profile/MMSE',
+          },{
+            name: 'MOCA',
+            path: '/profile/moca',
+            component: './Profile/MOCA',
+          },{
+            name: '理化检查详情',
+            path: '/profile/physicochemical',
+            component: './Profile/physicochemical',
           },
           {
             path: '/profile/advanced',

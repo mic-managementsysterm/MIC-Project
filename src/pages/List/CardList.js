@@ -65,11 +65,9 @@ class CardList extends PureComponent {
                 </List.Item>
               ) : (
                 <List.Item>
-                  <Link to="/form/step-form">
-                    <Button type="dashed" className={styles.newButton}>
+                    <Button type="dashed" className={styles.newButton} onClick={() =>{router.push('/profile/record')}} >
                       <Icon type="plus" /> 新增记录
                     </Button>
-                  </Link>
                 </List.Item>
               )
             }
