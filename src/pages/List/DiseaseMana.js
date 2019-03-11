@@ -85,7 +85,7 @@ class UpdateForm extends PureComponent {
     super(props);
     this.state = {
       Disease:this.props.DiseaseIn,
-      datal:[],
+      data1:[],
       data2:[]
     };
     this.columns1= [
@@ -103,7 +103,7 @@ class UpdateForm extends PureComponent {
         key: 'operate',
         align: 'center',
         render: (text,record)=>(
-          this.state.data1.length >= 1
+          record
             ? (
               <Popconfirm title="确认删除?" onConfirm={()=>this.deleteSyn(record)} okText="确认" cancelText="取消">
                 <Button>删除</Button>
@@ -126,7 +126,7 @@ class UpdateForm extends PureComponent {
         key: 'operate',
         align: 'center',
         render: (text,record)=>(
-          this.state.data2.length >= 1
+          record
             ? (
               <Popconfirm title="确认添加?" onConfirm={()=>this.addSyn(record)} okText="确认" cancelText="取消">
                 <Button>添加</Button>
@@ -178,20 +178,25 @@ class UpdateForm extends PureComponent {
 
   searchSyndrome = (value) => {
     const { dispatch } = this.props;
+    let _this = this;
     dispatch({
-      type: 'rule/fetchDisease',
+      type: 'rule/fetchSyn',
       payload: {
         searchKey:value,
       },
-    },(res) => {
-      console.log("res",res)
-      this.setState({data2:res.list})
+      callback:()=>{
+        if(_this.props.rule.data2 && _this.props.rule.data2.list){
+          let data1Text = JSON.stringify(_this.state.data1);
+          let data2Res = _this.props.rule.data2.list.filter( item => data1Text.indexOf(item.Id) < 0)
+          _this.setState({data2:data2Res})
+        }
+      }
     });
   };
 
   render() {
     const { ModalVisible, handleManaVisible,handRelate } = this.props;
-    const { datal, data2, Disease} = this.state;
+    const { data1,data2, Disease} = this.state;
     return (
       <Modal
         centered
@@ -203,19 +208,20 @@ class UpdateForm extends PureComponent {
         destroyOnClose
         onOk={() => handRelate(Disease)}
         onCancel={()=> handleManaVisible(false)}
-        className="form-modal"
+        className={styles.formModal}
         maskStyle={{backgroundColor:'rgba(0,0,0,.3)'}}
       >
         <Row className="breadcrumb">
           <Col span={12} className="breadcrumb-title">
-            <div className="syndrome-title">已关联证型</div>
+            <div className={styles["syndrome-title"]}>已关联证型</div>
             <Table
-              dataSource={datal}
+              dataSource={data1}
               columns={this.columns1}
+              rowKey={item => item.Id}
             />
           </Col>
-          <Col span={12} className="breadcrumb-title">
-            <div className="syndrome-title">
+          <Col span={12} className={styles.breadcrumbTitle}>
+            <div className={styles["syndrome-title"]}>
               <span>未关联证型</span>
               <Search
                 placeholder="根据疾病名称或疾病首字母搜索证型"
@@ -232,6 +238,7 @@ class UpdateForm extends PureComponent {
               }}
               dataSource={data2}
               columns={this.columns2}
+              rowKey={item => item.Id}
             />
           </Col>
         </Row>
@@ -421,7 +428,9 @@ class DiseaseMana extends PureComponent {
     });
   };
 
-  handRelate =() => {};
+  handRelate =() => {
+    this.handleManaVisible(false)
+  };
 
 
   renderSimpleForm() {

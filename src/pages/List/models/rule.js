@@ -1,4 +1,5 @@
-import { queryRule, removeRule, addRule, updateRule, queryDisease, removeDisease, addDisease, updateDisease,} from '@/services/api';
+import { queryRule, removeRule, addRule, updateRule,
+  queryDisease, removeDisease, addDisease, updateDisease,} from '@/services/api';
 
 export default {
   namespace: 'rule',
@@ -8,8 +9,15 @@ export default {
       list: [],
       pagination: {},
     },
+    data1: {
+      list: [],
+      pagination: {},
+    },
+    data2: {
+      list: [],
+      pagination: {},
+    },
   },
-
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(queryRule, payload);
@@ -50,6 +58,14 @@ export default {
         payload: response,
       });
     },
+    *fetchSyn({ payload,callback }, { call, put }) {
+      const response = yield call(queryDisease, payload);
+      yield put({
+        type: 'relate',
+        payload: response,
+      });
+      if(callback) callback();
+    },
     *addDisease({ payload, callback }, { call, put }) {
       const response = yield call(addDisease, payload);
       yield put({
@@ -81,6 +97,12 @@ export default {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    relate(relateState, action) {
+      return {
+        ...relateState,
+        data2: action.payload,
       };
     },
   },
