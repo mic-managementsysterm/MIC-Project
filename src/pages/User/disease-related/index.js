@@ -305,14 +305,21 @@ const EditableFormRow = Form.create()(EditableRow);
         // this.searchDisease()
       const { dispatch } = this.props;
       dispatch({
-        type: 'disease/fetch',  // action的类型，由disease命名空间和其下面的fetch方法构成
-      });                    // 派发这个action就会调用disease中的fetch函数，然后就会请求数据
-      const { disease: { list } } = this.props;
-      const dataSource = [...list];
-      this.setState({
-        dataSource:[...list]
-      })
-      console.log('@dataSource',dataSource)
+        type: 'disease/fetch', // action的类型，由disease命名空间和其下面的fetch方法构成
+      callback:()=> {
+        const { disease: { list } } = this.props;
+        this.setState({
+          dataSource: [...list]
+        });
+      },
+      }) ;             // 派发这个action就会调用disease中的fetch函数，然后就会请求数据
+        // const { disease: { list } } = this.props;
+        // const dataSource = [...list];
+        // this.setState({
+        //   dataSource:[...list]
+        // });
+
+      // console.log('@dataSource',dataSource)
     }
 
     onChange = (e) => {

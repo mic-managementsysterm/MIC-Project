@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Popconfirm } from 'antd';
-import { Link } from 'react-router-dom';
+import Link from 'umi/link';
 import './index.less'
 const data=[
     {
@@ -99,10 +99,12 @@ export  default class Index extends Component{
 
     render(){
         return(
-            <div>
-                <Link to={{pathname:'/list/question/add',state:{data:data}}}>
-                <Button style={{marginBottom:5,float:'right'}}>添加</Button>
-                </Link>
+            <div >
+              <div style={{display:'flex',flexDirection:'row-reverse'}}>
+              <Link to={'/list/question/add'}>
+                <Button className={'btn2'} style={{marginBottom:5,}} >添加</Button>
+              </Link>
+              </div>
                 <Table align={'center'} columns={this.state.columns} dataSource={this.state.data}></Table>
             </div>
         )

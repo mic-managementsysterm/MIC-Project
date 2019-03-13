@@ -1,5 +1,6 @@
 import React from 'react';
-import { DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Upload ,Row,message } from 'antd';
+import {Spin , DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Upload ,Row,message } from 'antd';
+import { UploadChangeParam } from 'antd/lib/upload/interface';
 // import './Edit.css';
 
 // const list = localStorage.list ? JSON.parse(localStorage.list) : [];
@@ -46,6 +47,7 @@ class Edit extends React.Component {
         this.handleDatePick = this.handleDatePick.bind(this);
         this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
         this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
+        this.handleIndex=this.handleIndex.bind(this);
         this.handleChange=this.handleChange.bind(this)
         this.state = {
             titleEditable:false,
@@ -78,8 +80,10 @@ class Edit extends React.Component {
                 action: '//jsonplaceholder.typicode.com/posts/',
                 listType: 'picture',
                 defaultFileList: [...fileList],
-            }
-
+            },
+          indexCurrent:null,
+          loading1:false,
+          loading2:false,
     };
     }
 
@@ -113,7 +117,7 @@ class Edit extends React.Component {
             type: 0,
             Id:'',
             QuestionnaireId:'',
-            Image:'',
+            Image:null,
             Order:null,
             GroupName:'',
             TotalScore:null,
@@ -125,8 +129,13 @@ class Edit extends React.Component {
             questions: this.state.questions,
             addAreaVisible: false
         });
+      console.log('@image',this.state.questions.Topics[0].Image)
     }
-
+   getBase64(img, callback) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
+  }
     handleChange = (info) => {
         if (info.file.status === 'uploading') {
             this.setState({ loading: true });
@@ -134,17 +143,28 @@ class Edit extends React.Component {
         }
         if (info.file.status === 'done') {
             // Get this url from response in real world.
-            getBase64(info.file.originFileObj, imageUrl => this.setState({
-                imageUrl,
-                loading: false,
-            }));
+            getBase64(info.file.originFileObj, imageUrl =>{
+                const base64Img=imageUrl
+                // console.log('@image',base64Img),
+                //   this.setState({
+                //     imageUrl,
+                //     loading: false,
+                //   })
+              this.state.questions.Topics[this.state.indexCurrent].Image=imageUrl,
+                this.setState({
+                  questions:this.state.questions,
+                  loading1:false,
+                  imageUrl:null
+                })
+            });
+          console.log('@image1',info.file)
         }
     }
     handleAddCheckbox() {
         const newQuestion = {
             Id:'',
             QuestionnaireId:'',
-            Image:'',
+            Image:null,
             Order:null,
             GroupName:'',
             type: 1,
@@ -333,14 +353,27 @@ class Edit extends React.Component {
             ) : ''
         );
     }
+  handleIndex=(index)=>{
+     this.setState({
+      indexCurrent:index,
+       loading:true
+  })
+  }
 
     getQuestions() {
         let questions = this.state.questions;
         const { TextArea } = Input;
             return questions.Topics.map((question, questionIndex, array) => {
                 if (question.type === 0) {
+                  const uploadButton = (
+                    <div onClick={()=>this.handleIndex(questionIndex)}>
+                      <Icon type={this.state.loading ? 'loading' : 'plus'} />
+                      <div className="ant-upload-text">Upload</div>
+                    </div>
+                  );
                     return (
                         <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
+
                             <span>Q{questionIndex + 1}</span>
                             <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
                             <span>题目类型</span>
@@ -349,22 +382,32 @@ class Edit extends React.Component {
                                 <span >总分：</span>
                                 <InputNumber style={{marginTop:5}} min={1} max={10} defaultValue={0} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
                             </Row>
-                            <div style={{marginTop:10}}>
-                                <img style={{width:200,height:200}} src={this.state.imageUrl} alt=""/>
-                            </div>
+                          {/*{*/}
+                            {/*question.Image?*/}
+                            {/*<div style={{marginTop:10}}>*/}
+                              {/*<img style={{width:200,height:200}} src={question.Image} alt=""/>*/}
+                            {/*</div>:<div style={{marginTop:10}}>*/}
+                                {/*<img style={{width:200,height:200}} src={this.state.imageUrl} alt=""/>*/}
+                              {/*</div>*/}
+                          {/*}*/}
+
                             <div style={{marginTop:5}}>
+                              <Spin spinning={this.state.loading1}>
                                 <Upload
                                     name="avatar"
-                                    // listType="picture-card"
-                                    // className="avatar-uploader"
+                                    listType="picture-card"
+                                    className="avatar-uploader"
                                     showUploadList={false}
                                     action="//jsonplaceholder.typicode.com/posts/"
                                     beforeUpload={beforeUpload}
                                         onChange={this.handleChange}>
-                                    <Button>
-                                        <Icon type="upload" /> Upload
-                                    </Button>
+                                  {
+                                    question.Image? <div style={{marginTop:10}}>
+                                      <img  src={question.Image} alt=""/>
+                                    </div>:uploadButton
+                                  }
                                 </Upload>
+                              </Spin>
                             </div>
                         </div>
                     );

@@ -107,13 +107,15 @@ export default [
             component: './User/questionnaire/ques',
           },
           {
+            hideInMenu:true,
             path: '/list/question/edit',
-            // name: 'questionEdit',
+            name: 'questionEdit',
             component: './User/questionnaire/edit',
           },
           {
+            hideInMenu:true,
             path: '/list/question/add',
-            // name: 'questionAdd',
+            name: 'questionAdd',
             component: './User/questionnaire/add',
           },
           {

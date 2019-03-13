@@ -8,12 +8,13 @@ export default {
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
+    *fetch({ payload,callback }, { call, put }) {
       const response = yield call(getDisease, payload);
       yield put({
         type: 'show',
         payload: response,
       });
+      if (callback) callback()
     },
   },
 
