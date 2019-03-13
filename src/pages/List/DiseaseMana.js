@@ -366,6 +366,7 @@ class DiseaseMana extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'disease/queryDisease',
+      payload:{}
     });
   }
 
@@ -478,26 +479,41 @@ class DiseaseMana extends PureComponent {
 
   // relate
   handleRelateVisible = (flag, record) => {
-    const { dispatch } = this.props;
+    const { dispatch,disAndSyn } = this.props;
     dispatch({
       type: 'disease/setStates',
       payload: {
         relateModalVisible:true
       },
-      // callback:()=>{
-      //   try {
-      //     dispatch({
-      //       type: 'disease/changeId',
-      //       payload: record.Id,
-      //     });
-      //   }catch (e){
-      //     console.log("catch",e)
-      //   }
-      // }
     });
+
+    // dispatch替代方案
+    disAndSyn.diseaseId = record.Id;
+    setTimeout(()=>{
+      dispatch({
+        type: 'disAndSyn/queryRelate',
+        payload:{DiseaseId:disAndSyn.diseaseId}
+      });
+      dispatch({
+        type: 'disAndSyn/queryRest',
+        payload:{DiseaseId:disAndSyn.diseaseId}
+      });
+    },1000)
+    //
+
     // dispatch({
     //   type: 'disAndSyn/changeId',
-    //   payload: record.Id,
+    //   payload: {diseaseId:record.Id},
+    //   callback:()=>{
+    //     dispatch({
+    //       type: 'disAndSyn/queryRelate',
+    //       payload:{DiseaseId:disAndSyn.diseaseId}
+    //     });
+    //     dispatch({
+    //       type: 'disAndSyn/queryRest',
+    //       payload:{DiseaseId:disAndSyn.diseaseId}
+    //     });
+    //   }
     // });
   };
 

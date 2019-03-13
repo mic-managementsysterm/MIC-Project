@@ -3,6 +3,7 @@ import { notification } from 'antd';
 import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
+import { ParamData } from './buildParams';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -56,33 +57,8 @@ const cachedSave = (response, hashcode) => {
   return response;
 };
 
-const objectToFormData = (obj, urlencoded, namespace) => {
-  let fd = urlencoded || '';
-  let formKey;
 
-  for(let property in obj) {
-    if(obj.hasOwnProperty(property)) {
-      let key = Array.isArray(obj) ? '' : `[${property}]`;
-      if(namespace) {
-        formKey = namespace + key;
-      } else {
-        formKey = property;
-      }
 
-      // if the property is an object, but not a File, use recursivity.
-      if(typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
-        fd = objectToFormData(obj[property], fd, formKey);
-      } else {
-        // if it's a string or a File object
-        if(obj[property] != null){
-          fd += `${formKey}=${obj[property]}&`
-        }
-
-      }
-    }
-  }
-  return fd;
-}
 
 /**
  * Requests a URL, returning a promise.
@@ -121,7 +97,7 @@ export default function request(url, option) {
           Accept: 'application/json',
           ...newOptions.headers,
         };
-        newOptions.body = objectToFormData(newOptions.body);
+        newOptions.body = ParamData(newOptions.body);
       }else {
         newOptions.headers = {
           Accept: 'application/json',

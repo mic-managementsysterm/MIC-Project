@@ -343,15 +343,7 @@ class TableList extends PureComponent {
         return dataSource.length >= 1
           ? (
             <div key={record.Id}>
-              <Link to={
-                {
-                  pathname: '',
-                  state: {key: record.Id}
-                }
-              }
-              >
                 <Button className="btn">查看</Button>
-              </Link>
               <Button onClick={() => this.handleUpdateModalVisible(true,record)}>编辑</Button>
             </div>
           ) : null
