@@ -10,11 +10,12 @@ export default {
   },
 
   effects: {
-    *changeId({ payload }, { put}){
+    *changeId({ payload, callback }, { put}){
       yield put({
         type:"changeId",
         payload:payload
-      })
+      });
+      if(callback) callback()
     },
     *queryRelate({ payload }, { call, put }) {
       const response = yield call(queryRelate, payload);

@@ -503,7 +503,17 @@ class DiseaseMana extends PureComponent {
 
     // dispatch({
     //   type: 'disAndSyn/changeId',
-    //   payload: record.Id,
+    //   payload: {diseaseId:record.Id},
+    //   callback:()=>{
+    //     dispatch({
+    //       type: 'disAndSyn/queryRelate',
+    //       payload:{DiseaseId:disAndSyn.diseaseId}
+    //     });
+    //     dispatch({
+    //       type: 'disAndSyn/queryRest',
+    //       payload:{DiseaseId:disAndSyn.diseaseId}
+    //     });
+    //   }
     // });
   };
 
