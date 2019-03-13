@@ -87,6 +87,13 @@ export default {
   //     pathRewrite: { '^/server': '' },
   //   },
   // },
+  proxy: {
+    '/server/api': {
+      target: 'http://localhost:5010/api',
+      changeOrigin: true,
+      pathRewrite: { '^/api/': '' },
+    },
+  },
   ignoreMomentLocale: true,
   lessLoaderOptions: {
     javascriptEnabled: true,

@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Card, Button, Icon, List, Popconfirm } from 'antd';
-import Link from 'umi/link';
 import router from 'umi/router';
 import Ellipsis from '@/components/Ellipsis';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -21,6 +20,12 @@ class CardList extends PureComponent {
         count: 8,
       },
     });
+
+    this.deleteItem();
+  }
+
+  deleteItem = (row) =>{
+    const { list: { list }, } = this.props;
   }
 
   render() {
@@ -28,7 +33,7 @@ class CardList extends PureComponent {
       list: { list },
       loading,
     } = this.props;
-
+    console.log('@list',list)
     return (
       <PageHeaderWrapper title="患者详情">
         <div className={styles.cardList}>
@@ -39,7 +44,7 @@ class CardList extends PureComponent {
             dataSource={['', ...list]}
             renderItem={item =>
               item ? (
-                <List.Item key={item.id}>
+                <List.Item key={item.key}>
                   <Card
                     hoverable
                     className={styles.card}

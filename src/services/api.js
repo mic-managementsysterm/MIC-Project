@@ -126,5 +126,8 @@ export async function getFakeCaptcha(mobile) {
 }
 
 export async function addRecord() {
-  return request(`/api/profile/record`);
+  const path = 'http://localhost:5010/questionnaire/get/getAll';
+  return request(path,{
+    method: 'GET',
+  });
 }

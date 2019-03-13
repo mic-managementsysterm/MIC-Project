@@ -5,14 +5,16 @@ export default {
 
   state: {
     list: [],
+    data:{},
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
-      const response = yield call(addRecord, payload);
+    *fetchRecord(_, { call, put }) {
+      const response = yield call(addRecord);
+      console.log('@response', response)
       yield put({
         type: 'show',
-        payload: response,
+        payload: response.Data,
       });
     },
   },
