@@ -3,6 +3,7 @@ import { notification } from 'antd';
 import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
+import { ParamData } from './buildParams';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -56,6 +57,9 @@ const cachedSave = (response, hashcode) => {
   return response;
 };
 
+
+
+
 /**
  * Requests a URL, returning a promise.
  *
@@ -79,7 +83,7 @@ export default function request(url, option) {
     .digest('hex');
 
   const defaultOptions = {
-    credentials: 'include',
+    credentials: 'omit',
   };
   const newOptions = { ...defaultOptions, ...options };
   if (
@@ -88,14 +92,21 @@ export default function request(url, option) {
     newOptions.method === 'DELETE'
   ) {
     if (!(newOptions.body instanceof FormData)) {
-      newOptions.headers = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-        ...newOptions.headers,
-      };
-      newOptions.body = JSON.stringify(newOptions.body);
-    } else {
-      // newOptions.body is FormData
+      if(newOptions.headers["Content-Type"]==="application/x-www-form-urlencoded"){
+        newOptions.headers = {
+          Accept: 'application/json',
+          ...newOptions.headers,
+        };
+        newOptions.body = ParamData(newOptions.body);
+      }else {
+        newOptions.headers = {
+          Accept: 'application/json',
+          'Content-Type': 'Content-Type; charset=utf-8',
+          ...newOptions.headers,
+        };
+        newOptions.body = JSON.stringify(newOptions.body);
+      }
+    } else{
       newOptions.headers = {
         Accept: 'application/json',
         ...newOptions.headers,
@@ -131,6 +142,7 @@ export default function request(url, option) {
     })
     .catch(e => {
       const status = e.name;
+      console.log("e",e);
       if (status === 401) {
         // @HACK
         /* eslint-disable no-underscore-dangle */
