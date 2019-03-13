@@ -1,4 +1,3 @@
-
 // https://umijs.org/config/
 import os from 'os';
 import pageRoutes from './router.config';
@@ -80,18 +79,11 @@ export default {
     '@antv/data-set': 'DataSet',
     bizcharts: 'BizCharts',
   },
-  // proxy: {
-  //   '/server/api/': {
-  //     target: 'https://preview.pro.ant.design/',
-  //     changeOrigin: true,
-  //     pathRewrite: { '^/server': '' },
-  //   },
-  // },
   proxy: {
-    '/server/api': {
-      target: 'http://localhost:5010/api',
+    '/Api': {
+      target: 'http://localhost:5010/',
       changeOrigin: true,
-      pathRewrite: { '^/api/': '' },
+      pathRewrite: { '^/Api': '' },
     },
   },
   ignoreMomentLocale: true,

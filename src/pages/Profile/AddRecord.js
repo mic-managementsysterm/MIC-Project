@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Col, Row, Button, Divider } from 'antd';
+import { Card, Col, Row, Button, List, Popconfirm, Icon } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import styles from '../List/CardList.less';
+import router from 'umi/router';
 
 @connect(({record,loading}) =>({
   record,
@@ -10,54 +12,60 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
  class AddRecord extends Component{
 
   componentDidMount() {
+    this.getAllQuestionnaire();
+    this.getAllGauge();
+  }
+
+ getAllQuestionnaire = () =>{
+   const { dispatch } = this.props;
+   dispatch({
+     type: 'record/fetchAllQuestionnaire',
+   })
+ }
+
+  getAllGauge = () =>{
     const { dispatch } = this.props;
-    console.log('@props',this.props)
     dispatch({
-      type: 'record/fetchRecord',
+      type: 'record/fetchAllGauge'
     })
   }
 
   render() {
-    const { record:{ list } , loading } = this.props;
-    console.log('@list',list)
+    const { record:{ allQuestionnaireData, allGaugeData } , loading } = this.props;
+    let data = [{Name: "四诊数据采集"}];
+    let Data = [];
+    allQuestionnaireData.map((item,index) =>{
+      Data.push(item)
+    })
+    allGaugeData.map((item,index) =>{
+      Data.push(item)
+    })
+    data = data.concat(Data);
     return(
       <PageHeaderWrapper title="新增记录" loading={loading}>
         <div style={{ background: '#ECECEC', padding: '30px' }}>
-          <Row gutter={16}>
-            <Col span={8}>
-              <Card title="四诊数据采集" bordered={false}>
-                <Button>填写</Button>
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card title="生理数据采集" bordered={false}>
-                <Button>填写</Button>
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card title="量表填写" bordered={false}>
-                <Button>填写</Button>
-              </Card>
-            </Col>
-          </Row>
-          <Divider style={{ marginBottom: 32 }} />
-          <Row gutter={16}>
-            <Col span={8}>
-              <Card title="四诊数据采集" bordered={false}>
-                <Button>填写</Button>
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card title="生理数据采集" bordered={false}>
-                <Button>填写</Button>
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card title="量表填写" bordered={false}>
-                <Button>填写</Button>
-              </Card>
-            </Col>
-          </Row>
+          <div className={styles.cardList}>
+            <List
+              rowKey="id"
+              loading={loading}
+              grid={{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }}
+              dataSource={data}
+              renderItem={item =>
+                (
+                  <List.Item key={item.key}>
+                    <Card
+                      hoverable
+                      className={styles.card}
+                      title={item.Name}
+                      extra={<Button>新增</Button>}
+                    >
+                      Card content
+                    </Card>
+                  </List.Item>
+                )
+              }
+            />
+          </div>
         </div>
       </PageHeaderWrapper>
     );

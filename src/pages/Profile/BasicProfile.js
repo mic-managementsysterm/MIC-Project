@@ -33,7 +33,6 @@ class BasicProfile extends Component {
       diagnosisData = {},
       cognitionData = {},
     } = profile;
-    console.log('@diagnosisData', diagnosisData);
     // @ts-ignore
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>

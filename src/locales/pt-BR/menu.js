@@ -16,6 +16,7 @@ export default {
   'menu.form.advancedform': 'Formulário Avançado',
   'menu.list': 'Lista',
   'menu.list.searchtable': 'Tabela de Busca',
+  'menu.list.diseaseMana': 'disease Mana',
   'menu.list.basiclist': 'Lista Básica',
   'menu.list.cardlist': 'Lista de Card',
   'menu.list.searchlist': 'Lista de Busca',

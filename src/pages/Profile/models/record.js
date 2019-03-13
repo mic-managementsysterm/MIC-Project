@@ -1,20 +1,30 @@
-import { addRecord } from '@/services/api';
+import { getAllQuestionnaire, getAllGauge } from '@/services/api';
 
 export default {
   namespace: 'record',
 
   state: {
-    list: [],
-    data:{},
+    allQuestionnaireData: [],
+    allGaugeData:[]
   },
 
   effects: {
-    *fetchRecord(_, { call, put }) {
-      const response = yield call(addRecord);
-      console.log('@response', response)
+    *fetchAllQuestionnaire({payload}, { call, put }) {
+      const response = yield call(getAllQuestionnaire,payload);
       yield put({
         type: 'show',
-        payload: response.Data,
+        payload: {
+          allQuestionnaireData: response.Data,
+        },
+      });
+    },
+    *fetchAllGauge({payload}, { call, put }) {
+      const response = yield call(getAllGauge);
+      yield put({
+        type: 'show',
+        payload: {
+          allGaugeData: response.Data,
+        },
       });
     },
   },
@@ -23,7 +33,7 @@ export default {
     show(state, action) {
       return {
         ...state,
-        list: action.payload,
+        ...action.payload,
       };
     },
   },

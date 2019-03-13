@@ -20,12 +20,6 @@ class CardList extends PureComponent {
         count: 8,
       },
     });
-
-    this.deleteItem();
-  }
-
-  deleteItem = (row) =>{
-    const { list: { list }, } = this.props;
   }
 
   render() {
@@ -33,7 +27,6 @@ class CardList extends PureComponent {
       list: { list },
       loading,
     } = this.props;
-    console.log('@list',list)
     return (
       <PageHeaderWrapper title="患者详情">
         <div className={styles.cardList}>

@@ -56,6 +56,34 @@ const cachedSave = (response, hashcode) => {
   return response;
 };
 
+const objectToFormData = (obj, urlencoded, namespace) => {
+  let fd = urlencoded || '';
+  let formKey;
+
+  for(let property in obj) {
+    if(obj.hasOwnProperty(property)) {
+      let key = Array.isArray(obj) ? '' : `[${property}]`;
+      if(namespace) {
+        formKey = namespace + key;
+      } else {
+        formKey = property;
+      }
+
+      // if the property is an object, but not a File, use recursivity.
+      if(typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
+        fd = objectToFormData(obj[property], fd, formKey);
+      } else {
+        // if it's a string or a File object
+        if(obj[property] != null){
+          fd += `${formKey}=${obj[property]}&`
+        }
+
+      }
+    }
+  }
+  return fd;
+}
+
 /**
  * Requests a URL, returning a promise.
  *
@@ -79,7 +107,7 @@ export default function request(url, option) {
     .digest('hex');
 
   const defaultOptions = {
-    credentials: 'include',
+    credentials: 'omit',
   };
   const newOptions = { ...defaultOptions, ...options };
   if (
@@ -88,14 +116,21 @@ export default function request(url, option) {
     newOptions.method === 'DELETE'
   ) {
     if (!(newOptions.body instanceof FormData)) {
-      newOptions.headers = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-        ...newOptions.headers,
-      };
-      newOptions.body = JSON.stringify(newOptions.body);
-    } else {
-      // newOptions.body is FormData
+      if(newOptions.headers["Content-Type"]==="application/x-www-form-urlencoded"){
+        newOptions.headers = {
+          Accept: 'application/json',
+          ...newOptions.headers,
+        };
+        newOptions.body = objectToFormData(newOptions.body);
+      }else {
+        newOptions.headers = {
+          Accept: 'application/json',
+          'Content-Type': 'Content-Type; charset=utf-8',
+          ...newOptions.headers,
+        };
+        newOptions.body = JSON.stringify(newOptions.body);
+      }
+    } else{
       newOptions.headers = {
         Accept: 'application/json',
         ...newOptions.headers,
