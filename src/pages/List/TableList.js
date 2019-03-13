@@ -28,30 +28,74 @@ const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
+const clearRespondent = {
+  Id: "",
+  Name: "",
+  Gender: 0,
+  Born: "1949-10-01",
+  Education: "",
+  MaritalStatus: 0,
+  DwellingStatus: 0,
+  Hobby: "",
+  Phone: "",
+  IDCard: "",
+  Address: "",
+  RecordUserId: "3c5e636a-c182-4ad7-a7b1-9205bbe534f5",
+  CreatedAt: ""
+};
 
 const CreateForm = Form.create()(props => {
-  const { Visit, modalVisible, form, handleAdd, handleModalVisible } = props;
+  const { respondent: { Respondent,modalVisible }, form, dispatch,  } = props;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      Visit.Name = fieldsValue.Name;
-      Visit.Education = fieldsValue.Education;
-      Visit.Hobby = fieldsValue.Hobby;
-      Visit.Phone = fieldsValue.Phone;
-      Visit.IDCard = fieldsValue.IDCard;
-      Visit.Address = fieldsValue.Address;
-      handleAdd(Visit);
+      Respondent.Name = fieldsValue.Name;
+      Respondent.Education = fieldsValue.Education;
+      Respondent.Hobby = fieldsValue.Hobby;
+      Respondent.Phone = fieldsValue.Phone;
+      Respondent.IDCard = fieldsValue.IDCard;
+      Respondent.Address = fieldsValue.Address;
+      dispatch({
+        type: 'respondent/addOrUpRespondent',
+        payload: {
+          ...Respondent,
+        },
+        callback:()=>{
+          dispatch({
+            type: 'respondent/queryRespondent',
+          });
+        }
+      });
       form.resetFields();
+      dispatch({
+        type: 'respondent/setStates',
+        payload: {
+          Respondent:clearRespondent,
+          modalVisible:false
+        },
+      });
     });
   };
+
+  const handleCancel =() =>{
+    form.resetFields();
+    dispatch({
+      type: 'respondent/setStates',
+      payload: {
+        Respondent:clearRespondent,
+        modalVisible:false
+      },
+    });
+  };
+
   return (
     <Modal
       destroyOnClose
       width={640}
       title="新增患者"
       visible={modalVisible}
-      onOk={okHandle}
-      onCancel={() => handleModalVisible()}
+      onOk={() => okHandle()}
+      onCancel={() => handleCancel()}
     >
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
         {form.getFieldDecorator('Name', {
@@ -60,7 +104,7 @@ const CreateForm = Form.create()(props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
         <RadioGroup
-          onChange={value => {Visit.Gender = value.target.value}}
+          onChange={value => {Respondent.Gender = value.target.value}}
           defaultValue={0}
         >
           <Radio value={1}>男</Radio>
@@ -70,7 +114,7 @@ const CreateForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
         <DatePicker
           placeholder="请选择患者出生日期"
-          onChange={value => {Visit.Born = value.format("YYYY-MM-DD")}}
+          onChange={value => {Respondent.Born = value.format("YYYY-MM-DD")}}
         />
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="教育程度">
@@ -83,7 +127,7 @@ const CreateForm = Form.create()(props => {
           defaultValue={0}
           style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
           placeholder="请选择患者婚姻状况"
-          onChange={value => {Visit.MaritalStatus = value}}
+          onChange={value => {Respondent.MaritalStatus = value}}
         >
           <Option value={0}>未婚</Option>
           <Option value={1}>已婚</Option>
@@ -94,7 +138,7 @@ const CreateForm = Form.create()(props => {
           defaultValue={0}
           style={{ width: 120,paddingBottom: 10}}
           placeholder="请选择患者居住状况"
-          onChange={value => {Visit.DwellingStatus = value}}
+          onChange={value => {Respondent.DwellingStatus = value}}
         >
           <Option value={0}>独自居住</Option>
           <Option value={1}>夫妻同居</Option>
@@ -127,28 +171,13 @@ const CreateForm = Form.create()(props => {
 
 @Form.create()
 class UpdateForm extends PureComponent {
-  static defaultProps = {
-    handleUpdate: () => {},
-    handleUpdateModalVisible: () => {},
-    values: {},
-  };
-
-  constructor(props) {
-    super(props);
-    const { Visit } = this.props;
-    this.state = {
-      Respondent:Visit,
-    };
-
-    this.formLayout = {
+    formLayout = {
       labelCol: { span: 7 },
       wrapperCol: { span: 13 },
     };
-  }
 
   handleUpdateIn = () =>{
-    const { handleUpdateModalVisible, form, handleUpdate } = this.props;
-    const { Respondent } = this.state;
+    const { respondent: { Respondent }, form, dispatch } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       Respondent.Name = fieldsValue.Name;
@@ -157,15 +186,42 @@ class UpdateForm extends PureComponent {
       Respondent.Phone = fieldsValue.Phone;
       Respondent.IDCard = fieldsValue.IDCard;
       Respondent.Address = fieldsValue.Address;
-      handleUpdate(Respondent);
-      handleUpdateModalVisible(false);
+      dispatch({
+        type: 'respondent/addOrUpRespondent',
+        payload: {
+          ...Respondent,
+        },
+        callback:()=>{
+          dispatch({
+            type: 'respondent/queryRespondent',
+          });
+        }
+      });
       form.resetFields();
+      dispatch({
+        type: 'respondent/setStates',
+        payload: {
+          Respondent:clearRespondent,
+          updateModalVisible:false
+        },
+      });
+    });
+  };
+
+  onCancel =() =>{
+    const { form, dispatch } = this.props;
+    form.resetFields();
+    dispatch({
+      type: 'respondent/setStates',
+      payload: {
+        Respondent:clearRespondent,
+        updateModalVisible:false
+      },
     });
   };
 
   render() {
-    const { updateModalVisible, handleUpdateModalVisible, form } = this.props;
-    const { Respondent } = this.state;
+    const {respondent: { Respondent,updateModalVisible }, form } = this.props;
     return (
       <Modal
         width={640}
@@ -173,7 +229,7 @@ class UpdateForm extends PureComponent {
         destroyOnClose
         title="编辑信息"
         visible={updateModalVisible}
-        onCancel={() => handleUpdateModalVisible(false)}
+        onCancel={() => this.onCancel()}
         onOk={() => this.handleUpdateIn()}
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
@@ -251,33 +307,12 @@ class UpdateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ rule, loading }) => ({
-  rule,
+@connect(({ respondent, loading }) => ({
+  respondent,
   loading: loading.models.rule,
 }))
 @Form.create()
 class TableList extends PureComponent {
-  state = {
-    modalVisible: false,
-    updateModalVisible: false,
-    selectedRows: [],
-    formValues: {},
-    Respondent : {
-      Id: "",
-      Name: "",
-      Gender: 0,
-      Born: "1949-10-01",
-      Education: "",
-      MaritalStatus: 0,
-      DwellingStatus: 0,
-      Hobby: "",
-      Phone: "",
-      IDCard: "",
-      Address: "",
-      RecordUserId: "3c5e636a-c182-4ad7-a7b1-9205bbe534f5",
-      CreatedAt: ""
-    },
-  };
 
   columns = [
     {
@@ -304,8 +339,8 @@ class TableList extends PureComponent {
     {
       title: '操作',
       render: (text, record) => {
-        const {rule:{data}} = this.props;
-        return data.list.length >= 1
+        const {respondent:{dataSource}} = this.props;
+        return dataSource.length >= 1
           ? (
             <div key={record.Id}>
               <Link to={
@@ -327,13 +362,12 @@ class TableList extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'rule/fetch',
+      type: 'respondent/queryRespondent',
     });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch } = this.props;
-    const { formValues } = this.state;
+    const { dispatch, formValues } = this.props;
 
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
@@ -352,8 +386,8 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'rule/fetch',
-      payload: params,
+      type: 'respondent/queryRespondent',
+      payload: {},
     });
   };
 
@@ -364,104 +398,95 @@ class TableList extends PureComponent {
   handleFormReset = () => {
     const { form, dispatch } = this.props;
     form.resetFields();
-    this.setState({
-      formValues: {},
+    dispatch({
+      type: 'respondent/setStates',
+      payload: {formValues:{}},
     });
     dispatch({
-      type: 'rule/fetch',
+      type: 'respondent/queryRespondent',
       payload: {},
     });
   };
 
   handleSelectRows = rows => {
-    this.setState({
-      selectedRows: rows,
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'respondent/setStates',
+      payload: {selectedRows:rows},
     });
   };
 
   handleSearch = e => {
     e.preventDefault();
-
     const { dispatch, form } = this.props;
-
     form.validateFields((err, fieldsValue) => {
-      if (err) return;
       const { key } = fieldsValue;
       dispatch({
-        type: 'rule/fetch',
+        type: 'respondent/queryRespondent',
         payload: {
-          searchKey:key
+          key:key
         },
       });
     });
   };
 
   handleModalVisible = flag => {
-    this.setState({
-      modalVisible: !!flag,
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'respondent/setStates',
+      payload: {modalVisible:!!flag},
     });
   };
 
   handleUpdateModalVisible = (flag, record) => {
-    const { Respondent } = this.state;
-    this.state.Respondent =  record || Respondent;
-    this.setState({
-      updateModalVisible: !!flag,
-      Respondent: record || Respondent,
-    });
-  };
-
-  handleAdd = respondent => {
     const { dispatch } = this.props;
+    let newRecord = Object.assign({},record);
+    if(flag){
+      newRecord.MaritalStatus = 0;
+      newRecord.DwellingStatus = 0;
+      newRecord.Gender = 0;
+    }
     dispatch({
-      type: 'rule/add',
+      type: 'respondent/setStates',
       payload: {
-        ...respondent,
+        updateModalVisible:!!flag,
+        Respondent:record?newRecord:clearRespondent
       },
     });
-
-    message.success('添加成功');
-    this.handleModalVisible();
   };
 
-  handleUpdate = (record) => {
-    const { dispatch } = this.props;
-    const { Respondent } = this.state;
-    dispatch({
-      type: 'rule/update',
-      payload: {
-        query: Respondent.Id,
-        body: {
-          ...record,
-          Id:Respondent.Id
-        },
-      },
-    });
-
-    message.success('配置成功');
-    this.handleUpdateModalVisible();
-  };
 
   handleDelete = () => {
-    const { selectedRows } = this.state;
-    const { dispatch } = this.props;
+    const { dispatch, respondent: { selectedRows }, } = this.props;
+    let Ids =[];
+    selectedRows.map(item => {
+      Ids.push(item.Id)
+    });
     dispatch({
-      type: 'rule/remove',
+      type: 'respondent/removeRespondent',
       payload: {
-        rows:selectedRows,
+        Ids:Ids,
       },
+      callback:() => {
+        dispatch({
+          type: 'respondent/queryRespondent',
+          payload: {},
+        })
+      }
     });
 
     message.success('删除成功');
 
-    this.setState({selectedRows:[]});
+    dispatch({
+      type: 'respondent/setStates',
+      payload: {
+        selectedRows:[],
+      },
+    });
   };
 
   renderSimpleForm() {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    const { selectedRows } = this.state;
+    const {form: { getFieldDecorator },respondent: { selectedRows }} = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
@@ -469,7 +494,7 @@ class TableList extends PureComponent {
             <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               新建
             </Button>
-            {selectedRows.length > 0 && (
+            {selectedRows.length >=1 && (
               <span>
                 <Button onClick={() => this.handleDelete()}>批量删除</Button>
               </span>
@@ -478,7 +503,7 @@ class TableList extends PureComponent {
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
               <Input placeholder="请输入姓名或身份证号码" style={{ width: 400,marginRight:20 }} />
-               )}
+            )}
             <Button type="primary" htmlType="submit">
                 查询
             </Button>
@@ -492,21 +517,14 @@ class TableList extends PureComponent {
   }
 
   render() {
-    const {
-      rule: { data },
-      loading,
-    } = this.props;
-    const { Respondent, selectedRows, modalVisible, updateModalVisible } = this.state;
-
-    const parentMethods = {
-      Visit:Respondent,
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
-    const updateMethods = {
-      handleUpdateModalVisible: this.handleUpdateModalVisible,
-      handleUpdate: this.handleUpdate,
-      Visit:Respondent,
+    const { respondent: { dataSource,selectedRows }, loading, } = this.props;
+    const data ={
+      list: dataSource,
+      pagination: {
+        total: dataSource.length,
+        pageSize:10,
+        current:1
+      },
     };
     return (
       <PageHeaderWrapper title="查询表格">
@@ -523,11 +541,8 @@ class TableList extends PureComponent {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        <UpdateForm
-          {...updateMethods}
-          updateModalVisible={updateModalVisible}
-        />
+        <CreateForm {...this.props} />
+        <UpdateForm {...this.props} />
       </PageHeaderWrapper>
     );
   }
