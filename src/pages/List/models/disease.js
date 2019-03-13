@@ -52,7 +52,7 @@ export default {
     },
     *changeId({ payload, callback }, { put }) {
       yield put({
-        type: 'disAndSyn/changeId',
+        type: 'changeId',
         payload: {
           ...payload
         },

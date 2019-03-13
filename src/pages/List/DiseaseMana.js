@@ -366,6 +366,7 @@ class DiseaseMana extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'disease/queryDisease',
+      payload:{}
     });
   }
 
