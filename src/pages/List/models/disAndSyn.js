@@ -10,7 +10,7 @@ export default {
   },
 
   effects: {
-    *changeId({ payload, callback }, { put}){
+    *changeIdEff({ payload, callback }, { put}){
       yield put({
         type:"changeId",
         payload:payload
@@ -22,16 +22,17 @@ export default {
       yield put({
         type: 'set',
         payload: {
-          relateSyn:response.Data
+          relateSyn:response.Data || []
         },
       });
     },
     *queryRest({ payload, callback }, { call, put }) {
       const response = yield call(queryRest, payload);
+      const {Data:{rows}} = response
       yield put({
         type: 'set',
         payload: {
-          restSyn:response.Data
+          restSyn:rows || []
         },
       });
       if (callback) callback();
@@ -64,7 +65,7 @@ export default {
     changeId(state, action){
       return {
         ...state,
-        diseaseId:action.payload.diseaseId
+        diseaseId:action.payload
       }
     },
     set(state, action) {
