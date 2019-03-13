@@ -50,16 +50,6 @@ export default {
       });
       if(callback) callback();
     },
-    *changeId({ payload, callback }, { put }) {
-      yield put({
-        type: 'changeId',
-        payload: {
-          ...payload
-        },
-      });
-      if(callback) callback();
-    },
-
   },
 
   reducers: {

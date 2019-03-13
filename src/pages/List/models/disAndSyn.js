@@ -63,6 +63,7 @@ export default {
     changeId(state, action){
       return {
         ...state,
+        diseaseId:action.payload.diseaseId
       }
     },
     set(state, action) {
