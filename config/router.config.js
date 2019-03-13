@@ -162,6 +162,23 @@ export default [
             component: './Profile/BasicProfile',
           },
           {
+            name: '新增记录',
+            path: '/profile/record',
+            component: './Profile/AddRecord',
+          },{
+            name: 'MMSE',
+            path: '/profile/mmse',
+            component: './Profile/MMSE',
+          },{
+            name: 'MOCA',
+            path: '/profile/moca',
+            component: './Profile/MOCA',
+          },{
+            name: '理化检查详情',
+            path: '/profile/physicochemical',
+            component: './Profile/physicochemical',
+          },
+          {
             path: '/profile/advanced',
             name: 'advanced',
             authority: ['admin'],

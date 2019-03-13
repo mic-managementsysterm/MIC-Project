@@ -142,7 +142,6 @@ export default function request(url, option) {
     })
     .catch(e => {
       const status = e.name;
-      console.log("e",e);
       if (status === 401) {
         // @HACK
         /* eslint-disable no-underscore-dangle */
