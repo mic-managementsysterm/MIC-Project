@@ -10,6 +10,7 @@ export default {
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(queryFakeList, payload);
+      console.log('@res',response)
       yield put({
         type: 'queryList',
         payload: Array.isArray(response) ? response : [],

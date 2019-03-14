@@ -103,7 +103,12 @@ export async function queryAdvancedProfile() {
 }
 
 export async function queryFakeList(params) {
-  return request(`/api/fake_list?${stringify(params)}`);
+  console.log('@test',params)
+  const path = `http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`;
+  return request(`http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`,{
+    body: params,
+    method: 'GET',
+  });
 }
 
 export async function removeFakeList(params) {
@@ -162,21 +167,15 @@ export async function getFakeCaptcha(mobile) {
 }
 
 export async function getAllQuestionnaire() {
-  const path = 'http://localhost:5010/questionnaire/get/getAll';
+  const path = `http://localhost:5010/questionnaire/get/getAll`;
   return request(path,{
     method: 'GET',
-    headers:{
-      "Content-Type":"application/x-www-form-urlencoded"
-    }
   });
 }
 
 export async function getAllGauge() {
-  const path = 'http://localhost:5010/gaugetable/get/lib';
+  const path = `http://localhost:5010/gaugetable/get/lib`;
   return request(path,{
     method: 'GET',
-    headers:{
-      "Content-Type":"application/x-www-form-urlencoded"
-    }
   });
 }

@@ -13,13 +13,15 @@ import styles from './CardList.less';
 }))
 class CardList extends PureComponent {
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, location } = this.props;
     dispatch({
       type: 'list/fetch',
       payload: {
         count: 8,
+        Id: this.props.location.query.Id,
       },
     });
+    console.log('@123',this.props.location.query.Id)
   }
 
   render() {
@@ -27,6 +29,7 @@ class CardList extends PureComponent {
       list: { list },
       loading,
     } = this.props;
+    console.log('@props',this.props)
     return (
       <PageHeaderWrapper title="患者详情">
         <div className={styles.cardList}>
