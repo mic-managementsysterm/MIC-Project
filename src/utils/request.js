@@ -1,5 +1,5 @@
 import fetch from 'dva/fetch';
-import { notification } from 'antd';
+import { notification,message } from 'antd';
 import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
@@ -129,7 +129,11 @@ export default function request(url, option) {
       sessionStorage.removeItem(`${hashcode}:timestamp`);
     }
   }
-  return fetch(url, newOptions)
+  const timeOut = new Promise((resolve,reject)=> {
+    setTimeout(() => reject(new Error('Request_Timeout')), 5000);
+  });
+
+  return Promise.race([fetch(url, newOptions),timeOut])
     .then(checkStatus)
     .then(response => cachedSave(response, hashcode))
     .then(response => {
@@ -141,8 +145,12 @@ export default function request(url, option) {
       return response.json();
     })
     .catch(e => {
+      console.log("request error",e);
+      if (e === "Request_Timeout") {
+        message.error("请求超时");
+        return;
+      }
       const status = e.name;
-      console.log("e",e);
       if (status === 401) {
         // @HACK
         /* eslint-disable no-underscore-dangle */
@@ -162,6 +170,8 @@ export default function request(url, option) {
       }
       if (status >= 404 && status < 422) {
         router.push('/exception/404');
+        return;
       }
+      message.error("请求出现错误！")
     });
 }
