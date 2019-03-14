@@ -99,24 +99,7 @@ export default [
           {
             path: '/list/table-list',
             name: 'searchtable',
-            component: './User/disease-related',
-          },
-          {
-            path: '/list/question',
-            name: 'question',
-            component: './User/questionnaire/ques',
-          },
-          {
-            hideInMenu:true,
-            path: '/list/question/edit',
-            name: 'questionEdit',
-            component: './User/questionnaire/edit',
-          },
-          {
-            hideInMenu:true,
-            path: '/list/question/add',
-            name: 'questionAdd',
-            component: './User/questionnaire/add',
+            component: './List/TableList',
           },
           {
             path: '/list/basic-list',
@@ -127,6 +110,11 @@ export default [
             path: '/list/card-list',
             name: 'cardlist',
             component: './List/CardList',
+          },
+          {
+            path: '/list/disease-mana',
+            name: 'diseaseMana',
+            component: './List/DiseaseMana',
           },
           {
             path: '/list/search',
@@ -172,6 +160,23 @@ export default [
             name: 'basic',
             hideInMenu: true,
             component: './Profile/BasicProfile',
+          },
+          {
+            name: '新增记录',
+            path: '/profile/record',
+            component: './Profile/AddRecord',
+          },{
+            name: 'MMSE',
+            path: '/profile/mmse',
+            component: './Profile/MMSE',
+          },{
+            name: 'MOCA',
+            path: '/profile/moca',
+            component: './Profile/MOCA',
+          },{
+            name: '理化检查详情',
+            path: '/profile/physicochemical',
+            component: './Profile/physicochemical',
           },
           {
             path: '/profile/advanced',

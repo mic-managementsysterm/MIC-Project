@@ -1,9 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 
-export async function getDisease() {
-  return request('/api/disease')
-}
 export async function queryProjectNotice() {
   return request('/api/project/notice');
 }
@@ -45,6 +42,42 @@ export async function updateRule(params = {}) {
     },
   });
 }
+
+
+export async function queryDisease(params) {
+  return request(`/api/disease?${stringify(params)}`);
+}
+
+export async function removeDisease(params) {
+  return request('/api/disease', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'delete',
+    },
+  });
+}
+
+export async function addDisease(params) {
+  return request('/api/disease', {
+    method: 'POST',
+    body: {
+      ...params,
+      method: 'post',
+    },
+  });
+}
+
+export async function updateDisease(params = {}) {
+  return request(`/api/disease?${stringify(params.query)}`, {
+    method: 'POST',
+    body: {
+      ...params.body,
+      method: 'update',
+    },
+  });
+}
+
 
 export async function fakeSubmitForm(params) {
   return request('/api/forms', {
@@ -126,4 +159,24 @@ export async function queryNotices(params = {}) {
 
 export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
+}
+
+export async function getAllQuestionnaire() {
+  const path = 'http://localhost:5010/questionnaire/get/getAll';
+  return request(path,{
+    method: 'GET',
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
+
+export async function getAllGauge() {
+  const path = 'http://localhost:5010/gaugetable/get/lib';
+  return request(path,{
+    method: 'GET',
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
 }
