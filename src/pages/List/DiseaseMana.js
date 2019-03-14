@@ -574,6 +574,7 @@ class DiseaseMana extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              rowKey={item => item.Id}
             />
           </div>
         </Card>
