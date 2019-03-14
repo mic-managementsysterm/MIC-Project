@@ -12,50 +12,37 @@ const data=[
         TotalScore:30
     }
 ]
-const Data=[
-    {
-        title: 'MIC',
+// noinspection JSAnnotator
+const Data= {
+        Name: 'MIC',
         TotalScore:13,
-        PassCore:12,
-        Topics:[
+        PassScore:12,
+      Topics:[
             {
-                name:'选择一个工具',
-                type:0,
-                // score:5,
-                pic:require('../../../assets/img/cognition.jpg'),
-                options:[
-                    {
-                        text:'锤子',
-                        value:5
-                    },
-                    {
-                        text:'锅',
-                        value:0
-                    }
-                ]
+                Id:33033,
+              QuestionnaireId:5556,
+              Title:'选择一个工具',
+                Type:0,
+              TotalScore:5,
+              Image:require('../../../assets/img/cognition.jpg'),
+              Order:null,
+              GroupName:'记忆组',
+              CreatedAt:'2019-03-14'
             },
             {
-                title:'选择一个数字',
-                type:1,
-                // score:1,
-                options:[
-                    {
-                        text:'+1',
-                        value:1
-                    },
-                    {
-                        text:'+2',
-                        value:2
-                    },
-                    {
-                        text:'+3',
-                        value:3
-                    }
-                ]
+              Id:33053,
+              QuestionnaireId:5557,
+              Title:'画钟表',
+              Type:0,
+              TotalScore:5,
+              Image:require('../../../assets/img/cognition.jpg'),
+              Order:null,
+              GroupName:'视空间与执行能力',
+              CreatedAt:'2019-03-14'
             }
         ]
     }
-]
+
 export  default class Index extends Component{
     constructor(props){
         super(props)
