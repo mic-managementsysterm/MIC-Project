@@ -160,3 +160,23 @@ export async function queryNotices(params = {}) {
 export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
 }
+
+export async function getAllQuestionnaire() {
+  const path = 'http://localhost:5010/questionnaire/get/getAll';
+  return request(path,{
+    method: 'GET',
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
+
+export async function getAllGauge() {
+  const path = 'http://localhost:5010/gaugetable/get/lib';
+  return request(path,{
+    method: 'GET',
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
