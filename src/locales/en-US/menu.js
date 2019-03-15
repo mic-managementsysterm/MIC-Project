@@ -31,6 +31,7 @@ export default {
   'menu.profile.diagnosis': 'Diagnosis',
   'menu.profile.physiology': 'Physiology',
   'menu.profile.basic': 'Basic Profile',
+  'menu.profile.cognition': 'Cognition',
   'menu.profile.advanced': 'Advanced Profile',
   'menu.result': 'Result',
   'menu.result.success': 'Success',

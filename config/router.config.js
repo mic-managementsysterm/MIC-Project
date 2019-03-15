@@ -162,6 +162,11 @@ export default [
             component: './Profile/BasicProfile',
           },
           {
+            path: '/profile/cognition',
+            name: 'cognition',
+            component: './Profile/Cognition',
+          },
+          {
             name: 'record',
             path: '/profile/record',
             component: './Profile/AddRecord',

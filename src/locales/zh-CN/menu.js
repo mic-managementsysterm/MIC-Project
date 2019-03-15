@@ -25,6 +25,7 @@ export default {
   'menu.list.searchlist.applications': '搜索列表（应用）',
   'menu.profile': '详情页',
   'menu.profile.basic': '基础详情页',
+  'menu.profile.cognition': '认知筛查量表',
   'menu.profile.record': '新增记录',
   'menu.profile.mmse': 'MMSE',
   'menu.profile.moca': 'MOCA',

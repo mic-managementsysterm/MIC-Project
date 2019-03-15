@@ -25,6 +25,7 @@ export default {
   'menu.list.searchlist.applications': 'Lista de Busca(aplicações)',
   'menu.profile': 'Perfil',
   'menu.profile.basic': 'Perfil Básico',
+  'menu.profile.cognition': 'Cognition',
   'menu.profile.record': 'Record',
   'menu.profile.mmse': 'MMSE',
   'menu.profile.moca': 'MOCA',

@@ -103,8 +103,6 @@ export async function queryAdvancedProfile() {
 }
 
 export async function queryFakeList(params) {
-  console.log('@test',params)
-  const path = `http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`;
   return request(`http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`,{
     // body: params,
     // method: 'GET',
