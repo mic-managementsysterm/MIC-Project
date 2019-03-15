@@ -8,16 +8,29 @@ const format = (arr,) => {
   arr.map( item => {
     let title = "四诊记录表";
     let description = `创建时间：${item.CreatedAt}\n主诉：${item.ZS}`;
-    let path = "/default";
+    let path = `/profile/basic?Id=${item.Id}`;
     if(item.GaugeName){
       title = item.GaugeName;
       description = `创建时间：${item.CreatedAt}\n点击查看理化检查详情`;
-      path = "/gauge"
+      path = `/profile/physicochemical?Id=${item.Id}`
     }
     if(item.QuestionnaireName){
       title = item.QuestionnaireName;
       description =`创建时间：${item.CreatedAt}\n总分：${item.TotalScore}\n及格分：${item.PassScore}\t得分：${item.Score}`;
-      path = "/questionnaire"
+      switch (item.QuestionnaireId){
+        case "16c7071b-ec13-4788-bfce-123774b8e347":
+          path = "/profile/cognition";
+          break;
+        case "39c66d1e-cab6-412d-918b-5fb895e545d7":
+          path = "/profile/moca";
+          break;
+        case "87f5a6b4-ee86-4b2f-a984-1dc6edc77e9c":
+          path = "/profile/mmse";
+          break;
+        default:
+          path = "/exception/404"
+      }
+      path += `?Id=${item.Id}`
     }
     newArr.push({
       title:title,
