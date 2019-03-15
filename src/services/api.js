@@ -103,7 +103,7 @@ export async function queryAdvancedProfile() {
 }
 
 export async function queryFakeList(params) {
-  return request(`/api/fake_list?${stringify(params)}`);
+  return request(`http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`);
 }
 
 export async function removeFakeList(params) {
