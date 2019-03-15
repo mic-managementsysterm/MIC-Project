@@ -1,6 +1,7 @@
 import React from 'react';
 import {Spin , DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Upload ,Row,message } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload/interface';
+import { connect } from 'dva';
 // import './Edit.css';
 
 // const list = localStorage.list ? JSON.parse(localStorage.list) : [];
@@ -8,7 +9,10 @@ const list=[]
 // const editing = localStorage.editing ? JSON.parse(localStorage.editing) : [];
 const fileList=[]
 
-
+@connect(({question,loading})=>({
+  question,
+  loading:loading.models.loading
+}))
 class Edit extends React.Component {
   constructor(props) {
     super(props);
@@ -43,17 +47,17 @@ class Edit extends React.Component {
         TotalScore: null,
         PassScore:  null,
         Topics:     [
-          // {
-          //     // Id:              null,
-          //     // QuestionnaireId: null,
-          //     // Title:           null,
-          //     // Image :          null,
-          //     // Order:           null,
-          //     // GroupName:       null,
-          //     // TotalScore:      null,
-          //     // Type:            null,
-          //     // CreatedAt:       null /* 2018-07-23 10:04:30 */
-          // }
+          {
+              Id:              null,
+              QuestionnaireId: null,
+              Title:           null,
+              Image :          null,
+              Order:           null,
+              GroupName:       null,
+              TotalScore:      null,
+              Type:            null,
+              CreatedAt:       null /* 2018-07-23 10:04:30 */
+          }
         ],
         CreatedAt:  null,
       }
@@ -78,12 +82,29 @@ class Edit extends React.Component {
     })
   }
   componentWillMount(){
-    const data=this.props.location.state.data
-    console.log('@data',data)
-    this.setState({
-      questions:data
-    })
+    const Id=this.props.location.state.Id
+    // console.log('@data',data)
+    this.getQuestion(Id)
+     console.log("@id",Id)
+
   }
+  getQuestion=(Id)=>{
+    const {dispatch}=this.props
+    dispatch({
+      type:'question/getQuestion',
+      payload:{
+        Id
+      },callback:()=>{
+        const {question:{question}}=this.props
+        console.log("@callback",question)
+        this.setState({
+                questions:question
+        })
+      }
+    })
+    console.log('@data',this.state.questions)
+  }
+
   handleTitleChange(e) {
     this.state.questions.Name=e.target.value
     this.setState({
@@ -369,11 +390,11 @@ class Edit extends React.Component {
     return (
       this.state.titleEditable ? (
         <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 3, textAlign: 'center' }} onClick={this.handleTitleClick}>
-          <Input style={{ fontSize: 18, fontWeight: 'bold', padding: 30, textAlign: 'center' }} value={this.state.title} onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} />
+          <Input style={{ fontSize: 18, fontWeight: 'bold', padding: 30, textAlign: 'center' }} value={this.state.questions.Name} onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} />
         </div>
       ) : (
         <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 20, textAlign: 'center' }} onClick={this.handleTitleClick}>
-          <h2><strong>{this.state.title}</strong></h2>
+          <h2><strong>{this.state.questions.Name}</strong></h2>
         </div>
       )
     );

@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import { Table, Button, Popconfirm } from 'antd';
 import Link from 'umi/link';
+import { connect } from 'dva';
+import moment from 'moment';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import './index.less'
 const data=[
     {
-        name:'MoCA评分量表',
+      Name:'MoCA评分量表',
         TotalScore:25
     },
     {
-        name:'认知筛查量表',
+      Name:'认知筛查量表',
         TotalScore:30
     }
 ]
@@ -42,7 +45,10 @@ const Data= {
             }
         ]
     }
-
+ @connect(({question,loading})=>({
+  question,
+  loading:loading.models.question
+}))
 export  default class Index extends Component{
     constructor(props){
         super(props)
@@ -51,16 +57,28 @@ export  default class Index extends Component{
             columns:[
                 {
                     title:'题目',
-                    dataIndex:'name',
-                    key:'name',
+                    dataIndex:'Name',
+                    key:'Name',
                     align:'center'
                 },
                 {
-                    title:'分数',
-                    dataIndex:'TotalScore',
-                    key:'TotalScore',
+                    title:'创建时间',
+                    dataIndex:'CreatedAt',
+                    key:'CreatedAt',
                     align:'center'
                 },
+              {
+                title:'总分',
+                dataIndex:'TotalScore',
+                key:'TotalScore',
+                align:'center'
+              },
+              {
+                title:'得分',
+                dataIndex:'PassScore',
+                key:'PassScore',
+                align:'center'
+              },
                 {
                     title:'操作',
                     dataIndex:'operation',
@@ -69,11 +87,12 @@ export  default class Index extends Component{
                         this.state.data.length>=1?
                             (   <div className='operation'>
                                     <Link to={{
-                                        pathname:'/list/question/edit',
-                                        state:{data:Data}
+                                        pathname:'/list/question-list/questionEdit-list',
+                                        state:{Id:record.Id}
                                     }}>
                                     <Button className='btn'>编辑</Button>
                                     </Link>
+                                  <Button>填写</Button>
                                 <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>
                                     <Button>删除</Button>
                                 </Popconfirm>
@@ -83,17 +102,34 @@ export  default class Index extends Component{
             ]
         }
     }
-
+componentWillMount(){
+  this.fetchQuestionList()
+}
+   fetchQuestionList=()=>{
+       const {dispatch}=this.props
+         dispatch({
+           type:'question/fetchQuestionList'
+         })
+     const {question:{questions}}=this.props
+     console.log('@question',questions)
+}
     render(){
+      const {question:{questions},loading}=this.props
+      questions.map((que,index)=>{
+        que.CreatedAt=moment(que.CreatedAt).format('YYYY-MM-DD HH:mm:ss')
+      })
+      // console.log('@question',questions)
         return(
+          <PageHeaderWrapper loading={loading}>
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
-              <Link to={'/list/question/add'}>
+              <Link to={'/list/question-list/questionAdd-list'}>
                 <Button className={'btn2'} style={{marginBottom:5,}} >添加</Button>
               </Link>
               </div>
-                <Table align={'center'} columns={this.state.columns} dataSource={this.state.data}></Table>
+                <Table style={{backgroundColor:'#ffffff'}} align={'center'} columns={this.state.columns} dataSource={questions}></Table>
             </div>
+          </PageHeaderWrapper>
         )
     }
 }

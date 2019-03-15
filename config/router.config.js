@@ -107,6 +107,23 @@ export default [
             component: './List/BasicList',
           },
           {
+            path: '/list/question-list',
+            name: 'question',
+            component: './User/questionnaire/ques',
+          },
+          {
+            path: '/list/question-list/questionAdd-list',
+            hideInMenu:true,
+            name: 'question-add',
+            component: './User/questionnaire/add',
+          },
+          {
+            path: '/list/question-list/questionEdit-list',
+            hideInMenu:true,
+            name: 'questionEdit',
+            component: './User/questionnaire/edit',
+          },
+          {
             path: '/list/card-list',
             name: 'cardlist',
             component: './List/CardList',

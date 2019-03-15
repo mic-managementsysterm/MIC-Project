@@ -17,6 +17,7 @@ export default {
   'menu.list': '列表页',
   'menu.list.searchtable': '查询表格',
   'menu.list.diseaseMana': '疾病管理',
+  'menu.list.question':'量表管理',
   'menu.list.basiclist': '标准列表',
   'menu.list.cardlist': '患者详情',
   'menu.list.searchlist': '搜索列表',
