@@ -162,21 +162,26 @@ export default [
             component: './Profile/BasicProfile',
           },
           {
-            name: '新增记录',
+            name: 'record',
             path: '/profile/record',
             component: './Profile/AddRecord',
           },{
-            name: 'MMSE',
+            name: 'mmse',
             path: '/profile/mmse',
             component: './Profile/MMSE',
           },{
-            name: 'MOCA',
+            name: 'moca',
             path: '/profile/moca',
             component: './Profile/MOCA',
           },{
-            name: '理化检查详情',
-            path: '/profile/physicochemical',
-            component: './Profile/physicochemical',
+            name: 'diagnosis',
+            path: '/profile/diagnosis',
+            component: './Profile/Diagnosis',
+          },
+          {
+            name: 'physiology',
+            path: '/profile/physiology',
+            component: './Profile/Physiology',
           },
           {
             path: '/profile/advanced',

@@ -18,18 +18,17 @@ class CardList extends PureComponent {
       type: 'list/fetch',
       payload: {
         count: 8,
-        Id: this.props.location.query.Id,
+        RespondentId: this.props.location.query.Id,
       },
     });
-    console.log('@123',this.props.location.query.Id)
   }
 
   render() {
     const {
-      list: { list },
+      list: { list,data },
       loading,
     } = this.props;
-    console.log('@props',this.props)
+    console.log('@data',data)
     return (
       <PageHeaderWrapper title="患者详情">
         <div className={styles.cardList}>
@@ -37,7 +36,7 @@ class CardList extends PureComponent {
             rowKey="id"
             loading={loading}
             grid={{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }}
-            dataSource={['', ...list]}
+            dataSource={['',...list]}
             renderItem={item =>
               item ? (
                 <List.Item key={item.key}>
@@ -58,7 +57,7 @@ class CardList extends PureComponent {
                       title={<a>{item.title}</a>}
                       description={
                         <Ellipsis className={styles.item} lines={3}>
-                          {item.description}
+                          {/*{item.description}*/}
                         </Ellipsis>
                       }
                     />
