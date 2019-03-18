@@ -479,7 +479,7 @@ class DiseaseMana extends PureComponent {
 
   // relate
   handleRelateVisible = (flag, record) => {
-    const { dispatch,disAndSyn } = this.props;
+    const { dispatch } = this.props;
     dispatch({
       type: 'disease/setStates',
       payload: {

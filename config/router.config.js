@@ -165,18 +165,26 @@ export default [
             name: '新增记录',
             path: '/profile/record',
             component: './Profile/AddRecord',
-          },{
+          },
+          {
             name: 'MMSE',
             path: '/profile/mmse',
             component: './Profile/MMSE',
-          },{
+          },
+          {
             name: 'MOCA',
             path: '/profile/moca',
             component: './Profile/MOCA',
-          },{
+          },
+          {
             name: '理化检查详情',
             path: '/profile/physicochemical',
             component: './Profile/physicochemical',
+          },
+          {
+            name: '问卷',
+            path: '/profile/questionnaire',
+            component: './Profile/Add/AddQuestionnaire',
           },
           {
             path: '/profile/advanced',
