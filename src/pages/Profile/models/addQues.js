@@ -144,7 +144,6 @@ export default {
     },
     setInfos(state, { payload }) {
       let newInfos = state.newQues.Infos.slice();
-      console.log("newinfo",newInfos)
       newInfos[payload.index][payload.type] = payload.value;
       return {
         ...state,

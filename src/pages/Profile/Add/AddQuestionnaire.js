@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Button, List, Select } from 'antd';
+import { Row, Button, List, Radio } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './AddQuestionnaire.less';
 
-const {Option} = Select;
+const {Group} = Radio;
 
 @connect(({addQues,loading}) =>({
   addQues,
@@ -40,21 +40,27 @@ class AddRecord extends Component{
   };
 
   uploadQues = () =>{
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'addQues/fetchAllGauge'
-    })
+    const { dispatch, addQues:{newQues} } = this.props;
+    let Score = 0;
+    newQues.Infos.map(item => {
+      Score += item.Score
+    });
+    newQues.Score = Score;
+    // dispatch({
+    //   type: 'addQues/fetchAllGauge'
+    // })
+    console.log("upload",newQues)
   };
 
   renderSelect = (itemin,total) => {
     const { dispatch } = this.props;
-    let handleChange = (value) => {
+    let handleChange = (event) => {
       dispatch({
         type:'addQues/setInfos',
         payload:{
           index:itemin.Order - 1,
           type:"Score",
-          value:value
+          value:event.target.value
         }
       })
     };
@@ -62,54 +68,68 @@ class AddRecord extends Component{
       let option = [];
       if(itemin.Type){
         for(let i = 0;i <= total; i++){
-          option.push(<Option value={i}>+{i}分</Option>)
+          option.push(<Radio value={i}>{i}分</Radio>)
         }
       } else {
-        option.push(<Option value={0}>+{0}分</Option>);
-        total>0 && option.push(<Option value={total}>+{total}分</Option>)
+        option.push(<Radio value={0}>{0}分</Radio>);
+        total>0 && option.push(<Radio value={total}>{total}分</Radio>)
       }
       return option
     };
     return(
-      <Select className="select-score" defaultValue={0} style={{ width: 120 }} onChange={handleChange}>
+      <Group className={styles["select-score"]} defaultValue={0} style={{ width: 120 }} onChange={handleChange}>
         {renderOption()}
-      </Select>
+      </Group>
     )
   };
 
-  renderTopic = (item) => {
+  renderTopic = (item, index) => {
+    const {addQues:{Topics}} = this.props;
+    let renderGroupName = () =>{};
+    let itemClassName = styles["ant-list-item"];
+    if( index > 0 && Topics[index].GroupName !== Topics[index -1].GroupName){
+      itemClassName = styles["ant-list-item-padding"];
+      renderGroupName = () => {
+        return (
+          <span className={styles.title}>{item.GroupName}</span>
+        )
+      };
+    }
+    if(index === 0){
+      renderGroupName = () => {
+        return (
+          <span className={styles.title}>{item.GroupName}</span>
+        )
+      };
+    }
     return(
-      <List.Item key={item.key}>
+      <List.Item className={itemClassName} key={item.Id}>
         <div className={styles.topic}>
           <Row>
-            <Col span={16}>
-              <span>
-                {item.GroupName}
-              </span>
-            </Col>
-            <Col span={8}>
-              {this.renderSelect(item,item.TotalScore)}
-            </Col>
+            {renderGroupName()}
           </Row>
-          <Row>
+          <Row className={styles.title}>
             <span>{`Q${item.Order}${"  "}${item.Title}`}</span>
           </Row>
           {item.Image?
             (<img
               alt="ex"
-              className="image"
+              className={styles.image}
               // src={`http://210.41.215.16:3306${item.Image}`}
               src={require("../../../assets/img/cognition.jpg")}
             />)
           :null}
+          <Row>
+            {this.renderSelect(item,item.TotalScore)}
+          </Row>
         </div>
       </List.Item>
     )
   };
 
+
   render() {
     const { addQues:{Topics} , loading } = this.props;
-
     return(
       <PageHeaderWrapper title="新增问卷" loading={loading}>
         <div style={{ background: '#ECECEC', padding: '30px' }}>
@@ -118,8 +138,13 @@ class AddRecord extends Component{
               rowKey="Id"
               loading={loading}
               dataSource={Topics}
-              renderItem={item =>this.renderTopic(item)}
+              renderItem={(item,index) =>this.renderTopic(item,index)}
             />
+          </div>
+          <div>
+            <Button onClick={()=>this.uploadQues()}>
+              <span>提交</span>
+            </Button>
           </div>
         </div>
       </PageHeaderWrapper>
