@@ -97,7 +97,7 @@ export default function request(url, option) {
           Accept: 'application/json',
           ...newOptions.headers,
         };
-        newOptions.body = ParamData(newOptions.body);
+        newOptions.body = ParamData(newOptions.body,newOptions.traditional);
       }else {
         newOptions.headers = {
           Accept: 'application/json',

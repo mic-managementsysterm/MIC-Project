@@ -44,8 +44,30 @@
 
 .select-score {
   display: inline;
+  padding: 0 0 0 10px;
 }
 
+.submit-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.fileinput-button {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  input{
+    position:absolute;
+    right: 0px;
+    top: 0px;
+    opacity: 0;
+    -ms-filter: 'alpha(opacity=0)';
+    font-size: 200px;
+  }
+}
 
 @media screen and (max-width: @screen-sm) {
   .stepDescription {

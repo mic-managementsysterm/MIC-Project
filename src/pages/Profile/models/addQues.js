@@ -5,7 +5,7 @@ export default {
 
   state: {
     newQues:{
-      RespondentId:"",
+      RespondentId:"fb2413f6-7cea-ea8e-82b3-17b6a9327b68",
       QuestionnaireId:"",
       QuestionnaireName:"",
       TotalScore:0,
@@ -114,6 +114,7 @@ export default {
   reducers: {
     setNewQues(state, { payload }) {
       let newObj ={};
+      let newTopics =[];
       newObj.QuestionnaireId = payload.Id;
       newObj.QuestionnaireName = payload.Name;
       newObj.TotalScore = payload.TotalScore;
@@ -126,6 +127,10 @@ export default {
             Order: item.Order,
             Score: 0,
             Images: []
+          });
+          newTopics.push({
+            ...item,
+            insertImg:""
           })
         });
       }
@@ -133,7 +138,7 @@ export default {
       return {
         ...state,
         newQues:{...state.newQues,...newObj},
-        Topics:payload.Topics,
+        Topics:newTopics,
       };
     },
     setStates(state, { payload }) {
@@ -144,7 +149,13 @@ export default {
     },
     setInfos(state, { payload }) {
       let newInfos = state.newQues.Infos.slice();
-      newInfos[payload.index][payload.type] = payload.value;
+      if(payload.type === "Score"){
+        newInfos[payload.index].Score = payload.value;
+      }else {
+        newInfos[payload.index].Images = [];
+        newInfos[payload.index].Images.push(payload.value);
+      }
+
       return {
         ...state,
         newQues:{...state.newQues,Infos:newInfos},
