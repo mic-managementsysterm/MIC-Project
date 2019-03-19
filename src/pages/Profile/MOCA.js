@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Badge, Table, Divider } from 'antd';
+import { Card, Divider } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
-import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './MOCA.less';
+import GaugeDetail from '@/components/GaugeDetail';
 
 const { Description } = DescriptionList;
 
-@connect(({ profile, loading }) => ({
+@connect(({ profile, detail, loading }) => ({
   profile,
-  loading: loading.effects['profile/fetchBasic'],
+  detail,
+  loading: loading.effects['profile/fetchBasic'] && loading.effects['detail/fetchMOCADetail'],
 }))
 class MOCA extends Component {
   componentDidMount() {
@@ -18,17 +18,27 @@ class MOCA extends Component {
     const { params } = match;
 
     dispatch({
-      type: 'profile/fetchBasic',
+      type: 'detail/fetchMOCADetail',
       payload: params.id || '1000000000',
+    });
+
+    this.getMOCADetail();
+  }
+
+  getMOCADetail = () =>{
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'detail/fetchMOCADetail',
+      payload: {
+        Id: '',
+      },
     });
   }
 
   render() {
-    const { profile = {}, loading } = this.props;
-    const {
-      userInfo = {},
-      mocaData = {},
-    } = profile;
+    const { profile = {}, detail = {}, loading } = this.props;
+    const { userInfo = {} } = profile;
+    const { mocaData = {} } = detail;
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
@@ -41,27 +51,7 @@ class MOCA extends Component {
             <Description term="时间">{userInfo.remark}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
-          <h1>MOcA量表得分 {mocaData.Score}</h1>
-          <div>{mocaData.Infos ? mocaData.Infos.map((item,index) =>{
-            return (
-              <div key={index}>
-                <div className={styles.cognitionContentName}>
-                  <div className={styles.cognitionContentGroupname}>
-                    {(index>0 && mocaData.Infos[index-1].TopicInfo.GroupName == item.TopicInfo.GroupName)?
-                      null:item.TopicInfo.GroupName}
-                  </div>
-                  <div className={styles.cognitionContentDetail}>
-                    <ul className={styles.cognitionContentDetailTitle}>
-                      <li>{item.TopicInfo.Order}.{item.TopicInfo.Title}</li>
-                    </ul>
-                    <ul className={styles.cognitionContentDetailScore}>
-                      <li>{item.Score}</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )
-          }) :null }</div>
+          <GaugeDetail data={mocaData} />
         </Card>
       </PageHeaderWrapper>
     );
