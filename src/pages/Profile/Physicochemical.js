@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Badge, Table, Divider, Icon } from 'antd';
+import { Card, Divider, Icon } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
-import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physicochemical.less';
 
 const { Description } = DescriptionList;
 
-@connect(({ profile, loading }) => ({
+@connect(({ profile, detail, loading }) => ({
   profile,
-  loading: loading.effects['profile/fetchBasic'],
+  detail,
+  loading: loading.effects['profile/fetchBasic'] && loading.effects['detail/fetchPhysicochemicalDetail'],
 }))
 class Physicochemical  extends Component {
   componentDidMount() {
@@ -21,15 +21,25 @@ class Physicochemical  extends Component {
       type: 'profile/fetchBasic',
       payload: params.id || '1000000000',
     });
+
+    this.getPhysicochemicalDetail();
+  }
+
+  getPhysicochemicalDetail = () =>{
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'detail/fetchPhysicochemicalDetail',
+      payload: {
+        Id: '3001'
+      }
+    })
   }
 
   render() {
-    const { profile = {}, loading } = this.props;
-    const {
-      userInfo = {},
-      data = {},
-    } = profile;
-    // @ts-ignore
+    const { profile = {}, detail = {}, loading } = this.props;
+    const { userInfo = {} } = profile;
+    const { physicochemicalData = {} } = detail;
+    console.log('@physicochemicalData',physicochemicalData)
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
@@ -42,13 +52,13 @@ class Physicochemical  extends Component {
             <Description term="时间">{userInfo.remark}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
-          <h1>理化检查详情</h1>
+          <h1>{physicochemicalData&&physicochemicalData.GaugeRecord ? physicochemicalData.GaugeRecord.GaugeName : null}检查详情</h1>
           <div className={styles.physicochemicalContentTitle}>
             <span>测定项目</span>
             <span>测定结果</span>
           </div>
           <div>{
-            data.Data ?  data.Data.RecordInfos.map((item,index) =>{
+            physicochemicalData&&physicochemicalData.RecordInfos ? physicochemicalData.RecordInfos.map((item,index) =>{
             return(
             <div key={index}>
             <span className={styles.groupName}>{item.GroupName}</span>

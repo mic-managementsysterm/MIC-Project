@@ -1,35 +1,43 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Badge, Table, Divider } from 'antd';
+import { Card, Divider } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
-import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './MMSE.less';
+import GaugeDetail from '@/components/GaugeDetail';
 
 const { Description } = DescriptionList;
 
-@connect(({ profile, loading }) => ({
+@connect(({ profile, detail, loading }) => ({
   profile,
-  loading: loading.effects['profile/fetchBasic'],
+  detail,
+  loading: loading.effects['profile/fetchBasic'] && loading.effects['detail/fetchMMSEDetail'],
 }))
 class MMSE extends Component {
   componentDidMount() {
     const { dispatch, match } = this.props;
     const { params } = match;
-
     dispatch({
       type: 'profile/fetchBasic',
       payload: params.id || '1000000000',
     });
+
+    this.getMMSEDetail();
+  }
+
+  getMMSEDetail = () =>{
+    const { dispatch, match } = this.props;
+    dispatch({
+      type: 'detail/fetchMMSEDetail',
+      payload: {
+        Id:''
+      },
+    });
   }
 
   render() {
-    const { profile = {}, loading } = this.props;
-    const {
-      userInfo = {},
-      mmseData = {},
-    } = profile;
-    // @ts-ignore
+    const { profile = {}, detail = {}, loading } = this.props;
+    const { userInfo = {} } = profile;
+    const { mmseData = {} } = detail;
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
@@ -42,27 +50,7 @@ class MMSE extends Component {
             <Description term="时间">{userInfo.remark}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
-          <h1>MMSE量表得分 {mmseData.Score}</h1>
-          <div>{mmseData.Infos ? mmseData.Infos.map((item,index) =>{
-            return (
-              <div key={index}>
-                <div className={styles.cognitionContentName}>
-                  <div className={styles.cognitionContentGroupname}>
-                    {(index>0 && mmseData.Infos[index-1].TopicInfo.GroupName == item.TopicInfo.GroupName)?
-                      null:item.TopicInfo.GroupName}
-                  </div>
-                  <div className={styles.cognitionContentDetail}>
-                    <ul className={styles.cognitionContentDetailTitle}>
-                      <li>{item.TopicInfo.Order}.{item.TopicInfo.Title}</li>
-                    </ul>
-                    <ul className={styles.cognitionContentDetailScore}>
-                      <li>{item.Score}</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )
-          }) :null }</div>
+          <GaugeDetail data={mmseData} />
         </Card>
       </PageHeaderWrapper>
     );

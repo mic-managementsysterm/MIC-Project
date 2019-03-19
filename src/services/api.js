@@ -177,3 +177,40 @@ export async function getAllGauge() {
     method: 'GET',
   });
 }
+
+export async function getCognitionDetail(params) {
+  const path = `http://localhost:5010/questionnairerecord/get/getById?${stringify(params)}`;
+  return request(path,{
+    method: 'GET',
+  });
+}
+
+export async function getMMSEDetail(params) {
+  const path = `http://localhost:5010/questionnairerecord/get/getById?${stringify(params)}`;
+  return request(path,{
+    method: 'GET',
+  });
+}
+
+export async function getMOCADetail(params) {
+  const path = `http://localhost:5010/questionnairerecord/get/getById?${stringify(params)}`;
+  return request(path,{
+    method: 'GET',
+  });
+}
+
+export async function getDiagnosisDetail(params) {
+  const path = `http://localhost:5010/medicalrecord/get/getById?${stringify(params)}`;
+  return request(path,{
+    method: 'GET',
+  });
+}
+
+export async function getPhysicochemicalDetail(params) {
+  const path = `http://localhost:5010/gaugerecord/get/getById?${stringify(params)}`;
+  return request(path,{
+    method: 'GET',
+  });
+}
+
+

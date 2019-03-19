@@ -165,6 +165,10 @@ export default [
             path: '/profile/cognition',
             name: 'cognition',
             component: './Profile/Cognition',
+          },{
+            name: 'physicochemical',
+            path: '/profile/physicochemical',
+            component: './Profile/Physicochemical',
           },
           {
             name: 'record',

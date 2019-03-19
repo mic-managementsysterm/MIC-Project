@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Card, Badge, Table, Divider } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
-import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import GaugeDetail from '@/components/GaugeDetail';
 import styles from './Cognition.less';
 
 const { Description } = DescriptionList;
 
-@connect(({ profile, loading }) => ({
+@connect(({ profile, detail, loading }) => ({
   profile,
-  loading: loading.effects['profile/fetchBasic'],
+  detail,
+  loading: loading.effects['profile/fetchBasic']  && loading.effects['detail/fetchCognitionDetail'],
 }))
 class Cognition extends Component {
   componentDidMount() {
@@ -21,15 +22,24 @@ class Cognition extends Component {
       type: 'profile/fetchBasic',
       payload: params.id || '1000000000',
     });
+
+    this.getCognitionDetail();
+  }
+
+  getCognitionDetail = () =>{
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'detail/fetchCognitionDetail',
+      payload: {
+        Id: '0c7523d0-d157-4918-9ba6-ecfa7bed8527'
+      }
+    })
   }
 
   render() {
-    const { profile = {}, loading } = this.props;
-    const {
-      userInfo = {},
-      cognitionData = {},
-    } = profile;
-    // @ts-ignore
+    const { profile = {}, loading , detail= {}} = this.props;
+    const { userInfo = {} } = profile;
+    const { cognitionData = {} } = detail;
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
@@ -42,27 +52,7 @@ class Cognition extends Component {
             <Description term="时间">{userInfo.remark}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
-          <h1>认知筛查量表得分 {cognitionData.Score}</h1>
-          <div>{cognitionData.Infos ? cognitionData.Infos.map((item,index) =>{
-            return (
-              <div key={index}>
-                <div className={styles.cognitionContentName}>
-                  <div className={styles.cognitionContentGroupname}>
-                    {(index>0 && cognitionData.Infos[index-1].TopicInfo.GroupName == item.TopicInfo.GroupName)?
-                      null:item.TopicInfo.GroupName}
-                  </div>
-                  <div className={styles.cognitionContentDetail}>
-                    <ul className={styles.cognitionContentDetailTitle}>
-                      <li>{item.TopicInfo.Order}.{item.TopicInfo.Title}</li>
-                    </ul>
-                    <ul className={styles.cognitionContentDetailScore}>
-                      <li>{item.Score}</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )
-          }) :null }</div>
+          <GaugeDetail data={cognitionData} />
         </Card>
       </PageHeaderWrapper>
     );
