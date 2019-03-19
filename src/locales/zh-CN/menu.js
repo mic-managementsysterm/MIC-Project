@@ -33,6 +33,7 @@ export default {
   'menu.profile.diagnosis': '四诊数据采集',
   'menu.profile.physiology': '生理数据采集',
   'menu.profile.advanced': '高级详情页',
+  'menu.profile.questionnaire': '问卷',
   'menu.result': '结果页',
   'menu.result.success': '成功页',
   'menu.result.fail': '失败页',

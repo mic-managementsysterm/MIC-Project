@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import Link from 'umi/link';
+import router from 'umi/router';
+import Link from "umi/link";
 import {
   Row,
   Col,

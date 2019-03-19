@@ -55,7 +55,7 @@ const buildParams = (prefix, obj, traditional, add) => {
   }
 }
 
-export const ParamData = (data, traditional = true) => {
+export const ParamData = (data, traditional) => {
   let prefix;
   let  s = [];
   let  add = (key, value)=> {

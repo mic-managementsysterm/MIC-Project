@@ -25,7 +25,8 @@ export async function removeVisit(params) {
     },
     headers:{
       "Content-Type":"application/x-www-form-urlencoded"
-    }
+    },
+    traditional:true
   });
 }
 

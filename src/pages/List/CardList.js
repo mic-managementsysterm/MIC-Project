@@ -15,28 +15,26 @@ class CardList extends PureComponent {
   componentDidMount() {
     const { dispatch, location } = this.props;
     dispatch({
-      type: 'list/fetch',
+      type: 'list/getRecords',
       payload: {
-        count: 8,
-        RespondentId: this.props.location.query.Id,
+        RespondentId: location.query.Id,
       },
     });
   }
 
   render() {
     const {
-      list: { list,data },
+      list: { records },
       loading,
     } = this.props;
-    console.log('@data',data)
     return (
       <PageHeaderWrapper title="患者详情">
         <div className={styles.cardList}>
           <List
-            rowKey="id"
+            rowKey="Id"
             loading={loading}
             grid={{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }}
-            dataSource={['',...list]}
+            dataSource={['', ...records]}
             renderItem={item =>
               item ? (
                 <List.Item key={item.key}>
@@ -44,11 +42,13 @@ class CardList extends PureComponent {
                     hoverable
                     className={styles.card}
                     actions={[
-                        <Button onClick={() => {
-                          router.push('/profile/basic')
-                        }}>查看</Button>,
+                      <a onClick={() => {
+                          router.push(`${item.path}`)
+                        }}
+                      >查看
+                      </a>,
                       <Popconfirm title="确认删除？" okText="确认" cancelText="取消">
-                        <Button>删除</Button>
+                        <a>删除</a>
                       </Popconfirm>,
                     ]}
                   >
@@ -57,7 +57,7 @@ class CardList extends PureComponent {
                       title={<a>{item.title}</a>}
                       description={
                         <Ellipsis className={styles.item} lines={3}>
-                          {/*{item.description}*/}
+                          {item.description}
                         </Ellipsis>
                       }
                     />
@@ -65,9 +65,9 @@ class CardList extends PureComponent {
                 </List.Item>
               ) : (
                 <List.Item>
-                    <Button type="dashed" className={styles.newButton} onClick={() =>{router.push('/profile/record')}} >
-                      <Icon type="plus" /> 新增记录
-                    </Button>
+                  <Button type="dashed" className={styles.newButton} onClick={() =>{router.push('/profile/record')}}>
+                    <Icon type="plus" /> 新增记录
+                  </Button>
                 </List.Item>
               )
             }

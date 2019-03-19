@@ -33,6 +33,7 @@ export default {
   'menu.profile.basic': 'Basic Profile',
   'menu.profile.cognition': 'Cognition',
   'menu.profile.advanced': 'Advanced Profile',
+  'menu.profile.questionnaire': 'Questionnaire',
   'menu.result': 'Result',
   'menu.result.success': 'Success',
   'menu.result.fail': 'Fail',

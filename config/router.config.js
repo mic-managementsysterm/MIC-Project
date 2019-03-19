@@ -193,6 +193,11 @@ export default [
             component: './Profile/Physiology',
           },
           {
+            name: 'questionnaire',
+            path: '/profile/questionnaire',
+            component: './Profile/Add/AddQuestionnaire',
+          },
+          {
             path: '/profile/advanced',
             name: 'advanced',
             authority: ['admin'],
