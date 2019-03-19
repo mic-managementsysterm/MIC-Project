@@ -1,4 +1,4 @@
-import { queryVisit, addOrUpdateVisit, removeVisit} from '@/services/respondentApi';
+import { queryVisit, addOrUpdateVisit, removeVisit} from '@/services/coustomApi/respondentApi';
 
 export default {
   namespace: 'respondent',
