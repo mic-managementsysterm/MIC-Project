@@ -182,7 +182,7 @@ export default [
             component: './Profile/physicochemical',
           },
           {
-            name: '问卷',
+            name: 'questionnaire',
             path: '/profile/questionnaire',
             component: './Profile/Add/AddQuestionnaire',
           },

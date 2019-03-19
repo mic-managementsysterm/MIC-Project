@@ -30,6 +30,7 @@ export default {
   'menu.profile.moca': 'MOCA',
   'menu.profile.Physicochemical': '理化检查详情',
   'menu.profile.advanced': '高级详情页',
+  'menu.profile.questionnaire': '问卷',
   'menu.result': '结果页',
   'menu.result.success': '成功页',
   'menu.result.fail': '失败页',

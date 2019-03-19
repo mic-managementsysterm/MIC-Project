@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Row, Button, List, Radio } from 'antd';
+import { Row, Button, List, Radio, Upload, message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './AddQuestionnaire.less';
 
@@ -32,13 +32,6 @@ class AddRecord extends Component{
     })
   }
 
-  getQues = () =>{
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'record/fetchAllQuestionnaire',
-    })
-  };
-
   uploadQues = () =>{
     const { dispatch, addQues:{newQues} } = this.props;
     let Score = 0;
@@ -46,10 +39,18 @@ class AddRecord extends Component{
       Score += item.Score
     });
     newQues.Score = Score;
-    // dispatch({
-    //   type: 'addQues/fetchAllGauge'
-    // })
-    console.log("upload",newQues)
+    dispatch({
+      type: 'addQues/uploadQues',
+      payload:{
+        ...newQues
+      }
+    })
+  };
+
+  insertImg = (index,img) => {
+    const {addQues:{newQues,Topics}} = this.props;
+    newQues.Infos[index].Images.push({Img:img})
+    Topics[index].insertImg = img;
   };
 
   renderSelect = (itemin,total) => {
@@ -84,7 +85,50 @@ class AddRecord extends Component{
   };
 
   renderTopic = (item, index) => {
-    const {addQues:{Topics}} = this.props;
+    const {addQues:{Topics}, dispatch} = this.props;
+    const beforeUpload = (file) =>{
+      const isJPG = file.type === 'image/jpeg';
+      if (!isJPG) {
+        message.error('You can only upload JPG file!');
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        message.error('Image must smaller than 2MB!');
+      }
+      return isJPG && isLt2M;
+    };
+    const onChange = (info) =>{
+      if (info.file.status === 'done') {
+        if(info.fileList.length > 1){
+          info.fileList.splice(0,1);
+        }
+        let reader = new FileReader();
+        reader.readAsDataURL(info.file.originFileObj);
+        reader.onload = (event) =>{
+          Topics[item.Order-1].insertImg = event.target.result;
+          dispatch({
+            type:'addQues/setInfos',
+            payload:{
+              index:item.Order - 1,
+              type:"Images",
+              value:{Url:event.target.result}
+            }
+          })
+        }
+      }
+    };
+    const onRemove = () =>{
+      Topics[item.Order-1].insertImg = "";
+      dispatch({
+        type:'addQues/setInfos',
+        payload:{
+          index:item.Order - 1,
+          type:"Images",
+          value:""
+        }
+      })
+    };
+
     let renderGroupName = () =>{};
     let itemClassName = styles["ant-list-item"];
     if( index > 0 && Topics[index].GroupName !== Topics[index -1].GroupName){
@@ -102,6 +146,7 @@ class AddRecord extends Component{
         )
       };
     }
+
     return(
       <List.Item className={itemClassName} key={item.Id}>
         <div className={styles.topic}>
@@ -111,7 +156,8 @@ class AddRecord extends Component{
           <Row className={styles.title}>
             <span>{`Q${item.Order}${"  "}${item.Title}`}</span>
           </Row>
-          {item.Image?
+          <Row>
+            {item.Image?
             (<img
               alt="ex"
               className={styles.image}
@@ -119,8 +165,31 @@ class AddRecord extends Component{
               src={require("../../../assets/img/cognition.jpg")}
             />)
           :null}
+            {item.insertImg?
+            (<img
+              alt="ex"
+              className={styles.image}
+              // src={`http://210.41.215.16:3306${item.Image}`}
+              src={item.insertImg}
+            />)
+            :null}
+          </Row>
           <Row>
             {this.renderSelect(item,item.TotalScore)}
+            <Upload
+              name="topicImg"
+              multiple={false}
+              accept=".jpg,.jpeg,.png"
+              className="topic-insertImg"
+              action=""
+              beforeUpload={(file)=>beforeUpload(file)}
+              onChange={info => onChange(info)}
+              onRemove={() => onRemove()}
+            >
+              <Button>
+                <span>选择图片</span>
+              </Button>
+            </Upload>
           </Row>
         </div>
       </List.Item>
@@ -141,7 +210,7 @@ class AddRecord extends Component{
               renderItem={(item,index) =>this.renderTopic(item,index)}
             />
           </div>
-          <div>
+          <div className={styles["submit-button"]}>
             <Button onClick={()=>this.uploadQues()}>
               <span>提交</span>
             </Button>
