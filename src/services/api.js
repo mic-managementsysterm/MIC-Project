@@ -164,7 +164,6 @@ export async function getFakeCaptcha(mobile) {
 
 export async function getQuestion(Id) {
   const path = `${Config.service}/questionnaire/get/getById?${stringify(Id)}`;
-  console.log('@id2',Id)
   return request(path)
 }
 
@@ -176,4 +175,16 @@ export async function getAllQuestionnaire() {
 export async function getAllGauge() {
   const path = `${Config.service}/gaugetable/get/lib`;
   return request(path);
+}
+
+export async function changeQuestion(params) {
+  const path=`${Config.service}/questionnaire/change/addOrUpdate`;
+  return request(path,{
+    method:'POST',
+    body:{...params},
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  })
+  console.log("@change",params)
 }
