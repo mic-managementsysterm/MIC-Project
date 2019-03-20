@@ -5,6 +5,9 @@ export default {
 
   state: {
     dataSource:[],
+    showSource:[],
+    current:1,
+    pageSize:10,
     relateData:[],
     restData:[],
     modalVisible: false,
@@ -25,7 +28,8 @@ export default {
       yield put({
         type: 'set',
         payload: {
-          dataSource:response.Data
+          dataSource:response.Data,
+          showSource:response.Data
         },
       });
     },
@@ -57,6 +61,18 @@ export default {
       return {
         ...state,
         ...action.payload,
+      };
+    },
+    queryPage(state, action) {
+      let { payload } = action;
+      let start = (payload.currentPage - 1) * payload.pageSize;
+      let end = start + payload.pageSize;
+      let newSource = state.dataSource.slice(start,end);
+      return {
+        ...state,
+        showSource:newSource,
+        current:payload.currentPage,
+        pageSize:payload.pageSize,
       };
     },
   },
