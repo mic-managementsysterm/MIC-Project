@@ -215,7 +215,20 @@ export async function getPhysicochemicalDetail(params) {
 }
 
 export async function uploadMedical(params) {
-  const path = `http://localhost:5010/gaugerecord/get/getById?${stringify(params)}`;
+  const path = `http://localhost:5010/medicalrecord/change/addOrUpdateRecord`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+
+export async function login(params) {
+  const path = `http://localhost:5010/user/change/login`;
   return request(path,{
     method: 'POST',
     body: {
