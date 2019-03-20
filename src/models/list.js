@@ -12,7 +12,7 @@ const format = (arr,) => {
     if(item.GaugeName){
       title = item.GaugeName;
       description = `创建时间：${item.CreatedAt}\n点击查看理化检查详情`;
-      path = `/profile/physicochemical?Id=${item.Id}&Name=${item.Name}&Gender=${item.Gender}&Phone=${item.Phone}&Born=${item.Born}$Address=${item.Address}&CreatedAt=${item.CreatedAt}`
+      path = `/profile/physicochemical?Id=${item.Id}`
     }
     if(item.QuestionnaireName){
       title = item.QuestionnaireName;
