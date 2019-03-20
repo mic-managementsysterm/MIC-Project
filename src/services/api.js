@@ -239,5 +239,41 @@ export async function login(params) {
     },
   });
 }
+export async function deleteMedical(params) {
+  const path = `http://localhost:5010/medicalrecord/delete/delete`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+export async function deleteGauge(params) {
+  const path = `http://localhost:5010/gaugerecord/delete/byId`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+export async function deleteQues(params) {
+  const path = `http://localhost:5010/questionnairerecord/delete/delete`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
 
 
