@@ -1,10 +1,32 @@
-import {getAllQuestionnaire,getQuestion} from '@//services/api'
+import {getAllQuestionnaire,getQuestion,changeQuestion} from '@//services/api'
 
 export default {
   namespace:'question',
   state:{
     questions:[],
-    question:{}
+    // question:{},
+    res:null,
+    showLoading:true,
+    question:{
+      Id:         null,
+      Name:       null,
+      TotalScore: null,
+      PassScore:  null,
+      Topics:     [
+        {
+            Id:              null,
+            QuestionnaireId: null,
+            Title:           null,
+            Image :          null,
+            Order:           null,
+            GroupName:       null,
+            TotalScore:      null,
+            Type:            null,
+            CreatedAt:       null /* 2018-07-23 10:04:30 */
+        }
+      ],
+      CreatedAt:  null,
+    }
   },
   effects: {
     * fetchQuestionList({ payload }, { call, put }) {
@@ -27,14 +49,31 @@ export default {
       }),
         console.log('@response11', response)
       if (callback) callback()
+    },
+
+    *changeQuestion({payload,callback},{call,put}){
+      const response= yield call(changeQuestion,payload);
+      yield put({
+        type:'show',
+        payload:{
+          // res:response
+        }
+      });
+      // console.log("@change",response)
+      if (callback) callback()
     }
   },
   reducers: {
     show(state, action) {
-      console.log('@1111')
       return {
         ...state,
         ...action.payload,
+      };
+    },
+    change(state, payload) {
+      return {
+        ...state,
+        status:payload.status,
       };
     },
   },
