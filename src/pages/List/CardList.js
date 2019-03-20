@@ -26,6 +26,7 @@ class CardList extends PureComponent {
     const {
       list: { records },
       loading,
+      location
     } = this.props;
     return (
       <PageHeaderWrapper title="患者详情">
@@ -65,7 +66,7 @@ class CardList extends PureComponent {
                 </List.Item>
               ) : (
                 <List.Item>
-                  <Button type="dashed" className={styles.newButton} onClick={() =>{router.push('/profile/record')}}>
+                  <Button type="dashed" className={styles.newButton} onClick={() =>{router.push(`/profile/record?Id=${location.query.Id}`)}}>
                     <Icon type="plus" /> 新增记录
                   </Button>
                 </List.Item>

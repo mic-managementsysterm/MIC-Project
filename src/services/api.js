@@ -1,5 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
+import Config from "./coustomApi/config";
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
@@ -210,6 +211,19 @@ export async function getPhysicochemicalDetail(params) {
   const path = `http://localhost:5010/gaugerecord/get/getById?${stringify(params)}`;
   return request(path,{
     method: 'GET',
+  });
+}
+
+export async function uploadMedical(params) {
+  const path = `http://localhost:5010/gaugerecord/get/getById?${stringify(params)}`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
   });
 }
 
