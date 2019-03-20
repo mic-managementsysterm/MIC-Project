@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import router from 'umi/router';
+// import router from 'umi/router';
 import Link from "umi/link";
 import {
   Row,
@@ -171,10 +171,10 @@ const CreateForm = Form.create()(props => {
 
 @Form.create()
 class UpdateForm extends PureComponent {
-    formLayout = {
-      labelCol: { span: 7 },
-      wrapperCol: { span: 13 },
-    };
+  formLayout = {
+    labelCol: { span: 7 },
+    wrapperCol: { span: 13 },
+  };
 
   handleUpdateIn = () =>{
     const { respondent: { Respondent }, form, dispatch } = this.props;
@@ -343,7 +343,7 @@ class TableList extends PureComponent {
         return dataSource.length >= 1
           ? (
             <div key={record.Id}>
-              <Link to={`/list/card-list?Id=${record.Id}`}>
+              <Link to={`/list/card-list?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
                 <Button className="btn">查看</Button>
               </Link>
               <Button onClick={() => this.handleUpdateModalVisible(true,record)}>编辑</Button>
@@ -380,13 +380,15 @@ class TableList extends PureComponent {
     }
 
     dispatch({
-      type: 'respondent/queryRespondent',
-      payload: {},
+      type: 'respondent/queryPage',
+      payload: {
+        ...params
+      },
     });
   };
 
-  previewItem = id => {
-    router.push(`/profile/basic/${id}`);
+  previewItem = () => {
+    // router.push(`/profile/basic/${id}`);
   };
 
   handleFormReset = () => {
@@ -511,13 +513,13 @@ class TableList extends PureComponent {
   }
 
   render() {
-    const { respondent: { dataSource,selectedRows }, loading, } = this.props;
+    const { respondent: { showSource,selectedRows,dataSource,pageSize,current }, loading, } = this.props;
     const data ={
-      list: dataSource,
+      list: showSource,
       pagination: {
         total: dataSource.length,
-        pageSize:10,
-        current:1
+        pageSize:pageSize,
+        current:current
       },
     };
     return (

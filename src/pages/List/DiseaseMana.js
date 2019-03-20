@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import router from 'umi/router';
+// import router from 'umi/router';
 import {
   Row,
   Col,
@@ -135,57 +135,57 @@ const ManaForm = Form.create()(props => {
 @Form.create()
 class RelateForm extends PureComponent {
   columns1= [
-      {
-        title: '证型名称',
-        dataIndex: 'Name',
-        align: 'center',
-      },{
-        title: '证型拼音',
-        dataIndex: 'PinYin',
-        align: 'center',
-      },{
-        title: '操作',
-        dataIndex: 'operate',
-        key: 'operate',
-        align: 'center',
-        render: (text,record)=>(
-          record
-            ? (
-              <Popconfirm title="确认删除?" onConfirm={()=>this.deleteSyn(record)} okText="确认" cancelText="取消">
-                <Button>删除</Button>
-              </Popconfirm>
-            ):null
-        ),
-      }];
+    {
+      title: '证型名称',
+      dataIndex: 'Name',
+      align: 'center',
+    },{
+      title: '证型拼音',
+      dataIndex: 'PinYin',
+      align: 'center',
+    },{
+      title: '操作',
+      dataIndex: 'operate',
+      key: 'operate',
+      align: 'center',
+      render: (text,record)=>(
+        record
+          ? (
+            <Popconfirm title="确认删除?" onConfirm={()=>this.deleteSyn(record)} okText="确认" cancelText="取消">
+              <Button>删除</Button>
+            </Popconfirm>
+          ):null
+      ),
+    }];
 
   columns2=[
-      {
-        title: '证型名称',
-        dataIndex: 'Name',
-        align: 'center',
-      }, {
-        title: '证型拼音',
-        dataIndex: 'PinYin',
-        align: 'center',
-      },{
-        title: '操作',
-        dataIndex: 'operate',
-        key: 'operate',
-        align: 'center',
-        render: (text,record)=>(
-          record
-            ? (
-              <Popconfirm title="确认添加?" onConfirm={()=>this.addSyn(record)} okText="确认" cancelText="取消">
-                <Button>添加</Button>
-              </Popconfirm>
-            ):null
-        ),
-      }];
+    {
+      title: '证型名称',
+      dataIndex: 'Name',
+      align: 'center',
+    }, {
+      title: '证型拼音',
+      dataIndex: 'PinYin',
+      align: 'center',
+    },{
+      title: '操作',
+      dataIndex: 'operate',
+      key: 'operate',
+      align: 'center',
+      render: (text,record)=>(
+        record
+          ? (
+            <Popconfirm title="确认添加?" onConfirm={()=>this.addSyn(record)} okText="确认" cancelText="取消">
+              <Button>添加</Button>
+            </Popconfirm>
+          ):null
+      ),
+    }];
 
   formLayout = {
-      labelCol: { span: 7 },
-      wrapperCol: { span: 13 },
-    };
+    labelCol: { span: 7 },
+    wrapperCol: { span: 13 },
+  };
 
   addSyn = ( record ) => {
     let { disAndSyn:{relateSyn, restSyn},dispatch } = this.props;
@@ -389,13 +389,13 @@ class DiseaseMana extends PureComponent {
     }
 
     dispatch({
-      type: 'disease/queryDisease',
-      payload: {},
+      type: 'disease/queryPage',
+      payload: {...params},
     });
   };
 
-  previewItem = id => {
-    router.push(`/profile/basic/${id}`);
+  previewItem = () => {
+    // router.push(`/profile/basic/${id}`);
   };
 
   handleFormReset = () => {
@@ -550,15 +550,15 @@ class DiseaseMana extends PureComponent {
 
   render() {
     const {
-      disease: { dataSource, selectedRows },
+      disease: { dataSource,showSource,current,pageSize, selectedRows },
       loading,
     } = this.props;
     const data = {
-      list: dataSource,
+      list: showSource,
       pagination: {
         total: dataSource.length,
-        pageSize:10,
-        current:1
+        pageSize:pageSize,
+        current:current
       },
     };
 

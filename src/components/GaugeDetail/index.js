@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Row, Col} from 'antd';
 import styles from './index.less';
 
 class GaugeDetail extends Component{
@@ -8,22 +9,26 @@ class GaugeDetail extends Component{
       <div>
         <h1>{data.QuestionnaireName} {data.Score}</h1>
         <div>{data&&data.Infos ? data.Infos.map((item,index) =>{
+          console.log('@Images',item.Images)
           return (
             <div key={index}>
-              <div className={styles.contentName}>
-                <div className={styles.contentGroupname}>
+                <Row className={styles.groupName}>
                   {(index>0 && data.Infos[index-1].TopicInfo.GroupName == item.TopicInfo.GroupName)?
                     null:item.TopicInfo.GroupName}
-                </div>
-                <div className={styles.contentDetail}>
-                  <ul className={styles.contentDetailTitle}>
+                </Row>
+              <Row className={styles.main}>
+                <Col span={12}>
+                  <ul>
                     <li>{item.TopicInfo.Order}.{item.TopicInfo.Title}</li>
                   </ul>
-                  <ul className={styles.contentDetailScore}>
+                </Col>
+                <Col span={6} offset={6}>
+                  <ul className={styles.score}>
                     <li>{item.Score}</li>
                   </ul>
-                </div>
-              </div>
+                </Col>
+                {/*<img src={require(item.Images ? item.Images[0].Url : '')} className={styles.img} />*/}
+              </Row>
             </div>
           )
         }) :null }</div>
