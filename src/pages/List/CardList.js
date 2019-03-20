@@ -1,10 +1,9 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Card, Button, Icon, List, Popconfirm } from 'antd';
-import router from 'umi/router';
+import Link from "umi/link";
 import Ellipsis from '@/components/Ellipsis';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-
 import styles from './CardList.less';
 
 @connect(({ list, loading }) => ({
@@ -26,7 +25,9 @@ class CardList extends PureComponent {
     const {
       list: { records },
       loading,
+      location
     } = this.props;
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = location.query;
     return (
       <PageHeaderWrapper title="患者详情">
         <div className={styles.cardList}>
@@ -42,13 +43,11 @@ class CardList extends PureComponent {
                     hoverable
                     className={styles.card}
                     actions={[
-                      <a onClick={() => {
-                          router.push(`${item.path}`)
-                        }}
-                      >查看
-                      </a>,
+                      <Link to= {`${item.path}&Name=${Name}&Gender=${Gender}&Phone=${Phone}&Born=${Born}&Address=${Address}&CreatedAt=${CreatedAt}`}>
+                        <Button>查看</Button>
+                      </Link>,
                       <Popconfirm title="确认删除？" okText="确认" cancelText="取消">
-                        <a>删除</a>
+                        <Button>删除</Button>
                       </Popconfirm>,
                     ]}
                   >

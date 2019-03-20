@@ -5,59 +5,45 @@ import DescriptionList from '@/components/DescriptionList';
 import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from  './BasicProfile.less';
-
 const { Description } = DescriptionList;
 
-@connect(({ profile, detail, loading }) => ({
-  profile,
+@connect(({ detail, loading }) => ({
   detail,
-  loading: loading.effects['profile/fetchBasic'] && loading.effects['detail/fetchDiagnosisDetail'],
+  loading: loading.effects['detail/fetchDiagnosisDetail'],
 }))
 class BasicProfile extends Component {
   componentDidMount() {
-    const { dispatch, match } = this.props;
-    const { params } = match;
-
-    dispatch({
-      type: 'profile/fetchBasic',
-      payload: params.id || '1000000000',
-    });
-
-    this.getDiagnosisDetail();
-  }
-
-  getDiagnosisDetail = () =>{
-    const { dispatch } = this.props;
+    const { dispatch,location } = this.props;
     dispatch({
       type: 'detail/fetchDiagnosisDetail',
       payload: {
-        Id: 'b9d6c4fe-69f7-42f9-ab64-318af8e7f62a'
-      }
-    })
+        Id: location.query.Id ? location.query.Id : '',
+      },
+    });
   }
 
   render() {
-    const { profile = {}, detail = {}, loading } = this.props;
-    const { userInfo = {} } = profile;
+    const { detail = {}, loading } = this.props;
     const { diagnosisData = {} } = detail;
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.location.query;
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
-            <Description term="用户姓名">{userInfo.name}</Description>
-            <Description term="用户性别">{userInfo.delivery}</Description>
-            <Description term="联系电话">{userInfo.tel}</Description>
-            <Description term="出生日期">{userInfo.tel}</Description>
-            <Description term="家庭地址">{userInfo.addr}</Description>
-            <Description term="时间">{userInfo.remark}</Description>
+            <Description term="用户姓名">{Name}</Description>
+            <Description term="用户性别">{Gender}</Description>
+            <Description term="联系电话">{Phone}</Description>
+            <Description term="出生日期">{Born}</Description>
+            <Description term="家庭地址">{Address}</Description>
+            <Description term="创建时间">{CreatedAt}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
           <DescriptionDetail size="large" title="记录详情" style={{ marginBottom: 32 }}>
-            <Description term="主诉" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.ZS}。</Description>
-            <Description term="现病史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.XBS}。</Description>
-            <Description term="既往史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.JWS}。</Description>
-            <Description term="过敏史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.GMS}。</Description>
-            <Description term="体格检查" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.TGJC}。</Description>
+            <Description term="主诉" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.ZS}</Description>
+            <Description term="现病史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.XBS}</Description>
+            <Description term="既往史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.JWS}</Description>
+            <Description term="过敏史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.GMS}</Description>
+            <Description term="体格检查" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.TGJC}</Description>
             <Description term="中医诊断" className={styles.term}>
               {diagnosisData&&diagnosisData.Diagnoses
                 ? diagnosisData.Diagnoses.map((item, index) => {
