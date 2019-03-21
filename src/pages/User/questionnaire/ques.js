@@ -19,6 +19,7 @@ export  default class Index extends Component{
             // data:data,
 
         }
+        this.handleDelete=this.handleDelete.bind(this)
     }
 componentWillMount(){
   this.fetchQuestionList()
@@ -31,6 +32,15 @@ componentWillMount(){
      const {question:{questions}}=this.props
      console.log('@question',questions)
 }
+   handleDelete=(Id)=>{
+      const {dispatch}=this.props
+     console.log("delete",Id)
+     dispatch({
+       type:'question/deleteQuestions',
+       payload:{Id},callback:()=>{
+         this.fetchQuestionList()
+     }})
+   }
     render(){
       const {question:{questions},loading}=this.props
       questions.map((que,index)=>{
@@ -56,7 +66,7 @@ componentWillMount(){
           align:'center'
         },
         {
-          title:'得分',
+          title:'及格分数',
           dataIndex:'PassScore',
           key:'PassScore',
           align:'center'
@@ -75,7 +85,7 @@ componentWillMount(){
           <Button className='btn'>编辑</Button>
           </Link>
           <Button>填写</Button>
-          <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>
+          <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.Id)}>
           <Button>删除</Button>
           </Popconfirm>
           </div>
@@ -87,7 +97,7 @@ componentWillMount(){
           <PageHeaderWrapper loading={loading}>
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
-              <Link to={'/list/question-list/questionAdd-list'}>
+              <Link to={{pathname:'/list/question-list/questionAdd-list',state:{data:{}}}}>
                 <Button className={'btn2'} style={{marginBottom:5,}} >添加</Button>
               </Link>
               </div>

@@ -179,10 +179,26 @@ export async function getAllGauge() {
 
 export async function changeQuestion(params) {
   const path=`${Config.service}/questionnaire/change/addOrUpdate`;
-  const path = `http://localhost:5010/gaugetable/get/lib`;
-  return request(path,{
-    method: 'GET',
+  return request(path, {
+    method: 'POST',
+    body: { ...params.body },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
   });
+}
+
+export async function deleteQuestion(Id) {
+  console.log("@22222112")
+  const path=`${Config.service}/questionnaire/delete/delete`;
+  return request(path,{
+    method:'POST',
+    body:Id,
+    headers:{
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  })
+  console.log("@111")
 }
 
 export async function getCognitionDetail(params) {
@@ -209,8 +225,6 @@ export async function getMOCADetail(params) {
     }
   })
   console.log("@change",params)
-    method: 'GET',
-  });
 }
 
 export async function getDiagnosisDetail(params) {
