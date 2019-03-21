@@ -351,7 +351,7 @@ class DiseaseMana extends PureComponent {
       title: '操作',
       render: (text, record) => {
         const {disease:{dataSource}} = this.props;
-        return dataSource.length >= 1
+        return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
               <Button onClick={() => this.handleRelateVisible(true,record)} className="btn">疾病关联</Button>

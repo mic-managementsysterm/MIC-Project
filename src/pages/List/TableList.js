@@ -340,7 +340,7 @@ class TableList extends PureComponent {
       title: '操作',
       render: (text, record) => {
         const {respondent:{dataSource}} = this.props;
-        return dataSource.length >= 1
+        return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
               <Link to={`/list/card-list?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
