@@ -1,6 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
-import Config from "./coustomApi/config";
+import Config from './config';
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');

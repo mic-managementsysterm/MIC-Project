@@ -1,6 +1,8 @@
 import React from 'react';
 import {Spin , DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Upload ,Row,message } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload/interface';
+import router from 'umi/router';
+import { connect } from 'dva';
 // import './Edit.css';
 
 // const list = localStorage.list ? JSON.parse(localStorage.list) : [];
@@ -8,7 +10,10 @@ const list=[]
 // const editing = localStorage.editing ? JSON.parse(localStorage.editing) : [];
 const fileList=[]
 
-
+@connect(({question,loading})=>({
+  question,
+  loading:loading.models.loading
+}))
 class Edit extends React.Component {
   constructor(props) {
     super(props);
@@ -23,7 +28,7 @@ class Edit extends React.Component {
     this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
     this.handleOptionChange = this.handleOptionChange.bind(this);
-    this.handleAddOption = this.handleAddOption.bind(this);
+    // this.handleAddOption = this.handleAddOption.bind(this);
     this.handleRemoveOption = this.handleRemoveOption.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.handleTextRequire = this.handleTextRequire.bind(this);
@@ -43,17 +48,17 @@ class Edit extends React.Component {
         TotalScore: null,
         PassScore:  null,
         Topics:     [
-          // {
-          //     // Id:              null,
-          //     // QuestionnaireId: null,
-          //     // Title:           null,
-          //     // Image :          null,
-          //     // Order:           null,
-          //     // GroupName:       null,
-          //     // TotalScore:      null,
-          //     // Type:            null,
-          //     // CreatedAt:       null /* 2018-07-23 10:04:30 */
-          // }
+          {
+              Id:              null,
+              QuestionnaireId: null,
+              Title:           null,
+              Image :          null,
+              Order:           null,
+              GroupName:       null,
+              TotalScore:      null,
+              Type:            null,
+              CreatedAt:       null /* 2018-07-23 10:04:30 */
+          }
         ],
         CreatedAt:  null,
       }
@@ -69,6 +74,7 @@ class Edit extends React.Component {
       indexCurrent:null,
       loading1:false,
       loading2:false,
+      showLoading:false,
     };
   }
 
@@ -78,12 +84,29 @@ class Edit extends React.Component {
     })
   }
   componentWillMount(){
-    const data=this.props.location.state.data
-    console.log('@data',data)
-    this.setState({
-      questions:data
-    })
+    const Id=this.props.location.state.Id
+    // console.log('@data',data)
+    this.getQuestion(Id)
+     console.log("@id",Id)
+
   }
+  getQuestion=(Id)=>{
+    const {dispatch}=this.props
+    dispatch({
+      type:'question/getQuestion',
+      payload:{
+        Id
+      },callback:()=>{
+        const {question:{question}}=this.props
+        // console.log("@callback",question)
+        this.setState({
+                questions:question
+        })
+      }
+    })
+    // console.log('@data',this.state.questions)
+  }
+
   handleTitleChange(e) {
     this.state.questions.Name=e.target.value
     this.setState({
@@ -170,20 +193,26 @@ class Edit extends React.Component {
     });
   }
   handleChange = (info) => {
+    const {indexCurrent}=this.state
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
       return;
     }
     if (info.file.status === 'done') {
       // Get this url from response in real world.
+      if (info.fileList.length>1){
+        info.fileList.splice(0,1);
+      }
       this.getBase64(info.file.originFileObj, imageUrl =>{
         const base64Img=imageUrl
-        // console.log('@image',base64Img),
-        //   this.setState({
-        //     imageUrl,
-        //     loading: false,
-        //   })
-        this.state.questions.Topics[this.state.indexCurrent].Image=imageUrl,
+        console.log('@image',info),
+          // this.state.questions.Topics[this.state.indexCurrent].Image=null,
+          // this.setState({
+          //   questions:this.state.questions,
+          //   // loading:false,
+          //   // imageUrl:null
+          // })
+        this.state.questions.Topics[indexCurrent].Image=imageUrl,
           this.setState({
             questions:this.state.questions,
             loading:false,
@@ -230,8 +259,8 @@ class Edit extends React.Component {
 
   handleShiftQuestion(questionIndex, num) {
     let { questions } = this.state;
-    let shiftQuestion = questions.splice(questionIndex, 1)[0];
-    questions.splice(questionIndex + num, 0, shiftQuestion);
+    let shiftQuestion = questions.Topics.splice(questionIndex, 1)[0];
+    questions.Topics.splice(questionIndex + num, 0, shiftQuestion);
     this.setState({
       questions: questions
     })
@@ -239,11 +268,11 @@ class Edit extends React.Component {
 
   handleCopyQuestion(questionIndex) {
     let { questions } = this.state;
-    let copy = Object.assign({}, questions[questionIndex]);
-    if (questions[questionIndex].Type !== 1) {
-      copy.options = copy.options.slice(0);
-    }
-    questions.splice(questionIndex + 1, 0, copy);
+    let copy = Object.assign({}, questions.Topics[questionIndex]);
+    // if (questions.Topics[questionIndex].Type !== 1) {
+    //   // copy.options = copy.options.slice(0);
+    // }
+    questions.Topics.splice(questionIndex + 1, 0, copy);
     this.setState({
       questions: questions
     });
@@ -251,7 +280,7 @@ class Edit extends React.Component {
 
   handleRemoveQuestion(questionIndex) {
     let { questions } = this.state;
-    questions.splice(questionIndex, 1);
+    questions.Topics.splice(questionIndex, 1);
     this.setState({
       questions: questions
     });
@@ -259,20 +288,20 @@ class Edit extends React.Component {
 
   handleOptionChange(value, questionIndex, optionIndex) {
     let { questions } = this.state;
-    questions[questionIndex].options[optionIndex].value =value;
+    questions.Topics[questionIndex].options[optionIndex].value =value;
     this.setState({
       questoins: questions
     });
   }
 
-  handleAddOption(questionIndex) {
-    let { questions } = this.state;
-    const newOption = { text: '新选项' };
-    questions[questionIndex].options.push(newOption);
-    this.setState({
-      questions: questions
-    });
-  }
+  // handleAddOption(questionIndex) {
+  //   let { questions } = this.state;
+  //   const newOption = { text: '新选项' };
+  //   questions[questionIndex].options.push(newOption);
+  //   this.setState({
+  //     questions: questions
+  //   });
+  // }
 
   handleRemoveOption(questionIndex, optionIndex) {
     let { questions } = this.state;
@@ -299,18 +328,30 @@ class Edit extends React.Component {
   }
 
   handleDatePick(date, dateString) {
+    const {questions}=this.state
+    questions.CreatedAt=dateString
     this.setState({
-      date: dateString
+      questions:questions
     })
   }
 
-  handleSaveQuestionnaire() {
-    const index = this.state.index;
-    list[index] = Object.assign({}, this.state);
-    localStorage.list = JSON.stringify(list);
-    message.success({
-      title: '保存成功'
-    });
+  handleSaveQuestionnaire(body) {
+    console.log("@idid",body)
+    this.setState({
+      showLoading:true
+    })
+    const {question:{question},dispatch}=this.props
+    // question=body
+    dispatch({
+      type:'question/changeQuestion',
+      payload: {body},callback:()=>{
+        this.setState({
+          showLoading:false
+        })
+        router.push('/list/question-list')
+        }
+    }
+    )
   }
 
   handleReleaseQuestionnaire() {
@@ -369,11 +410,11 @@ class Edit extends React.Component {
     return (
       this.state.titleEditable ? (
         <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 3, textAlign: 'center' }} onClick={this.handleTitleClick}>
-          <Input style={{ fontSize: 18, fontWeight: 'bold', padding: 30, textAlign: 'center' }} value={this.state.title} onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} />
+          <Input style={{ fontSize: 18, fontWeight: 'bold', padding: 30, textAlign: 'center' }} value={this.state.questions.Name} onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} />
         </div>
       ) : (
         <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 20, textAlign: 'center' }} onClick={this.handleTitleClick}>
-          <h2><strong>{this.state.title}</strong></h2>
+          <h2><strong>{this.state.questions.Name}</strong></h2>
         </div>
       )
     );
@@ -406,17 +447,46 @@ class Edit extends React.Component {
           <div className="ant-upload-text">Upload</div>
         </div>
       );
-      if (question.Type === 0) {
+      const handleChange = (info) => {
+        const {indexCurrent}=this.state
+        if (info.file.status === 'uploading') {
+          this.setState({ loading: true });
+          return;
+        }
+        if (info.file.status === 'done') {
+          // Get this url from response in real world.
+          if (info.fileList.length>1){
+            info.fileList.splice(0,1);
+          }
+          this.getBase64(info.file.originFileObj, imageUrl =>{
+            const base64Img=imageUrl
+            console.log('@image',info),
+              // this.state.questions.Topics[this.state.indexCurrent].Image=null,
+              // this.setState({
+              //   questions:this.state.questions,
+              //   // loading:false,
+              //   // imageUrl:null
+              // })
+              this.state.questions.Topics[questionIndex].Image=imageUrl,
+              this.setState({
+                questions:this.state.questions,
+                loading:false,
+                imageUrl:null
+              })
+          });
+          console.log('@image1',info.file)
+        }
+      }
+      if (question.Type === 0||1) {
         return (
           <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
-
             <span>Q{questionIndex + 1}</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
             <span>题目类型</span>
             <Input value={question.GroupName} style={{ borderStyle: 'none', width: '50%', marginLeft: 3,marginTop:10 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
             <Row style={{float:'right'}}>
               <span >总分：</span>
-              <InputNumber style={{marginTop:5}} min={1} max={10} defaultValue={0} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
+              <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
             </Row>
             {/*{*/}
             {/*question.Image?*/}
@@ -439,53 +509,17 @@ class Edit extends React.Component {
                   photoWidth: file.height, // 通过  handleBeforeUpload 获取 图片的宽高
                   photoHeight: file.width,
                 })}
-                action="//jsonplaceholder.typicode.com/posts/"
+                // action="//jsonplaceholder.typicode.com/posts/"
                 beforeUpload={this.beforeUpload}
-                onChange={this.handleChange}>
+                onChange={handleChange}>
                 {
-                  question.Image? <div style={{marginTop:10}}>
-                    <img  src={question.Image} alt=""/>
+                  question.Image? <div >
+                    <img style={{width:250,height:250}}  src={question.Image} alt=""/>
                   </div>:uploadButton
                 }
               </Upload>
             </div>
-          </div>
-        );
-      } else if (question.Type === 1) {
-        return (
-          <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
-            <span>Q{questionIndex + 1}</span>
-            <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex)} />
-            <span>题目类型</span>
-            <Input value={question.GroupName} style={{ borderStyle: 'none', width: '50%', marginLeft: 3,marginTop:10 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
-            <Row style={{float:'right'}}>
-              <span >总分：</span>
-              <InputNumber style={{marginTop:5}} min={1} max={10} defaultValue={0} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
-            </Row>
-
-            <div style={{marginTop:5}}>
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                data={file => ({ // data里存放的是接口的请求参数
-                  // param1: myParam1,
-                  // param2: myParam2,
-                  photoCotent: file, // file 是当前正在上传的图片
-                  photoWidth: file.height, // 通过  handleBeforeUpload 获取 图片的宽高
-                  photoHeight: file.width,
-                })}
-                action="//jsonplaceholder.typicode.com/posts/"
-                beforeUpload={this.beforeUpload}
-                onChange={this.handleChange}>
-                {
-                  question.Image? <div style={{marginTop:10}}>
-                    <img  src={question.Image} alt=""/>
-                  </div>:uploadButton
-                }
-              </Upload>
-            </div>
+            {this.getQuestionOperator(questionIndex,questions.Topics)}
           </div>
         );
       }
@@ -522,14 +556,14 @@ class Edit extends React.Component {
 
     return (
       <div style={{ padding: 20 }}>
-        <div style={{ float: 'left' }}>
-          <span>问卷截止日期：</span>
-          <DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />
-          <span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.date }</span>
-        </div>
+        {/*<div style={{ float: 'left' }}>*/}
+          {/*<span>问卷截止日期：</span>*/}
+          {/*<DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />*/}
+          {/*<span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>*/}
+        {/*</div>*/}
         <div style={{ float: 'right' }}>
-          <Button onClick={this.handleSaveQuestionnaire}>保存问卷</Button>
-          <Button type="primary" style={{ marginLeft: 16 }} onClick={this.handleReleaseQuestionnaire}>发布问卷</Button>
+          <Button onClick={()=>this.handleSaveQuestionnaire(this.state.questions)}>保存问卷</Button>
+          {/*<Button type="primary" style={{ marginLeft: 16 }} onClick={this.handleReleaseQuestionnaire}>发布问卷</Button>*/}
         </div>
       </div>
     );
@@ -541,13 +575,27 @@ class Edit extends React.Component {
       questions:questions
     })
   }
+  onChangePassInt=(value)=>{
+    const {questions}=this.state
+    questions.PassScore=value;
+    this.setState({
+      questions:questions
+    })
+  }
   render() {
+    const {question:{showLoading}}=this.props
     return (
+      <Spin spinning={this.state.showLoading} tip={'正在保存'}>
       <div>
         {this.getTitle()}
         <div>
           <span >总分：</span>
-          <InputNumber style={{marginTop:5}} min={1} max={50} defaultValue={0} onChange={(value)=>this.onChangeTotalInt(value)}/>
+          <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.TotalScore}  onChange={(value)=>this.onChangeTotalInt(value)}/>
+          <span >及格分数：</span>
+          <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.PassScore}  onChange={(value)=>this.onChangePassInt(value)}/>
+        </div>
+        <div>
+
         </div>
         <div style={{ padding: 20, borderTop: '2px solid #ccc', borderBottom: '2px solid #ccc' }}>
           <div style={{ marginBottom: 20 }}>
@@ -560,6 +608,7 @@ class Edit extends React.Component {
         </div>
         {this.getFooter()}
       </div>
+      </Spin>
     );
   }
 }
