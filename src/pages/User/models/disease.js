@@ -1,7 +1,7 @@
 import { getDisease } from '@/services/api';
 
 export default {
-  namespace: 'disease',
+  namespace: '_disease',
 
   state: {
     list: [],

@@ -38,6 +38,7 @@ export default {
             return;
           }
         }
+        yield put({type: 'user/saveCurrentUser', payload: response.Data});
         yield put(routerRedux.replace(redirect || '/'));
       }else {
         message.error(response.Message)
