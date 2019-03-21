@@ -517,7 +517,7 @@ class TableList extends PureComponent {
     const data ={
       list: showSource,
       pagination: {
-        total: dataSource.length,
+        total: dataSource?dataSource.length:0,
         pageSize:pageSize,
         current:current
       },
