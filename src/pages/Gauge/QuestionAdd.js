@@ -1,15 +1,9 @@
 import React from 'react';
-import {Spin , DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Upload ,Row,message } from 'antd';
-import { UploadChangeParam } from 'antd/lib/upload/interface';
-// import './Edit.css';
-
-// const list = localStorage.list ? JSON.parse(localStorage.list) : [];
+import { DatePicker, Button, Input, Icon, InputNumber,Upload ,Row,message } from 'antd';
 const list=[]
-// const editing = localStorage.editing ? JSON.parse(localStorage.editing) : [];
 const fileList=[]
 
-
-class Edit extends React.Component {
+class questionAdd extends React.Component {
     constructor(props) {
         super(props);
         this.handleTitleClick = this.handleTitleClick.bind(this);
@@ -114,7 +108,6 @@ class Edit extends React.Component {
             questions: this.state.questions,
             addAreaVisible: false
         });
-      console.log('@image',this.state.questions.Topics[0].Image)
     }
    getBase64(img, callback) {
     const reader = new FileReader();
@@ -151,8 +144,6 @@ class Edit extends React.Component {
         const image = new Image();
         image.onload = function() {
           // 获取图片的宽高，并存放到file对象中
-          console.log('file width :' + this.width);
-          console.log('file height :' + this.height);
           file.width = this.width;
           file.height = this.height;
           resolve();
@@ -558,4 +549,4 @@ class Edit extends React.Component {
     }
 }
 
-export default Edit;
+export default questionAdd;

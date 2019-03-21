@@ -1,5 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
+import Config from './config';
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
@@ -104,8 +105,6 @@ export async function queryAdvancedProfile() {
 
 export async function queryFakeList(params) {
   return request(`http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`,{
-    // body: params,
-    // method: 'GET',
   });
 }
 
@@ -164,15 +163,23 @@ export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
 }
 
+export async function getQuestion(Id) {
+  const path = `${Config.service}/questionnaire/get/getById?${stringify(Id)}`;
+  return request(path)
+}
+
 export async function getAllQuestionnaire() {
-  const path = `http://localhost:5010/questionnaire/get/getAll`;
-  return request(path,{
-    method: 'GET',
-  });
+  const path = `${Config.service}/questionnaire/get/getAll`;
+  return request(path);
 }
 
 export async function getAllGauge() {
-  const path = `http://localhost:5010/gaugetable/get/lib`;
+  const path = `${Config.service}/gaugetable/get/lib`;
+  return request(path);
+}
+
+export async function changeQuestion(params) {
+  const path=`${Config.service}/questionnaire/change/addOrUpdate`;
   return request(path,{
     method: 'GET',
   });

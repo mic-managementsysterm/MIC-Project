@@ -3,7 +3,7 @@ import { connect } from 'dva';import {
   Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete,
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from  './Diagnosis.less';
+import styles from './Diagnosis.less';
 const { TextArea } = Input;
 
 class DiagnosisForm extends PureComponent {

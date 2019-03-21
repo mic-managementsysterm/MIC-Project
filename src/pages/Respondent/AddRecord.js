@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Col, Row, Button, List, Popconfirm, Icon } from 'antd';
+import Link from "umi/link";
+import { Card, Button, List } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from '../List/CardList.less';
+import styles from './RespondentRecord.less';
 import router from 'umi/router';
 
 @connect(({record,loading}) =>({
@@ -10,7 +11,6 @@ import router from 'umi/router';
   loading:loading.models.record,
 }))
  class AddRecord extends Component{
-
   componentDidMount() {
     this.getAllQuestionnaire();
     this.getAllGauge();
@@ -30,17 +30,21 @@ import router from 'umi/router';
     })
   }
 
+  next = () =>{
+
+  }
+
   render() {
     const { record:{ allQuestionnaireData, allGaugeData } , loading } = this.props;
-    let data = [{Name: "四诊数据采集"}];
-    let Data = [];
-    allQuestionnaireData.map((item,index) =>{
-      Data.push(item)
-    })
-    allGaugeData.map((item,index) =>{
-      Data.push(item)
-    })
-    data = data.concat(Data);
+    let data = [{Name: "四诊数据采集",path: `/record/diagnosis`},{Name: '理化数据',path: `/record/physiology`},{Name: '问卷',path: `/record/add-questionnaire`}];
+    // let Data = [];
+    // allQuestionnaireData.map((item,index) =>{
+    //   Data.push(item)
+    // })
+    // allGaugeData.map((item,index) =>{
+    //   Data.push(item)
+    // })
+    // data = data.concat(Data);
     return(
       <PageHeaderWrapper title="新增记录" loading={loading}>
         <div style={{ background: '#ECECEC', padding: '30px' }}>
@@ -57,7 +61,10 @@ import router from 'umi/router';
                       hoverable
                       className={styles.card}
                       title={item.Name}
-                      extra={<Button>新增</Button>}
+                      extra={
+                        <Link to={item.path}>
+                        <Button>新增</Button>
+                        </Link>}
                     >
                       Card content
                     </Card>
