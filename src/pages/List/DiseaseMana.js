@@ -558,6 +558,8 @@ class DiseaseMana extends PureComponent {
               onChange={this.handleStandardTableChange}
             />
           </div>
+          <ManaForm {...this.props} />
+          <RelateForm {...this.props} />
         </Card>
       </PageHeaderWrapper>
     );
