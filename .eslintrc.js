@@ -39,6 +39,7 @@ module.exports = {
     'array-callback-return':0, //箭头函数必须返回值
     'react/destructuring-assignment':0, //必须解构
     'no-underscore-dangle':0, //变量禁用下划线
+    'no-plusplus':0, //禁用++
   },
   settings: {
     polyfills: ['fetch', 'promises', 'url'],

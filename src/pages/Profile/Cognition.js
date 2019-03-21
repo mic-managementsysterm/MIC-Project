@@ -1,43 +1,45 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Divider } from 'antd';
+import { Card, Badge, Table, Divider } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import GaugeDetail from '@/components/GaugeDetail';
+import styles from './Cognition.less';
 
 const { Description } = DescriptionList;
 
 @connect(({ profile, detail, loading }) => ({
   profile,
   detail,
-  loading: loading.effects['profile/fetchBasic'] && loading.effects['detail/fetchMMSEDetail'],
+  loading: loading.effects['profile/fetchBasic']  && loading.effects['detail/fetchCognitionDetail'],
 }))
-class MMSE extends Component {
+class Cognition extends Component {
   componentDidMount() {
     const { dispatch, match } = this.props;
     const { params } = match;
+
     dispatch({
       type: 'profile/fetchBasic',
       payload: params.id || '1000000000',
     });
 
-    this.getMMSEDetail();
+    this.getCognitionDetail();
   }
 
-  getMMSEDetail = () =>{
-    const { dispatch, match } = this.props;
+  getCognitionDetail = () =>{
+    const { dispatch } = this.props;
     dispatch({
-      type: 'detail/fetchMMSEDetail',
+      type: 'detail/fetchCognitionDetail',
       payload: {
-        Id:''
-      },
-    });
+        Id: '0c7523d0-d157-4918-9ba6-ecfa7bed8527'
+      }
+    })
   }
 
   render() {
-    const { profile = {}, detail = {}, loading } = this.props;
+    const { profile = {}, loading , detail= {}} = this.props;
     const { userInfo = {} } = profile;
-    const { mmseData = {} } = detail;
+    const { cognitionData = {} } = detail;
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
@@ -50,11 +52,11 @@ class MMSE extends Component {
             <Description term="时间">{userInfo.remark}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
-          <GaugeDetail data={mmseData} />
+          <GaugeDetail data={cognitionData} />
         </Card>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default MMSE;
+export default Cognition;
