@@ -91,7 +91,6 @@ class BaseView extends Component {
                   {
                     required: true,
                     len:11,
-                    type:"number",
                     message: formatMessage({ id: 'app.settings.basic.phone-message' }, {}),
                   },
                 ],

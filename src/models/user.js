@@ -13,8 +13,7 @@ export default {
     // basicLayout
     *fetchCurrent({payload}, { call, put }) {
       const avatar =require("../assets/image/admin.jpg");
-      const tmpId = {Id:"70cfa728-626d-492c-ba9b-8e20e9fa051a"};
-      const response = yield call(queryUser,tmpId);
+      const response = yield call(queryUser,payload);
       response.Data.avatar = avatar;
       yield put({
         type: 'saveCurrentUser',
@@ -26,8 +25,8 @@ export default {
       if(response.Success){
         message.success("修改信息成功");
         yield put({
-          type: 'fetchCurrent',
-          payload: response,
+          type: 'saveCurrentUser',
+          payload: payload,
         });
         if(callback) callback();
       } else {
