@@ -30,16 +30,33 @@ import router from 'umi/router';
     })
   }
 
+  addRecord = (item) => {
+    const {record:{allQuestionnaireData,allGaugeData},location} =this.props;
+    let basePath ="";
+    if(allGaugeData.includes(item)){
+      basePath = "/profile/physiology";
+      router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`);
+      return
+    }
+    if(allQuestionnaireData.includes(item)){
+      basePath = "/profile/questionnaire";
+      router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`);
+      return
+    }
+    basePath = "/profile/diagnosis";
+    router.push(`${basePath}?Id=${location.query.Id}`)
+  };
+
   render() {
     const { record:{ allQuestionnaireData, allGaugeData } , loading } = this.props;
     let data = [{Name: "四诊数据采集"}];
     let Data = [];
     allQuestionnaireData.map((item,index) =>{
       Data.push(item)
-    })
+    });
     allGaugeData.map((item,index) =>{
       Data.push(item)
-    })
+    });
     data = data.concat(Data);
     return(
       <PageHeaderWrapper title="新增记录" loading={loading}>
@@ -57,7 +74,7 @@ import router from 'umi/router';
                       hoverable
                       className={styles.card}
                       title={item.Name}
-                      extra={<Button>新增</Button>}
+                      extra={<Button onClick={()=>this.addRecord(item)}>新增</Button>}
                     >
                       Card content
                     </Card>

@@ -1,4 +1,4 @@
-import {queryFakeList, removeFakeList, addFakeList, updateFakeList } from '@/services/api';
+import {deleteQues,deleteGauge,deleteMedical,queryFakeList, removeFakeList, addFakeList, updateFakeList } from '@/services/api';
 
 const format = (arr,) => {
   if(!Array.isArray(arr)){
@@ -9,10 +9,12 @@ const format = (arr,) => {
     let title = "四诊记录表";
     let description = `创建时间：${item.CreatedAt}\n主诉：${item.ZS}`;
     let path = `/profile/basic?Id=${item.Id}`;
+    let delAction = "list/delMedical";
     if(item.GaugeName){
       title = item.GaugeName;
       description = `创建时间：${item.CreatedAt}\n点击查看理化检查详情`;
-      path = `/profile/physicochemical?Id=${item.Id}&Name=${item.Name}&Gender=${item.Gender}&Phone=${item.Phone}&Born=${item.Born}$Address=${item.Address}&CreatedAt=${item.CreatedAt}`
+      path = `/profile/physicochemical?Id=${item.Id}`
+      delAction = "list/delGauge";
     }
     if(item.QuestionnaireName){
       title = item.QuestionnaireName;
@@ -30,12 +32,14 @@ const format = (arr,) => {
         default:
           path = "/exception/404"
       }
-      path += `?Id=${item.Id}`
+      path += `?Id=${item.Id}`;
+      delAction = "list/delQues";
     }
     newArr.push({
       title:title,
       description:description,
       path:path,
+      delAction:delAction,
       ...item
     })
   });
@@ -82,6 +86,18 @@ export default {
         type: 'queryList',
         payload: response,
       });
+    },
+    *delMedical({ payload, callback }, { call }) {
+      yield call(deleteMedical, payload);
+      if(callback) callback();
+    },
+    *delGauge({ payload, callback }, { call }) {
+      yield call(deleteGauge, payload);
+      if(callback) callback();
+    },
+    *delQues({ payload, callback }, { call }) {
+      yield call(deleteQues, payload);
+      if(callback) callback();
     },
   },
 

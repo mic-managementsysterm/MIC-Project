@@ -17,17 +17,17 @@ class AddRecord extends Component{
     // dispatch({
     //   type: 'addQues/setStates',
     //   payload:{
-    //     RespondentId:location.query.Id
+    //     Id:location.query.recordId
     //   }
     // })
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch,location } = this.props;
     dispatch({
       type: 'addQues/getQues',
       payload:{
-        Id:"87f5a6b4-ee86-4b2f-a984-1dc6edc77e9c"
+        Id:location.query.recordId
       }
     })
   }

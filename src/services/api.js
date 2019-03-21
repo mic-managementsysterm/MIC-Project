@@ -104,7 +104,10 @@ export async function queryAdvancedProfile() {
 }
 
 export async function queryFakeList(params) {
-  return request(`/api/fake_list?${stringify(params)}`);
+  return request(`http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`,{
+    // body: params,
+    // method: 'GET',
+  });
 }
 
 export async function removeFakeList(params) {
@@ -162,43 +165,18 @@ export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
 }
 
-export async function getQuestion(Id) {
-  const path = `${Config.service}/questionnaire/get/getById?${stringify(Id)}`;
-  return request(path)
-}
-
 export async function getAllQuestionnaire() {
-  const path = `${Config.service}/questionnaire/get/getAll`;
-  return request(path);
-}
-
-export async function getAllGauge() {
-  const path = `${Config.service}/gaugetable/get/lib`;
-  return request(path);
-}
-
-export async function changeQuestion(params) {
-  const path=`${Config.service}/questionnaire/change/addOrUpdate`;
-  return request(path, {
-    method: 'POST',
-    body: { ...params.body },
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
+  const path = `http://localhost:5010/questionnaire/get/getAll`;
+  return request(path,{
+    method: 'GET',
   });
 }
 
-export async function deleteQuestion(Id) {
-  console.log("@22222112")
-  const path=`${Config.service}/questionnaire/delete/delete`;
+export async function getAllGauge() {
+  const path = `http://localhost:5010/gaugetable/get/lib`;
   return request(path,{
-    method:'POST',
-    body:Id,
-    headers:{
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
-  })
-  console.log("@111")
+    method: 'GET',
+  });
 }
 
 export async function getCognitionDetail(params) {
@@ -218,13 +196,8 @@ export async function getMMSEDetail(params) {
 export async function getMOCADetail(params) {
   const path = `http://localhost:5010/questionnairerecord/get/getById?${stringify(params)}`;
   return request(path,{
-    method:'POST',
-    body:{...params},
-    headers:{
-      "Content-Type":"application/x-www-form-urlencoded"
-    }
-  })
-  console.log("@change",params)
+    method: 'GET',
+  });
 }
 
 export async function getDiagnosisDetail(params) {
@@ -238,6 +211,68 @@ export async function getPhysicochemicalDetail(params) {
   const path = `http://localhost:5010/gaugerecord/get/getById?${stringify(params)}`;
   return request(path,{
     method: 'GET',
+  });
+}
+
+export async function uploadMedical(params) {
+  const path = `http://localhost:5010/medicalrecord/change/addOrUpdateRecord`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+
+export async function login(params) {
+  const path = `http://localhost:5010/user/change/login`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+export async function deleteMedical(params) {
+  const path = `http://localhost:5010/medicalrecord/delete/delete`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+export async function deleteGauge(params) {
+  const path = `http://localhost:5010/gaugerecord/delete/byId`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+export async function deleteQues(params) {
+  const path = `http://localhost:5010/questionnairerecord/delete/delete`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
   });
 }
 

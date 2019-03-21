@@ -24,7 +24,8 @@ class LoginPage extends Component {
       dispatch({
         type: 'login/login',
         payload: {
-          ...values,
+          LoginCode:values.userName,
+          LoginPwd:values.password,
           type,
         },
       });
