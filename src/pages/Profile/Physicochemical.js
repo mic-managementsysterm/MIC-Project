@@ -1,75 +1,64 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Divider, Icon } from 'antd';
+import { Card, Divider, Icon, Row, Col } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physicochemical.less';
-
 const { Description } = DescriptionList;
 
-@connect(({ profile, detail, loading }) => ({
-  profile,
+@connect(({ detail, loading }) => ({
   detail,
-  loading: loading.effects['profile/fetchBasic'] && loading.effects['detail/fetchPhysicochemicalDetail'],
+  loading: loading.effects['detail/fetchPhysicochemicalDetail'],
 }))
 class Physicochemical  extends Component {
   componentDidMount() {
-    const { dispatch, match } = this.props;
-    const { params } = match;
-
-    dispatch({
-      type: 'profile/fetchBasic',
-      payload: params.id || '1000000000',
-    });
-
-    this.getPhysicochemicalDetail();
-  }
-
-  getPhysicochemicalDetail = () =>{
-    const { dispatch } = this.props;
+    const { dispatch, location } = this.props;
     dispatch({
       type: 'detail/fetchPhysicochemicalDetail',
       payload: {
-        Id: '3001'
-      }
-    })
+        Id:  location.query.Id ? location.query.Id : '',
+      },
+    });
   }
 
   render() {
-    const { profile = {}, detail = {}, loading } = this.props;
-    const { userInfo = {} } = profile;
+    const { detail = {}, loading } = this.props;
     const { physicochemicalData = {} } = detail;
-    console.log('@physicochemicalData',physicochemicalData)
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.location.query;
     return (
       <PageHeaderWrapper title="基础详情页" loading={loading}>
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
-            <Description term="用户姓名">{userInfo.name}</Description>
-            <Description term="用户性别">{userInfo.delivery}</Description>
-            <Description term="联系电话">{userInfo.tel}</Description>
-            <Description term="出生日期">{userInfo.tel}</Description>
-            <Description term="家庭地址">{userInfo.addr}</Description>
-            <Description term="时间">{userInfo.remark}</Description>
+            <Description term="用户姓名">{Name}</Description>
+            <Description term="用户性别">{Gender}</Description>
+            <Description term="联系电话">{Phone}</Description>
+            <Description term="出生日期">{Born}</Description>
+            <Description term="家庭地址">{Address}</Description>
+            <Description term="创建时间">{CreatedAt}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
           <h1>{physicochemicalData&&physicochemicalData.GaugeRecord ? physicochemicalData.GaugeRecord.GaugeName : null}检查详情</h1>
-          <div className={styles.physicochemicalContentTitle}>
-            <span>测定项目</span>
-            <span>测定结果</span>
-          </div>
+          <Row>
+            <Col span={6}>测定项目</Col>
+            <Col span={6} offset={6}>测定结果</Col>
+          </Row>
           <div>{
             physicochemicalData&&physicochemicalData.RecordInfos ? physicochemicalData.RecordInfos.map((item,index) =>{
             return(
             <div key={index}>
-            <span className={styles.groupName}>{item.GroupName}</span>
-            <div className={styles.physicochemicalContentDetail}>
-            <ul className={styles.physicochemicalContentDetails}>
-            <li>{item.Title}</li>
-            </ul>
-            <ul className={styles.physicochemicalContentDetails}>
-            <li>{item.ItemResult}{item.ExceptionType === '1' ? <Icon type='arrow-up' /> : <Icon type='arrow-down' /> }</li>
-            </ul>
-            </div>
+            <Row className={styles.groupName}>{item.GroupName}</Row>
+              <Row>
+                <Col span={6}>
+                  <ul>
+                  <li>{item.Title}</li>
+                  </ul>
+                </Col>
+                <Col span={6} offset={6}>
+                  <ul>
+                  <li>{item.ItemResult}{item.ExceptionType === '1' ? <Icon type='arrow-up' /> : <Icon type='arrow-down' /> }</li>
+                  </ul>
+                  </Col>
+              </Row>
             </div>
             )
           }) : null}</div>

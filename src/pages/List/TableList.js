@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import router from 'umi/router';
 import Link from "umi/link";
 import {
   Row,
@@ -343,7 +342,7 @@ class TableList extends PureComponent {
         return dataSource.length >= 1
           ? (
             <div key={record.Id}>
-              <Link to={`/list/card-list?Id=${record.Id}`}>
+              <Link to={`/list/card-list?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
                 <Button className="btn">查看</Button>
               </Link>
               <Button onClick={() => this.handleUpdateModalVisible(true,record)}>编辑</Button>

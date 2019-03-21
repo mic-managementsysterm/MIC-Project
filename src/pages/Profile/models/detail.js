@@ -13,9 +13,11 @@ export default {
       RecordInfos: []
     },
     mmseData: {
+      Images: [],
       Infos:[],
     },
     mocaData: {
+      Images: [],
       Infos:[],
     },
   },
