@@ -340,7 +340,7 @@ class TableList extends PureComponent {
       title: '操作',
       render: (text, record) => {
         const {respondent:{dataSource}} = this.props;
-        return dataSource.length >= 1
+        return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
               <Link to={`/list/card-list?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
@@ -490,7 +490,7 @@ class TableList extends PureComponent {
             <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               新建
             </Button>
-            {selectedRows.length >=1 && (
+            {selectedRows && selectedRows.length >=1 && (
               <span>
                 <Button onClick={() => this.handleDelete()}>批量删除</Button>
               </span>
@@ -517,7 +517,7 @@ class TableList extends PureComponent {
     const data ={
       list: showSource,
       pagination: {
-        total: dataSource.length,
+        total: dataSource?dataSource.length:0,
         pageSize:pageSize,
         current:current
       },
@@ -528,7 +528,7 @@ class TableList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
-              selectedRows={selectedRows}
+              selectedRows={selectedRows || []}
               loading={loading}
               data={data}
               columns={this.columns}

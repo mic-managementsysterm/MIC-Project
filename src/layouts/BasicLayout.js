@@ -46,12 +46,14 @@ const query = {
 
 class BasicLayout extends React.Component {
   componentDidMount() {
+    let uid =localStorage.getItem("userId");
     const {
       dispatch,
       route: { routes, authority },
     } = this.props;
     dispatch({
       type: 'user/fetchCurrent',
+      payload:{Id:uid}
     });
     dispatch({
       type: 'setting/getSetting',
@@ -160,7 +162,8 @@ class BasicLayout extends React.Component {
   }
 }
 
-export default connect(({ global, setting, menu: menuModel }) => ({
+export default connect(({ global, setting, menu: menuModel,user }) => ({
+  currentUser:user.currentUser,
   collapsed: global.collapsed,
   layout: setting.layout,
   menuData: menuModel.menuData,
