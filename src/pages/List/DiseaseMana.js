@@ -330,10 +330,10 @@ class RelateForm extends PureComponent {
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ disease,disAndSyn, loading }) => ({
+@connect(({ disease,respondent, loading }) => ({
   disease,
-  disAndSyn,
-  loading: loading.models.disease && loading.models.disAndSyn,
+  respondent,
+  loading: loading.models.disease,
 }))
 @Form.create()
 class DiseaseMana extends PureComponent {
@@ -362,11 +362,11 @@ class DiseaseMana extends PureComponent {
     },
   ];
 
-  componentDidMount() {
+  componentDidMount(){
     const { dispatch } = this.props;
     dispatch({
       type: 'disease/queryDisease',
-      payload:{}
+      payload: "",
     });
   }
 
@@ -487,20 +487,6 @@ class DiseaseMana extends PureComponent {
       },
     });
 
-    // dispatch替代方案
-    // disAndSyn.diseaseId = record.Id;
-    // setTimeout(()=>{
-    //   dispatch({
-    //     type: 'disAndSyn/queryRelate',
-    //     payload:{DiseaseId:disAndSyn.diseaseId}
-    //   });
-    //   dispatch({
-    //     type: 'disAndSyn/queryRest',
-    //     payload:{DiseaseId:disAndSyn.diseaseId}
-    //   });
-    // },1000)
-    //
-
     dispatch({
       type: 'disAndSyn/changeIdEff',
       payload: record.Id,
@@ -526,7 +512,7 @@ class DiseaseMana extends PureComponent {
             <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               新建
             </Button>
-            {selectedRows.length > 0 && (
+            {selectedRows && selectedRows.length > 0 && (
               <span>
                 <Button onClick={() => this.handleDelete()}>批量删除</Button>
               </span>
@@ -549,11 +535,8 @@ class DiseaseMana extends PureComponent {
   };
 
   render() {
-    const {
-      disease: { dataSource,showSource,current,pageSize, selectedRows },
-      loading,
-    } = this.props;
-    const data = {
+    const { disease: { showSource,selectedRows,dataSource,pageSize,current }, loading, } = this.props;
+    const data ={
       list: showSource,
       pagination: {
         total: dataSource?dataSource.length:0,
@@ -561,25 +544,21 @@ class DiseaseMana extends PureComponent {
         current:current
       },
     };
-
     return (
-      <PageHeaderWrapper title="查询表格">
+      <PageHeaderWrapper title="患者管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
-              selectedRows={selectedRows}
+              selectedRows={selectedRows || []}
               loading={loading}
               data={data}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              rowKey={item => item.Id}
             />
           </div>
         </Card>
-        <ManaForm {...this.props} />
-        <RelateForm />
       </PageHeaderWrapper>
     );
   }

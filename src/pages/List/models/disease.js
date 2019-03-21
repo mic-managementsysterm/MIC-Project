@@ -25,13 +25,15 @@ export default {
   effects: {
     *queryDisease({ payload }, { call, put }) {
       const response = yield call(queryDisease, payload);
-      yield put({
-        type: 'set',
-        payload: {
-          dataSource:response.Data,
-          showSource:response.Data
-        },
-      });
+      if(response.Success){
+        yield put({
+          type: 'set',
+          payload: {
+            dataSource:response.Data,
+            showSource:response.Data
+          },
+        });
+      }
     },
     *addDisease({ payload, callback }, { call }) {
       yield call(addDisease, payload);

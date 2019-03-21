@@ -490,7 +490,7 @@ class TableList extends PureComponent {
             <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               新建
             </Button>
-            {selectedRows.length >=1 && (
+            {selectedRows && selectedRows.length >=1 && (
               <span>
                 <Button onClick={() => this.handleDelete()}>批量删除</Button>
               </span>
@@ -528,7 +528,7 @@ class TableList extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
-              selectedRows={selectedRows}
+              selectedRows={selectedRows || []}
               loading={loading}
               data={data}
               columns={this.columns}

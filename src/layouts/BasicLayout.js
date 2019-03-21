@@ -46,13 +46,14 @@ const query = {
 
 class BasicLayout extends React.Component {
   componentDidMount() {
+    let uid =localStorage.getItem("userId");
     const {
-      dispatch,currentUser,
+      dispatch,
       route: { routes, authority },
     } = this.props;
     dispatch({
       type: 'user/fetchCurrent',
-      payload:{Id:currentUser.Id}
+      payload:{Id:uid}
     });
     dispatch({
       type: 'setting/getSetting',
