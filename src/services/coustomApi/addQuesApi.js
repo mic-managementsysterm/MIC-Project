@@ -5,7 +5,7 @@ import request from '@/utils/request';
 // 新增问卷
 
 export async function queryQues(params) {
-  return request(`http://localhost:5010/questionnaire/get/getById?${stringify(params)}`);
+  return request(`/Api/questionnaire/get/getById?${stringify(params)}`);
 }
 export async function addOrUpdateQues(params) {
   return request(`${Config.service}/questionnairerecord/change/addOrUpdate`,{

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spin , DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Upload ,Row,message } from 'antd';
+import {Spin , Button, Input, Icon,InputNumber,Upload ,Row,message } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload/interface';
 import router from 'umi/router';
 import { connect } from 'dva';
@@ -23,11 +23,6 @@ class QuestionEdit extends React.Component {
     this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
     this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
-    this.handleOptionChange = this.handleOptionChange.bind(this);
-    // this.handleAddOption = this.handleAddOption.bind(this);
-    this.handleRemoveOption = this.handleRemoveOption.bind(this);
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleTextRequire = this.handleTextRequire.bind(this);
     this.handleDatePick = this.handleDatePick.bind(this);
     this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
     this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
@@ -81,9 +76,7 @@ class QuestionEdit extends React.Component {
   }
   componentWillMount(){
     const Id=this.props.location.state.Id
-    // console.log('@data',data)
     this.getQuestion(Id)
-    console.log("@id",Id)
 
   }
   getQuestion=(Id)=>{
@@ -94,13 +87,11 @@ class QuestionEdit extends React.Component {
         Id
       },callback:()=>{
         const {question:{question}}=this.props
-        // console.log("@callback",question)
         this.setState({
           questions:question
         })
       }
     })
-    // console.log('@data',this.state.questions)
   }
 
   handleTitleChange(e) {
@@ -139,7 +130,6 @@ class QuestionEdit extends React.Component {
       questions: this.state.questions,
       addAreaVisible: false
     });
-    console.log('@image',this.state.questions.Topics[0].Image)
   }
   getBase64(img, callback) {
     const reader = new FileReader();
@@ -176,8 +166,6 @@ class QuestionEdit extends React.Component {
         const image = new Image();
         image.onload = function() {
           // 获取图片的宽高，并存放到file对象中
-          console.log('file width :' + this.width);
-          console.log('file height :' + this.height);
           file.width = this.width;
           file.height = this.height;
           resolve();
@@ -201,7 +189,6 @@ class QuestionEdit extends React.Component {
       }
       this.getBase64(info.file.originFileObj, imageUrl =>{
         const base64Img=imageUrl
-        console.log('@image',info),
           // this.state.questions.Topics[this.state.indexCurrent].Image=null,
           // this.setState({
           //   questions:this.state.questions,
@@ -215,7 +202,6 @@ class QuestionEdit extends React.Component {
             imageUrl:null
           })
       });
-      console.log('@image1',info.file)
     }
   }
   handleAddCheckbox() {
@@ -282,46 +268,6 @@ class QuestionEdit extends React.Component {
     });
   }
 
-  handleOptionChange(value, questionIndex, optionIndex) {
-    let { questions } = this.state;
-    questions.Topics[questionIndex].options[optionIndex].value =value;
-    this.setState({
-      questoins: questions
-    });
-  }
-
-  // handleAddOption(questionIndex) {
-  //   let { questions } = this.state;
-  //   const newOption = { text: '新选项' };
-  //   questions[questionIndex].options.push(newOption);
-  //   this.setState({
-  //     questions: questions
-  //   });
-  // }
-
-  handleRemoveOption(questionIndex, optionIndex) {
-    let { questions } = this.state;
-    questions[questionIndex].options.splice(optionIndex, 1);
-    this.setState({
-      questions: questions
-    });
-  }
-
-  handleTextChange(e, questionIndex) {
-    let { questions } = this.state;
-    questions[questionIndex].text = e.target.value;
-    this.setState({
-      questions: questions
-    });
-  }
-
-  handleTextRequire(e, questionIndex) {
-    let { questions } = this.state;
-    questions[questionIndex].required = e.target.checked;
-    this.setState({
-      questions: questions
-    });
-  }
 
   handleDatePick(date, dateString) {
     const {questions}=this.state
@@ -332,7 +278,6 @@ class QuestionEdit extends React.Component {
   }
 
   handleSaveQuestionnaire(body) {
-    console.log("@idid",body)
     this.setState({
       showLoading:true
     })
@@ -344,7 +289,7 @@ class QuestionEdit extends React.Component {
           this.setState({
             showLoading:false
           })
-          router.push('/list/question-list')
+          router.push('/gauge/question-list')
         }
       }
     )
@@ -382,24 +327,6 @@ class QuestionEdit extends React.Component {
     this.setState({
       questions: questions
     });
-    // if (questions.Topics[quesIndex].type===0) {
-    //     questions[quesIndex].options.map((d,index)=>{
-    //         if (d.text==='加分'){
-    //             d.value=value;
-    //             // d.text='加'+value+'分'
-    //         }else {
-    //             d.value=0;
-    //             // d.text='加'+0+'分'
-    //         }
-    //         this.setState({
-    //             questions: questions
-    //         })
-    //     })
-    // }else {
-    //   for (let i=1;i<questions.Topics[quesIndex].TotalScore+1;i++) {
-    //     return
-    //   }
-    // }
   }
 
   getTitle() {
@@ -456,13 +383,6 @@ class QuestionEdit extends React.Component {
           }
           this.getBase64(info.file.originFileObj, imageUrl =>{
             const base64Img=imageUrl
-            console.log('@image',info),
-              // this.state.questions.Topics[this.state.indexCurrent].Image=null,
-              // this.setState({
-              //   questions:this.state.questions,
-              //   // loading:false,
-              //   // imageUrl:null
-              // })
               this.state.questions.Topics[questionIndex].Image=imageUrl,
               this.setState({
                 questions:this.state.questions,
@@ -470,7 +390,6 @@ class QuestionEdit extends React.Component {
                 imageUrl:null
               })
           });
-          console.log('@image1',info.file)
         }
       }
       if (question.Type === 0||1) {
@@ -484,14 +403,6 @@ class QuestionEdit extends React.Component {
               <span >总分：</span>
               <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
             </Row>
-            {/*{*/}
-            {/*question.Image?*/}
-            {/*<div style={{marginTop:10}}>*/}
-            {/*<img style={{width:200,height:200}} src={question.Image} alt=""/>*/}
-            {/*</div>:<div style={{marginTop:10}}>*/}
-            {/*<img style={{width:200,height:200}} src={this.state.imageUrl} alt=""/>*/}
-            {/*</div>*/}
-            {/*}*/}
             <div style={{marginTop:5}}>
               <Upload
                 name="avatar"

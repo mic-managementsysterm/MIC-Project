@@ -38,7 +38,6 @@ export default {
           questions: response.Data
         }
       })
-
     },
     * getQuestion({ payload, callback }, { call, put }) {
       const response = yield call(getQuestion, payload);
@@ -47,34 +46,16 @@ export default {
         payload: {
           question: response.Data
         }
-      }),
-        console.log('@response11', response)
+      });
       if (callback) callback()
     },
 
     *changeQuestion({payload,callback},{call,put}){
-      // const response=
         yield call(changeQuestion,payload);
-      // yield put({
-      //   type:'show',
-      //   payload:{
-      //     // res:response
-      //   }
-      // });
-      // console.log("@change",response)
       if (callback) callback()
     },
     *deleteQuestions({payload,callback},{call,put}){
-      // const response=
-      console.log("@222")
         yield call(deleteQuestion,payload)
-      // console.log("@222")
-    //   yield put({
-    //     type:'show',
-    //       payload:{
-    //         res:response
-    //       }
-    //   })
       if (callback) callback()
     }
   },
