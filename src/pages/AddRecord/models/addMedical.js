@@ -2,7 +2,6 @@ import { uploadMedical } from '@/services/api';
 
 export default {
   namespace: 'addMedical',
-
   state: {},
 
   effects: {

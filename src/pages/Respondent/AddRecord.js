@@ -44,7 +44,7 @@ import router from 'umi/router';
       return
     }
     basePath = "/record/diagnosis";
-    router.push(`${basePath}?Id=${location.query.Id}`)
+    router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`)
   };
 
 
@@ -52,10 +52,10 @@ import router from 'umi/router';
     const { record:{ allQuestionnaireData, allGaugeData } , loading } = this.props;
     let data = [{Name: "四诊数据采集"}];
     let Data = [];
-    allQuestionnaireData.map((item,index) =>{
+    allQuestionnaireData.map(item =>{
       Data.push(item)
     })
-    allGaugeData.map((item,index) =>{
+    allGaugeData.map(item =>{
       Data.push(item)
     })
     data = data.concat(Data);

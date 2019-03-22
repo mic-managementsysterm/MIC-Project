@@ -82,7 +82,7 @@ class RespondentRecord extends PureComponent {
                 </List.Item>
               ) : (
                 <List.Item>
-                  <Link to="/respondent/respondent-list/respondent-record/add-record">
+                  <Link to={`/respondent/respondent-list/respondent-record/add-record?Id=${location.query.Id}`}>
                     <Button type="dashed" className={styles.newButton}>
                       <Icon type="plus" /> 新增记录
                     </Button>
