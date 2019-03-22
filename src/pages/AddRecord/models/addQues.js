@@ -22,7 +22,6 @@ export default {
   effects: {
     *getQues({ payload }, { call, put }) {
       const response = yield call(queryQues, payload);
-      console.log('@response',response);
       yield put({
         type: 'setNewQues',
         payload: response.Data,
@@ -32,7 +31,6 @@ export default {
       yield call(addOrUpdateQues, payload)
     },
   },
-
   reducers: {
     setNewQues(state, { payload }) {
       let newObj ={};

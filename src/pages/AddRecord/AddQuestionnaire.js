@@ -208,7 +208,6 @@ class AddRecord extends Component{
 
   render() {
     const { addQues:{Topics} , loading } = this.props;
-    console.log('@props',this.props)
     return(
       <PageHeaderWrapper title="新增问卷" loading={loading}>
         <div style={{ background: '#ECECEC', padding: '30px' }}>
