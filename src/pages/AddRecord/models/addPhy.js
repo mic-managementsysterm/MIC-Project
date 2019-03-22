@@ -5,7 +5,7 @@ export default {
 
   state: {
     newPhy:{
-      RespondentId:"fb2413f6-7cea-ea8e-82b3-17b6a9327b68",
+      RespondentId:"",
       GaugeId:"",
       GaugeName:"",
       Infos:[],

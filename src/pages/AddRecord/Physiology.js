@@ -6,7 +6,6 @@ import {
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physiology.less';
 
-
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
 const { TextArea } = Input;
