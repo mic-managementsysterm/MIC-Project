@@ -4,14 +4,14 @@ import { Card, Divider } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from  './BasicProfile.less';
+import styles from  './FourDagnostic.less';
 const { Description } = DescriptionList;
 
 @connect(({ detail, loading }) => ({
   detail,
   loading: loading.effects['detail/fetchDiagnosisDetail'],
 }))
-class BasicProfile extends Component {
+class FourDagnostic extends Component {
   componentDidMount() {
     const { dispatch,location } = this.props;
     dispatch({
@@ -47,15 +47,15 @@ class BasicProfile extends Component {
             <Description term="中医诊断" className={styles.term}>
               {diagnosisData&&diagnosisData.Diagnoses
                 ? diagnosisData.Diagnoses.map((item, index) => {
-                    return <span key={index}>{item.DiagnoseName}、</span>;
-                  })
+                  return <span key={index}>{item.DiagnoseName}、</span>;
+                })
                 : null}
             </Description>
             <Description term="四诊信息" className={styles.term}>
               {diagnosisData.Symptoms
                 ? diagnosisData.Symptoms.map((item, index) => {
-                    return <span key={index}>{item.SymptomName}、</span>;
-                  })
+                  return <span key={index}>{item.SymptomName}、</span>;
+                })
                 : null}
             </Description>
           </DescriptionDetail>
@@ -65,4 +65,4 @@ class BasicProfile extends Component {
   }
 }
 
-export default BasicProfile;
+export default FourDagnostic;

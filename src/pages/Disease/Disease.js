@@ -17,7 +17,7 @@ import {
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
-import styles from './DiseaseMana.less';
+import styles from './Disease.less';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -336,7 +336,7 @@ class RelateForm extends PureComponent {
   loading: loading.models.disease,
 }))
 @Form.create()
-class DiseaseMana extends PureComponent {
+class Disease extends PureComponent {
   columns = [
     {
       title: '姓名',
@@ -558,10 +558,12 @@ class DiseaseMana extends PureComponent {
               onChange={this.handleStandardTableChange}
             />
           </div>
+          <ManaForm {...this.props}/>
+          <RelateForm {...this.props}/>
         </Card>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default DiseaseMana;
+export default Disease;

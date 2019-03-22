@@ -14,136 +14,121 @@ export default [
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/list/table-list' },
+      { path: '/', redirect: '/disease/disease-list' },
       // 疾病管理
       {
-        path: '/list',
+        path: '/disease',
         icon: 'table',
-        name: 'list',
+        name: 'disease',
         routes: [
           {
-            path: '/list/table-list',
-            name: 'searchtable',
-            component: './List/TableList',
-          },
-          {
-            path: '/list/basic-list',
-            name: 'basiclist',
-            component: './List/BasicList',
-          },
-          {
-            path: '/list/question-list',
-            name: 'question',
-            component: './User/questionnaire/ques',
-          },
-          {
-            path: '/list/question-list/questionAdd-list',
-            hideInMenu:true,
-            name: 'question-add',
-            component: './User/questionnaire/add',
-          },
-          {
-            path: '/list/question-list/questionEdit-list',
-            hideInMenu:true,
-            name: 'questionEdit',
-            component: './User/questionnaire/edit',
-          },
-          {
-            path: '/list/card-list',
-            name: 'cardlist',
-            component: './List/CardList',
-          },
-          {
-            path: '/list/disease-mana',
-            name: 'diseaseMana',
-            component: './List/DiseaseMana',
-          },
-          {
-            path: '/list/search',
-            name: 'searchlist',
-            component: './List/List',
-            routes: [
-              {
-                path: '/list/search',
-                redirect: '/list/search/articles',
-              },
-              {
-                path: '/list/search/articles',
-                name: 'articles',
-                component: './List/Articles',
-              },
-              {
-                path: '/list/search/projects',
-                name: 'projects',
-                component: './List/Projects',
-              },
-              {
-                path: '/list/search/applications',
-                name: 'applications',
-                component: './List/Applications',
-              },
-            ],
+            path: '/disease/disease-list',
+            name: 'diseaseList',
+            component: './Disease/Disease',
           },
         ],
       },
+      //量表管理
       {
-        path: '/profile',
-        name: 'profile',
-        icon: 'profile',
+        path: '/gauge',
+        icon: 'form',
+        name: 'gauge',
         routes: [
-          // profile
           {
-            path: '/profile/basic',
-            name: 'basic',
-            component: './Profile/BasicProfile',
+            path: '/gauge/question-list',
+            name: 'question',
+            component: './Gauge/Question',
           },
           {
-            path: '/profile/basic/:id',
-            name: 'basic',
-            hideInMenu: true,
-            component: './Profile/BasicProfile',
+            path: '/gauge/question-list/questionAdd-list',
+            hideInMenu:true,
+            name: 'questionAdd',
+            component: './Gauge/QuestionAdd',
           },
           {
-            path: '/profile/cognition',
-            name: 'cognition',
-            component: './Profile/Cognition',
-          },{
+            path: '/gauge/question-list/questionEdit-list',
+            hideInMenu:true,
+            name: 'questionEdit',
+            component: './Gauge/QuestionEdit',
+          },
+        ],
+      },
+      //受访者管理
+      {
+        path: '/respondent',
+        icon: 'user',
+        name: 'respondent',
+        routes: [
+          {
+            path: '/respondent/respondent-list',
+            name: 'respondentList',
+            component: './Respondent/Respondent',
+          },
+          {
+            path: '/respondent/respondent-list/respondent-record',
+            name: 'respondentRecord',
+            component: './Respondent/RespondentRecord',
+            hideInMenu:true,
+          },
+          {
+            path: '/respondent/respondent-list/respondent-record/four-dagnostic',
+            name: 'fourDagnostic',
+            component: './Respondent/Detail/FourDagnostic',
+            hideInMenu:true,
+          },
+          {
+            path: '/respondent/respondent-list/respondent-record/Physicochemical',
             name: 'physicochemical',
-            path: '/profile/physicochemical',
-            component: './Profile/Physicochemical',
+            component: './Respondent/Detail/Physicochemical',
+            hideInMenu:true,
           },
           {
-            name: 'record',
-            path: '/profile/record',
-            component: './Profile/AddRecord',
-          },{
+            path: '/respondent/respondent-list/respondent-record/cognition',
+            name: 'cognition',
+            component: './Respondent/Detail/Cognition',
+            hideInMenu:true,
+          },
+          {
+            path: '/respondent/respondent-list/respondent-record/MMSE',
             name: 'mmse',
-            path: '/profile/mmse',
-            component: './Profile/MMSE',
-          },{
+            component: './Respondent/Detail/MMSE',
+            hideInMenu:true,
+          },
+          {
+            path: '/respondent/respondent-list/respondent-record/moca',
             name: 'moca',
-            path: '/profile/moca',
-            component: './Profile/MOCA',
-          },{
+            component: './Respondent/Detail/MOCA',
+            hideInMenu:true,
+          },
+          {
+            path: '/respondent/respondent-list/respondent-record/add-record',
+            name: 'addRecord',
+            component: './Respondent/AddRecord',
+            hideInMenu:true,
+          },
+        ],
+      },
+      //新增记录
+      {
+        path: '/record',
+        icon: 'table',
+        name: 'record',
+        hideInMenu:true,
+        routes: [
+          {
+            path: '/record/diagnosis',
             name: 'diagnosis',
-            path: '/profile/diagnosis',
-            component: './Profile/Diagnosis',
+            component: './AddRecord/Diagnosis',
           },
           {
+            path: '/record/physiology',
             name: 'physiology',
-            path: '/profile/physiology',
-            component: './Profile/Physiology',
+            component: './AddRecord/Physiology',
           },
           {
-            name: 'questionnaire',
-            path: '/profile/questionnaire',
-            component: './Profile/Add/AddQuestionnaire',
-          },
-          {
-            path: '/profile/advanced',
-            name: 'advanced',
-            authority: ['admin'],
-            component: './Profile/AdvancedProfile',
+            path: '/record/add-questionnaire',
+            name: 'addQuestionnaire',
+            component: './AddRecord/AddQuestionnaire',
           },
         ],
       },

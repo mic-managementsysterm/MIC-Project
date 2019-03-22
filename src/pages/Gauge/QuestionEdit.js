@@ -3,18 +3,14 @@ import {Spin , DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Uplo
 import { UploadChangeParam } from 'antd/lib/upload/interface';
 import router from 'umi/router';
 import { connect } from 'dva';
-// import './Edit.css';
-
-// const list = localStorage.list ? JSON.parse(localStorage.list) : [];
-const list=[]
-// const editing = localStorage.editing ? JSON.parse(localStorage.editing) : [];
-const fileList=[]
+const list=[];
+const fileList=[];
 
 @connect(({question,loading})=>({
   question,
   loading:loading.models.loading
 }))
-class Edit extends React.Component {
+class QuestionEdit extends React.Component {
   constructor(props) {
     super(props);
     this.handleTitleClick = this.handleTitleClick.bind(this);
@@ -35,6 +31,8 @@ class Edit extends React.Component {
     this.handleDatePick = this.handleDatePick.bind(this);
     this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
     this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
+    this.handleIndex=this.handleIndex.bind(this);
+    this.handleChange=this.handleChange.bind(this);
     this.beforeUpload=this.beforeUpload.bind(this);
     this.checkImageWH=this.checkImageWH.bind(this)
     this.state = {
@@ -42,7 +40,7 @@ class Edit extends React.Component {
       addAreaVisible:false,
       questions:{
         Id:         null,
-        Name:       '这里是标题',
+        Name:       null,
         TotalScore: null,
         PassScore:  null,
         Topics:     [
@@ -55,10 +53,10 @@ class Edit extends React.Component {
             GroupName:       null,
             TotalScore:      null,
             Type:            null,
-            // CreatedAt:       null /* 2018-07-23 10:04:30 */
+            CreatedAt:       null /* 2018-07-23 10:04:30 */
           }
         ],
-        // CreatedAt:  null,
+        CreatedAt:  null,
       }
       ,
       date:null,
@@ -80,6 +78,29 @@ class Edit extends React.Component {
     this.setState({
       titleEditable: true
     })
+  }
+  componentWillMount(){
+    const Id=this.props.location.state.Id
+    // console.log('@data',data)
+    this.getQuestion(Id)
+    console.log("@id",Id)
+
+  }
+  getQuestion=(Id)=>{
+    const {dispatch}=this.props
+    dispatch({
+      type:'question/getQuestion',
+      payload:{
+        Id
+      },callback:()=>{
+        const {question:{question}}=this.props
+        // console.log("@callback",question)
+        this.setState({
+          questions:question
+        })
+      }
+    })
+    // console.log('@data',this.state.questions)
   }
 
   handleTitleChange(e) {
@@ -167,7 +188,36 @@ class Edit extends React.Component {
       filereader.readAsDataURL(file);
     });
   }
-
+  handleChange = (info) => {
+    const {indexCurrent}=this.state
+    if (info.file.status === 'uploading') {
+      this.setState({ loading: true });
+      return;
+    }
+    if (info.file.status === 'done') {
+      // Get this url from response in real world.
+      if (info.fileList.length>1){
+        info.fileList.splice(0,1);
+      }
+      this.getBase64(info.file.originFileObj, imageUrl =>{
+        const base64Img=imageUrl
+        console.log('@image',info),
+          // this.state.questions.Topics[this.state.indexCurrent].Image=null,
+          // this.setState({
+          //   questions:this.state.questions,
+          //   // loading:false,
+          //   // imageUrl:null
+          // })
+          this.state.questions.Topics[indexCurrent].Image=imageUrl,
+          this.setState({
+            questions:this.state.questions,
+            loading:false,
+            imageUrl:null
+          })
+      });
+      console.log('@image1',info.file)
+    }
+  }
   handleAddCheckbox() {
     const newQuestion = {
       Id:'',
@@ -276,19 +326,12 @@ class Edit extends React.Component {
   handleDatePick(date, dateString) {
     const {questions}=this.state
     questions.CreatedAt=dateString
-    console.log("@date",dateString)
     this.setState({
       questions:questions
     })
   }
 
   handleSaveQuestionnaire(body) {
-    // const index = this.state.index;
-    // list[index] = Object.assign({}, this.state);
-    // localStorage.list = JSON.stringify(list);
-    // message.success({
-    //   title: '保存成功'
-    // });
     console.log("@idid",body)
     this.setState({
       showLoading:true
@@ -383,14 +426,19 @@ class Edit extends React.Component {
       ) : ''
     );
   }
-
+  handleIndex=(index)=>{
+    this.setState({
+      indexCurrent:index,
+      loading:true
+    })
+  }
 
   getQuestions() {
     let questions = this.state.questions;
     const { TextArea } = Input;
     return questions.Topics.map((question, questionIndex, array) => {
       const uploadButton = (
-        <div >
+        <div onClick={()=>this.handleIndex(questionIndex)}>
           <Icon type={this.state.loading ? 'loading' : 'plus'} />
           <div className="ant-upload-text">Upload</div>
         </div>
@@ -504,11 +552,11 @@ class Edit extends React.Component {
 
     return (
       <div style={{ padding: 20 }}>
-        <div style={{ float: 'left' }}>
-        <span>问卷截止日期：</span>
-        <DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />
-        <span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>
-        </div>
+        {/*<div style={{ float: 'left' }}>*/}
+        {/*<span>问卷截止日期：</span>*/}
+        {/*<DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />*/}
+        {/*<span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>*/}
+        {/*</div>*/}
         <div style={{ float: 'right' }}>
           <Button onClick={()=>this.handleSaveQuestionnaire(this.state.questions)}>保存问卷</Button>
           {/*<Button type="primary" style={{ marginLeft: 16 }} onClick={this.handleReleaseQuestionnaire}>发布问卷</Button>*/}
@@ -542,6 +590,9 @@ class Edit extends React.Component {
             <span >及格分数：</span>
             <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.PassScore}  onChange={(value)=>this.onChangePassInt(value)}/>
           </div>
+          <div>
+
+          </div>
           <div style={{ padding: 20, borderTop: '2px solid #ccc', borderBottom: '2px solid #ccc' }}>
             <div style={{ marginBottom: 20 }}>
               {this.getQuestions()}
@@ -558,4 +609,4 @@ class Edit extends React.Component {
   }
 }
 
-export default Edit;
+export default QuestionEdit;

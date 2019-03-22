@@ -4,21 +4,15 @@ import Link from 'umi/link';
 import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import './index.less'
-
-// noinspection JSAnnotator
+import styles from './Question.less'
 
  @connect(({question,loading})=>({
   question,
   loading:loading.models.question
 }))
-export  default class Index extends Component{
+export  default class Question extends Component{
     constructor(props){
-        super(props)
-        this.state={
-            // data:data,
-
-        }
+        super(props);
         this.handleDelete=this.handleDelete.bind(this)
     }
 componentWillMount(){
@@ -30,11 +24,9 @@ componentWillMount(){
            type:'question/fetchQuestionList'
          })
      const {question:{questions}}=this.props
-     console.log('@question',questions)
 }
    handleDelete=(Id)=>{
       const {dispatch}=this.props
-     console.log("delete",Id)
      dispatch({
        type:'question/deleteQuestions',
        payload:{Id},callback:()=>{
@@ -77,28 +69,26 @@ componentWillMount(){
           align:'center',
           render:(text,record)=>(
             questions.length>=1?
-            (   <div className='operation'>
+            (   <div className={styles.operation}>
           <Link to={{
-            pathname:'/list/question-list/questionEdit-list',
+            pathname:'/gauge/question-list/questionEdit-list',
             state:{Id:record.Id}
           }}>
-          <Button className='btn'>编辑</Button>
+          <Button className={styles.btn}>编辑</Button>
           </Link>
-          <Button>填写</Button>
-          <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.Id)}>
+          <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>
           <Button>删除</Button>
           </Popconfirm>
           </div>
           ) : null)
         }
         ]
-      // console.log('@question',questions)
         return(
           <PageHeaderWrapper loading={loading}>
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
-              <Link to={{pathname:'/list/question-list/questionAdd-list',state:{data:{}}}}>
-                <Button className={'btn2'} style={{marginBottom:5,}} >添加</Button>
+              <Link to={'/gauge/question-list/questionAdd-list'}>
+                <Button className={styles.btn2} style={{marginBottom:5,}} >添加</Button>
               </Link>
               </div>
                 <Table style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}></Table>
