@@ -9,7 +9,6 @@ class GaugeDetail extends Component{
       <div>
         <h1>{data.QuestionnaireName} {data.Score}</h1>
         <div>{data&&data.Infos ? data.Infos.map((item,index) =>{
-          console.log('@Images',item.Images)
           return (
             <div key={index}>
                 <Row className={styles.groupName}>
@@ -27,7 +26,7 @@ class GaugeDetail extends Component{
                     <li>{item.Score}</li>
                   </ul>
                 </Col>
-                {/*<img src={require(item.Images ? item.Images[0].Url : '')} className={styles.img} />*/}
+                {/*{ item.Images ? <img src={ item.Images[0].Url} className={styles.img} /> : null}*/}
               </Row>
             </div>
           )

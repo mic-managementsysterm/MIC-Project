@@ -162,7 +162,7 @@ class AddRecord extends Component{
               alt="ex"
               className={styles.image}
               // src={`http://210.41.215.16:3306${item.Image}`}
-              src={require("../../../assets/img/cognition.jpg")}
+              src={require("../../assets/img/cognition.jpg")}
             />)
           :null}
             {item.insertImg?

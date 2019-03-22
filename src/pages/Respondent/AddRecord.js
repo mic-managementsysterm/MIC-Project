@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Col, Row, Button, List, Popconfirm, Icon } from 'antd';
+import Link from "umi/link";
+import { Card, Button, List } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from '../List/CardList.less';
+import styles from './RespondentRecord.less';
 import router from 'umi/router';
 
 @connect(({record,loading}) =>({
@@ -10,7 +11,6 @@ import router from 'umi/router';
   loading:loading.models.record,
 }))
  class AddRecord extends Component{
-
   componentDidMount() {
     this.getAllQuestionnaire();
     this.getAllGauge();
@@ -34,18 +34,19 @@ import router from 'umi/router';
     const {record:{allQuestionnaireData,allGaugeData},location} =this.props;
     let basePath ="";
     if(allGaugeData.includes(item)){
-      basePath = "/profile/physiology";
+      basePath = "/record/physiology";
       router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`);
       return
     }
     if(allQuestionnaireData.includes(item)){
-      basePath = "/profile/questionnaire";
+      basePath = "/record/add-questionnaire";
       router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`);
       return
     }
-    basePath = "/profile/diagnosis";
+    basePath = "/record/diagnosis";
     router.push(`${basePath}?Id=${location.query.Id}`)
   };
+
 
   render() {
     const { record:{ allQuestionnaireData, allGaugeData } , loading } = this.props;
@@ -53,10 +54,10 @@ import router from 'umi/router';
     let Data = [];
     allQuestionnaireData.map((item,index) =>{
       Data.push(item)
-    });
+    })
     allGaugeData.map((item,index) =>{
       Data.push(item)
-    });
+    })
     data = data.concat(Data);
     return(
       <PageHeaderWrapper title="新增记录" loading={loading}>

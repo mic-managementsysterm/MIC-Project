@@ -17,8 +17,7 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-
-import styles from './TableList.less';
+import styles from './Respondent.less';
 
 const FormItem = Form.Item;
 FormItem.className = styles["ant-form-item"];
@@ -312,7 +311,7 @@ class UpdateForm extends PureComponent {
   loading: loading.models.rule,
 }))
 @Form.create()
-class TableList extends PureComponent {
+class Respondent extends PureComponent {
 
   columns = [
     {
@@ -343,7 +342,7 @@ class TableList extends PureComponent {
         return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
-              <Link to={`/list/card-list?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
+              <Link to={`/respondent/respondent-list/respondent-record?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
                 <Button className="btn">查看</Button>
               </Link>
               <Button onClick={() => this.handleUpdateModalVisible(true,record)}>编辑</Button>
@@ -544,4 +543,4 @@ class TableList extends PureComponent {
   }
 }
 
-export default TableList;
+export default Respondent;
