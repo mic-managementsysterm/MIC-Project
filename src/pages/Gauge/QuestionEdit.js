@@ -1,8 +1,10 @@
 import React from 'react';
-import {Spin , DatePicker, Button, Input, Icon, InputNumber,Upload ,Row,message } from 'antd';
+import {Spin , DatePicker, Button, Input, Checkbox, Icon, Modal,InputNumber,Upload ,Row,message } from 'antd';
+import { UploadChangeParam } from 'antd/lib/upload/interface';
+import router from 'umi/router';
 import { connect } from 'dva';
-const list=[]
-const fileList=[]
+const list=[];
+const fileList=[];
 
 @connect(({question,loading})=>({
   question,
@@ -43,15 +45,15 @@ class QuestionEdit extends React.Component {
         PassScore:  null,
         Topics:     [
           {
-              Id:              null,
-              QuestionnaireId: null,
-              Title:           null,
-              Image :          null,
-              Order:           null,
-              GroupName:       null,
-              TotalScore:      null,
-              Type:            null,
-              CreatedAt:       null /* 2018-07-23 10:04:30 */
+            Id:              null,
+            QuestionnaireId: null,
+            Title:           null,
+            Image :          null,
+            Order:           null,
+            GroupName:       null,
+            TotalScore:      null,
+            Type:            null,
+            CreatedAt:       null /* 2018-07-23 10:04:30 */
           }
         ],
         CreatedAt:  null,
@@ -79,7 +81,9 @@ class QuestionEdit extends React.Component {
   }
   componentWillMount(){
     const Id=this.props.location.state.Id
+    // console.log('@data',data)
     this.getQuestion(Id)
+    console.log("@id",Id)
 
   }
   getQuestion=(Id)=>{
@@ -90,11 +94,13 @@ class QuestionEdit extends React.Component {
         Id
       },callback:()=>{
         const {question:{question}}=this.props
+        // console.log("@callback",question)
         this.setState({
-                questions:question
+          questions:question
         })
       }
     })
+    // console.log('@data',this.state.questions)
   }
 
   handleTitleChange(e) {
@@ -133,6 +139,7 @@ class QuestionEdit extends React.Component {
       questions: this.state.questions,
       addAreaVisible: false
     });
+    console.log('@image',this.state.questions.Topics[0].Image)
   }
   getBase64(img, callback) {
     const reader = new FileReader();
@@ -169,6 +176,8 @@ class QuestionEdit extends React.Component {
         const image = new Image();
         image.onload = function() {
           // 获取图片的宽高，并存放到file对象中
+          console.log('file width :' + this.width);
+          console.log('file height :' + this.height);
           file.width = this.width;
           file.height = this.height;
           resolve();
@@ -180,25 +189,33 @@ class QuestionEdit extends React.Component {
     });
   }
   handleChange = (info) => {
+    const {indexCurrent}=this.state
     if (info.file.status === 'uploading') {
       this.setState({ loading: true });
       return;
     }
     if (info.file.status === 'done') {
       // Get this url from response in real world.
+      if (info.fileList.length>1){
+        info.fileList.splice(0,1);
+      }
       this.getBase64(info.file.originFileObj, imageUrl =>{
         const base64Img=imageUrl
-        //   this.setState({
-        //     imageUrl,
-        //     loading: false,
-        //   })
-        this.state.questions.Topics[this.state.indexCurrent].Image=imageUrl,
+        console.log('@image',info),
+          // this.state.questions.Topics[this.state.indexCurrent].Image=null,
+          // this.setState({
+          //   questions:this.state.questions,
+          //   // loading:false,
+          //   // imageUrl:null
+          // })
+          this.state.questions.Topics[indexCurrent].Image=imageUrl,
           this.setState({
             questions:this.state.questions,
             loading:false,
             imageUrl:null
           })
       });
+      console.log('@image1',info.file)
     }
   }
   handleAddCheckbox() {
@@ -315,25 +332,21 @@ class QuestionEdit extends React.Component {
   }
 
   handleSaveQuestionnaire(body) {
-    // const index = this.state.index;
-    // list[index] = Object.assign({}, this.state);
-    // localStorage.list = JSON.stringify(list);
-    // message.success({
-    //   title: '保存成功'
-    // });
+    console.log("@idid",body)
     this.setState({
       showLoading:true
     })
     const {question:{question},dispatch}=this.props
     // question=body
     dispatch({
-      type:'question/changeQuestion',
-      payload: {body},callback:()=>{
-        this.setState({
-          showLoading:false
-        })
+        type:'question/changeQuestion',
+        payload: {body},callback:()=>{
+          this.setState({
+            showLoading:false
+          })
+          router.push('/list/question-list')
         }
-    }
+      }
     )
   }
 
@@ -430,6 +443,36 @@ class QuestionEdit extends React.Component {
           <div className="ant-upload-text">Upload</div>
         </div>
       );
+      const handleChange = (info) => {
+        const {indexCurrent}=this.state
+        if (info.file.status === 'uploading') {
+          this.setState({ loading: true });
+          return;
+        }
+        if (info.file.status === 'done') {
+          // Get this url from response in real world.
+          if (info.fileList.length>1){
+            info.fileList.splice(0,1);
+          }
+          this.getBase64(info.file.originFileObj, imageUrl =>{
+            const base64Img=imageUrl
+            console.log('@image',info),
+              // this.state.questions.Topics[this.state.indexCurrent].Image=null,
+              // this.setState({
+              //   questions:this.state.questions,
+              //   // loading:false,
+              //   // imageUrl:null
+              // })
+              this.state.questions.Topics[questionIndex].Image=imageUrl,
+              this.setState({
+                questions:this.state.questions,
+                loading:false,
+                imageUrl:null
+              })
+          });
+          console.log('@image1',info.file)
+        }
+      }
       if (question.Type === 0||1) {
         return (
           <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
@@ -464,7 +507,7 @@ class QuestionEdit extends React.Component {
                 })}
                 // action="//jsonplaceholder.typicode.com/posts/"
                 beforeUpload={this.beforeUpload}
-                onChange={this.handleChange}>
+                onChange={handleChange}>
                 {
                   question.Image? <div >
                     <img style={{width:250,height:250}}  src={question.Image} alt=""/>
@@ -509,11 +552,11 @@ class QuestionEdit extends React.Component {
 
     return (
       <div style={{ padding: 20 }}>
-        <div style={{ float: 'left' }}>
-          <span>问卷截止日期：</span>
-          <DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />
-          <span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>
-        </div>
+        {/*<div style={{ float: 'left' }}>*/}
+        {/*<span>问卷截止日期：</span>*/}
+        {/*<DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />*/}
+        {/*<span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>*/}
+        {/*</div>*/}
         <div style={{ float: 'right' }}>
           <Button onClick={()=>this.handleSaveQuestionnaire(this.state.questions)}>保存问卷</Button>
           {/*<Button type="primary" style={{ marginLeft: 16 }} onClick={this.handleReleaseQuestionnaire}>发布问卷</Button>*/}
@@ -528,27 +571,39 @@ class QuestionEdit extends React.Component {
       questions:questions
     })
   }
+  onChangePassInt=(value)=>{
+    const {questions}=this.state
+    questions.PassScore=value;
+    this.setState({
+      questions:questions
+    })
+  }
   render() {
     const {question:{showLoading}}=this.props
     return (
       <Spin spinning={this.state.showLoading} tip={'正在保存'}>
-      <div>
-        {this.getTitle()}
         <div>
-          <span >总分：</span>
-          <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.TotalScore}  onChange={(value)=>this.onChangeTotalInt(value)}/>
-        </div>
-        <div style={{ padding: 20, borderTop: '2px solid #ccc', borderBottom: '2px solid #ccc' }}>
-          <div style={{ marginBottom: 20 }}>
-            {this.getQuestions()}
+          {this.getTitle()}
+          <div>
+            <span >总分：</span>
+            <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.TotalScore}  onChange={(value)=>this.onChangeTotalInt(value)}/>
+            <span >及格分数：</span>
+            <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.PassScore}  onChange={(value)=>this.onChangePassInt(value)}/>
           </div>
-          {this.getAddArea()}
-          <div className="addQuestion" style={{ wdith: '100%', height: '100%', padding: 30, background: '#eee', textAlign: 'center'}} onClick={this.handleAddQuestion}>
-            添加问题
+          <div>
+
           </div>
+          <div style={{ padding: 20, borderTop: '2px solid #ccc', borderBottom: '2px solid #ccc' }}>
+            <div style={{ marginBottom: 20 }}>
+              {this.getQuestions()}
+            </div>
+            {this.getAddArea()}
+            <div className="addQuestion" style={{ wdith: '100%', height: '100%', padding: 30, background: '#eee', textAlign: 'center'}} onClick={this.handleAddQuestion}>
+              添加问题
+            </div>
+          </div>
+          {this.getFooter()}
         </div>
-        {this.getFooter()}
-      </div>
       </Spin>
     );
   }

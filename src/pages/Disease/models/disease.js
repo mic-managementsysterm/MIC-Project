@@ -5,6 +5,9 @@ export default {
 
   state: {
     dataSource:[],
+    showSource:[],
+    current:1,
+    pageSize:10,
     relateData:[],
     restData:[],
     modalVisible: false,
@@ -22,12 +25,15 @@ export default {
   effects: {
     *queryDisease({ payload }, { call, put }) {
       const response = yield call(queryDisease, payload);
-      yield put({
-        type: 'set',
-        payload: {
-          dataSource:response.Data
-        },
-      });
+      if(response.Success){
+        yield put({
+          type: 'set',
+          payload: {
+            dataSource:response.Data,
+            showSource:response.Data
+          },
+        });
+      }
     },
     *addDisease({ payload, callback }, { call }) {
       yield call(addDisease, payload);
@@ -57,6 +63,18 @@ export default {
       return {
         ...state,
         ...action.payload,
+      };
+    },
+    queryPage(state, action) {
+      let { payload } = action;
+      let start = (payload.currentPage - 1) * payload.pageSize;
+      let end = start + payload.pageSize;
+      let newSource = state.dataSource.slice(start,end);
+      return {
+        ...state,
+        showSource:newSource,
+        current:payload.currentPage,
+        pageSize:payload.pageSize,
       };
     },
   },

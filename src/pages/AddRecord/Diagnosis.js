@@ -6,10 +6,12 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Diagnosis.less';
 const { TextArea } = Input;
 
-class DiagnosisForm extends PureComponent {
-  componentDidMount() {
-  }
 
+@connect(({ addMedical, loading }) => ({
+  addMedical,
+  loading: loading.models.addMedical,
+}))
+class DiagnosisForm extends PureComponent {
   state = {
     confirmDirty: false,
   };
@@ -17,11 +19,22 @@ class DiagnosisForm extends PureComponent {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
+      let upload = {};
       if (!err) {
-        console.log('Received values of form: ', values);
+        upload.RespondentId = this.props.location.query.Id;
+        upload.ZS = values.ZS;
+        upload.XBS = values.XBS;
+        upload.JWS = values.JWS;
+        upload.GMS = values.GMS;
+        upload.TGJC = values.TGJC;
+        upload.Diagnose = values.Diagnose;
+        this.props.dispatch({
+          type: 'addMedical/upload',
+          payload:upload
+        });
       }
     });
-  }
+  };
 
   handleConfirmBlur = (e) => {
     const value = e.target.value;
@@ -53,7 +66,7 @@ class DiagnosisForm extends PureComponent {
               wrapperCol={{ span: 15 }}
               className={styles.form}
             >
-              {getFieldDecorator('email', {
+              {getFieldDecorator('ZS', {
                 rules: [{
                   required: true, message: '请输入主诉!',
                 }],
@@ -67,7 +80,7 @@ class DiagnosisForm extends PureComponent {
               wrapperCol={{ span: 15 }}
               className={styles.form}
             >
-              {getFieldDecorator('password', {
+              {getFieldDecorator('XBS', {
                 rules: [{
                   required: true, message: '请输入现病史！',
                 }],
@@ -81,7 +94,7 @@ class DiagnosisForm extends PureComponent {
               wrapperCol={{ span: 15 }}
               className={styles.form}
             >
-              {getFieldDecorator('confirm', {
+              {getFieldDecorator('JWS', {
                 rules: [{
                   required: true, message: '请输入既往史!',
                 }],
@@ -95,7 +108,7 @@ class DiagnosisForm extends PureComponent {
               wrapperCol={{ span: 15 }}
               className={styles.form}
             >
-              {getFieldDecorator('nickname', {
+              {getFieldDecorator('GMS', {
                 rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
               })(
                 <TextArea />
@@ -107,7 +120,7 @@ class DiagnosisForm extends PureComponent {
               wrapperCol={{ span: 15 }}
               className={styles.form}
             >
-              {getFieldDecorator('residence', {
+              {getFieldDecorator('TGJC', {
                 rules: [{ type: 'array', required: true, message: '请输入体格检查!' }],
               })(
                 <TextArea />
@@ -119,20 +132,8 @@ class DiagnosisForm extends PureComponent {
               wrapperCol={{ span: 15 }}
               className={styles.form}
             >
-              {getFieldDecorator('phone', {
+              {getFieldDecorator('Diagnose', {
                 rules: [{ required: true, message: '请输入中医诊断!' }],
-              })(
-                <TextArea />
-              )}
-            </Form.Item>
-            <Form.Item
-              label="四诊信息"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {getFieldDecorator('website', {
-                rules: [{ required: true, message: '请输入四诊信息!' }],
               })(
                 <TextArea />
               )}

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import router from 'umi/router';
+// import router from 'umi/router';
 import {
   Row,
   Col,
@@ -330,10 +330,10 @@ class RelateForm extends PureComponent {
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ disease,disAndSyn, loading }) => ({
+@connect(({ disease,respondent, loading }) => ({
   disease,
-  disAndSyn,
-  loading: loading.models.disease && loading.models.disAndSyn,
+  respondent,
+  loading: loading.models.disease,
 }))
 @Form.create()
 class Disease extends PureComponent {
@@ -351,7 +351,7 @@ class Disease extends PureComponent {
       title: '操作',
       render: (text, record) => {
         const {disease:{dataSource}} = this.props;
-        return dataSource.length >= 1
+        return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
               <Button onClick={() => this.handleRelateVisible(true,record)} className="btn">疾病关联</Button>
@@ -362,11 +362,11 @@ class Disease extends PureComponent {
     },
   ];
 
-  componentDidMount() {
+  componentDidMount(){
     const { dispatch } = this.props;
     dispatch({
       type: 'disease/queryDisease',
-      payload:{}
+      payload: "",
     });
   }
 
@@ -389,13 +389,13 @@ class Disease extends PureComponent {
     }
 
     dispatch({
-      type: 'disease/queryDisease',
-      payload: {},
+      type: 'disease/queryPage',
+      payload: {...params},
     });
   };
 
-  previewItem = id => {
-    router.push(`/profile/basic/${id}`);
+  previewItem = () => {
+    // router.push(`/profile/basic/${id}`);
   };
 
   handleFormReset = () => {
@@ -487,20 +487,6 @@ class Disease extends PureComponent {
       },
     });
 
-    // dispatch替代方案
-    // disAndSyn.diseaseId = record.Id;
-    // setTimeout(()=>{
-    //   dispatch({
-    //     type: 'disAndSyn/queryRelate',
-    //     payload:{DiseaseId:disAndSyn.diseaseId}
-    //   });
-    //   dispatch({
-    //     type: 'disAndSyn/queryRest',
-    //     payload:{DiseaseId:disAndSyn.diseaseId}
-    //   });
-    // },1000)
-    //
-
     dispatch({
       type: 'disAndSyn/changeIdEff',
       payload: record.Id,
@@ -526,7 +512,7 @@ class Disease extends PureComponent {
             <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               新建
             </Button>
-            {selectedRows.length > 0 && (
+            {selectedRows && selectedRows.length > 0 && (
               <span>
                 <Button onClick={() => this.handleDelete()}>批量删除</Button>
               </span>
@@ -549,37 +535,32 @@ class Disease extends PureComponent {
   };
 
   render() {
-    const {
-      disease: { dataSource, selectedRows },
-      loading,
-    } = this.props;
-    const data = {
-      list: dataSource,
+    const { disease: { showSource,selectedRows,dataSource,pageSize,current }, loading, } = this.props;
+    const data ={
+      list: showSource,
       pagination: {
-        total: dataSource.length,
-        pageSize:10,
-        current:1
+        total: dataSource?dataSource.length:0,
+        pageSize:pageSize,
+        current:current
       },
     };
-
     return (
-      <PageHeaderWrapper title="查询表格">
+      <PageHeaderWrapper title="患者管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
-              selectedRows={selectedRows}
+              selectedRows={selectedRows || []}
               loading={loading}
               data={data}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              rowKey={item => item.Id}
             />
           </div>
+          <ManaForm {...this.props}/>
+          <RelateForm {...this.props}/>
         </Card>
-        <ManaForm {...this.props} />
-        <RelateForm />
       </PageHeaderWrapper>
     );
   }

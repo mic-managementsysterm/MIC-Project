@@ -12,11 +12,8 @@ import styles from './Question.less'
 }))
 export  default class Question extends Component{
     constructor(props){
-        super(props)
-        this.state={
-            // data:data,
-
-        }
+        super(props);
+        this.handleDelete=this.handleDelete.bind(this)
     }
 componentWillMount(){
   this.fetchQuestionList()
@@ -28,6 +25,14 @@ componentWillMount(){
          })
      const {question:{questions}}=this.props
 }
+   handleDelete=(Id)=>{
+      const {dispatch}=this.props
+     dispatch({
+       type:'question/deleteQuestions',
+       payload:{Id},callback:()=>{
+         this.fetchQuestionList()
+     }})
+   }
     render(){
       const {question:{questions},loading}=this.props
       questions.map((que,index)=>{
@@ -53,7 +58,7 @@ componentWillMount(){
           align:'center'
         },
         {
-          title:'得分',
+          title:'及格分数',
           dataIndex:'PassScore',
           key:'PassScore',
           align:'center'

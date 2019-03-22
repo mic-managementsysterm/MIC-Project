@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
+// import router from 'umi/router';
 import Link from "umi/link";
 import {
   Row,
@@ -338,7 +339,7 @@ class Respondent extends PureComponent {
       title: '操作',
       render: (text, record) => {
         const {respondent:{dataSource}} = this.props;
-        return dataSource.length >= 1
+        return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
               <Link to={`/respondent/respondent-list/respondent-record?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
@@ -378,13 +379,15 @@ class Respondent extends PureComponent {
     }
 
     dispatch({
-      type: 'respondent/queryRespondent',
-      payload: {},
+      type: 'respondent/queryPage',
+      payload: {
+        ...params
+      },
     });
   };
 
-  previewItem = id => {
-    router.push(`/profile/basic/${id}`);
+  previewItem = () => {
+    // router.push(`/profile/basic/${id}`);
   };
 
   handleFormReset = () => {
@@ -486,7 +489,7 @@ class Respondent extends PureComponent {
             <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               新建
             </Button>
-            {selectedRows.length >=1 && (
+            {selectedRows && selectedRows.length >=1 && (
               <span>
                 <Button onClick={() => this.handleDelete()}>批量删除</Button>
               </span>
@@ -509,13 +512,13 @@ class Respondent extends PureComponent {
   }
 
   render() {
-    const { respondent: { dataSource,selectedRows }, loading, } = this.props;
+    const { respondent: { showSource,selectedRows,dataSource,pageSize,current }, loading, } = this.props;
     const data ={
-      list: dataSource,
+      list: showSource,
       pagination: {
-        total: dataSource.length,
-        pageSize:10,
-        current:1
+        total: dataSource?dataSource.length:0,
+        pageSize:pageSize,
+        current:current
       },
     };
     return (
@@ -524,7 +527,7 @@ class Respondent extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
-              selectedRows={selectedRows}
+              selectedRows={selectedRows || []}
               loading={loading}
               data={data}
               columns={this.columns}

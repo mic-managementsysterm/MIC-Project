@@ -1,4 +1,4 @@
-import {getAllQuestionnaire,getQuestion,changeQuestion} from '@//services/api'
+import {getAllQuestionnaire,getQuestion,changeQuestion,deleteQuestion} from '@/services/api'
 
 export default {
   namespace:'question',
@@ -26,7 +26,8 @@ export default {
         }
       ],
       CreatedAt:  null,
-    }
+    },
+    Id:''
   },
   effects: {
     * fetchQuestionList({ payload }, { call, put }) {
@@ -52,14 +53,28 @@ export default {
     },
 
     *changeQuestion({payload,callback},{call,put}){
-      const response= yield call(changeQuestion,payload);
-      yield put({
-        type:'show',
-        payload:{
-          // res:response
-        }
-      });
+      // const response=
+        yield call(changeQuestion,payload);
+      // yield put({
+      //   type:'show',
+      //   payload:{
+      //     // res:response
+      //   }
+      // });
       // console.log("@change",response)
+      if (callback) callback()
+    },
+    *deleteQuestions({payload,callback},{call,put}){
+      // const response=
+      console.log("@222")
+        yield call(deleteQuestion,payload)
+      // console.log("@222")
+    //   yield put({
+    //     type:'show',
+    //       payload:{
+    //         res:response
+    //       }
+    //   })
       if (callback) callback()
     }
   },
