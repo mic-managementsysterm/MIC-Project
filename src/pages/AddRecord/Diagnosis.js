@@ -112,7 +112,7 @@ class DiagnosisForm extends PureComponent {
               className={styles.form}
             >
               {getFieldDecorator('TGJC', {
-                rules: [{ type: 'array', required: true, message: '请输入体格检查!' }],
+                rules: [{ required: true, message: '请输入体格检查!' }],
               })(
                 <TextArea />
               )}

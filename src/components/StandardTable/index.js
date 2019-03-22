@@ -25,7 +25,6 @@ class StandardTable extends PureComponent {
   }
 
   static getDerivedStateFromProps(nextProps) {
-    console.log(nextProps);
     // clean state
     if (nextProps.selectedRows.length === 0) {
       const needTotalList = initTotalList(nextProps.columns);
