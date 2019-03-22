@@ -286,7 +286,6 @@ export async function changeQuestion(params) {
 }
 
 export async function deleteQuestion(Id) {
-  console.log("@22222112")
   const path=`${Config.service}/questionnaire/delete/delete`;
   return request(path,{
     method:'POST',
@@ -298,6 +297,24 @@ export async function deleteQuestion(Id) {
 }
 export async function deleteQues(params) {
   const path = `http://localhost:5010/questionnairerecord/delete/delete`;
+  return request(path,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+
+export async function getGauge(params) {
+  const path = `http://localhost:5010/gaugetable/get/getById?${stringify(params)}`;
+  return request(path);
+}
+
+export async function addOrUpdateGauge(params) {
+  const path = `http://localhost:5010/gaugerecord/change/add`;
   return request(path,{
     method: 'POST',
     body: {

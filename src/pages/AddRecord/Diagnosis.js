@@ -12,10 +12,6 @@ const { TextArea } = Input;
   loading: loading.models.addMedical,
 }))
 class DiagnosisForm extends PureComponent {
-  state = {
-    confirmDirty: false,
-  };
-
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
@@ -35,11 +31,6 @@ class DiagnosisForm extends PureComponent {
       }
     });
   };
-
-  handleConfirmBlur = (e) => {
-    const value = e.target.value;
-    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
-  }
 
   render() {
     const { getFieldDecorator } = this.props.form;

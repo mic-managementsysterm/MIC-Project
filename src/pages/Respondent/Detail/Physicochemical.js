@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Card, Divider, Icon, Row, Col } from 'antd';
+import { Card, Divider, Icon, Row, Col, Table  } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physicochemical.less';
@@ -38,20 +38,21 @@ class Physicochemical  extends Component {
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
           <h1>{physicochemicalData&&physicochemicalData.GaugeRecord ? physicochemicalData.GaugeRecord.GaugeName : null}检查详情</h1>
-          <Row>
-            <Col span={6}>测定项目</Col>
-            <Col span={6} offset={6}>测定结果</Col>
+          <Row clssName={styles.mainNav}>
+            <Col span={6} className={styles.name}>测定项目</Col>
+            <Col span={6} offset={6} className={styles.name}>测定结果</Col>
           </Row>
-          <div>{
+          {
             physicochemicalData&&physicochemicalData.RecordInfos ? physicochemicalData.RecordInfos.map((item,index) =>{
             return(
             <div key={index}>
-            <Row className={styles.groupName}>{item.GroupName}</Row>
-              <Row>
+            <Row className={styles.groupName}>
+              {(index>0 && physicochemicalData.RecordInfos[index-1].GroupName == item.GroupName)?
+                null:item.GroupName}
+            </Row>
+              <Row className={styles.que}>
                 <Col span={6}>
-                  <ul>
-                  <li>{item.Title}</li>
-                  </ul>
+                  <ul><li>{item.Title}</li></ul>
                 </Col>
                 <Col span={6} offset={6}>
                   <ul>
@@ -61,7 +62,7 @@ class Physicochemical  extends Component {
               </Row>
             </div>
             )
-          }) : null}</div>
+          }) : null}
         </Card>
       </PageHeaderWrapper>
     );
