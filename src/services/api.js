@@ -208,7 +208,7 @@ export async function getDiagnosisDetail(params) {
 }
 
 export async function getPhysicochemicalDetail(params) {
-  const path = `http://localhost:5010/gaugerecord/get/getById?${stringify(params)}`;
+  const path = `${Config.service}/gaugerecord/get/getById?${stringify(params)}`;
   return request(path,{
     method: 'GET',
   });

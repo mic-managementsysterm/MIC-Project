@@ -9,7 +9,7 @@ const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
-class PhysiologyForm extends PureComponent {
+class PhysiologyForm extends React.Component {
   state = {
     Data: {
       GaugeRecord: {
@@ -325,9 +325,9 @@ class PhysiologyForm extends PureComponent {
              <div className={styles.title}>静息电图</div>
                <FormItem {...formItemLayout} label={'心率'} className={styles.form}>
                  {getFieldDecorator('16', {
+                   initialValue:'',
                    rules: [
-                     {
-                       required: true,
+                     { required: true,
                        message: "请选择检查结果！",
                      },
                    ],
@@ -390,7 +390,7 @@ class PhysiologyForm extends PureComponent {
                })(<TextArea />)}
              </FormItem>
            <FormItem {...submitFormLayout} className={styles.form}>
-             <Button type="primary" htmlType="submit" style={{marginTop: 10, marginBottom: 10}}>提交</Button>
+             <Button onClick={this.handleSubmit} type="primary" htmlType="submit" style={{marginTop: 10, marginBottom: 10}}>提交</Button>
            </FormItem>
          </Form>
        </div>
@@ -400,4 +400,5 @@ class PhysiologyForm extends PureComponent {
 }
 
 const Physiology = Form.create({ name: 'register' })(PhysiologyForm);
+
 export default Physiology;
