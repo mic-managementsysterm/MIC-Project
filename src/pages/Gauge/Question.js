@@ -91,7 +91,7 @@ componentWillMount(){
                 <Button className={styles.btn2} style={{marginBottom:5,}} >添加</Button>
               </Link>
               </div>
-                <Table style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}> </Table>
+                <Table rowKey="Id" style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}> </Table>
             </div>
           </PageHeaderWrapper>
         )
