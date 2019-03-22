@@ -21,6 +21,24 @@ class RespondentRecord extends PureComponent {
     });
   }
 
+  delRecord = (item) => {
+    const { dispatch,location } = this.props;
+    dispatch({
+      type: item.delAction,
+      payload: {
+        Id: item.Id,
+      },
+      callback:()=>{
+        dispatch({
+          type: 'list/getRecords',
+          payload: {
+            RespondentId: location.query.Id,
+          },
+        });
+      }
+    });
+  };
+
   render() {
     const {
       list: { records },
@@ -43,10 +61,10 @@ class RespondentRecord extends PureComponent {
                     hoverable
                     className={styles.card}
                     actions={[
-                      <Link to= {`${item.path}&Name=${Name}&Gender=${Gender}&Phone=${Phone}&Born=${Born}&Address=${Address}&CreatedAt=${CreatedAt}`}>
+                      <Link to={`${item.path}&Name=${Name}&Gender=${Gender}&Phone=${Phone}&Born=${Born}&Address=${Address}&CreatedAt=${CreatedAt}`}>
                         <Button>查看</Button>
                       </Link>,
-                      <Popconfirm title="确认删除？" okText="确认" cancelText="取消">
+                      <Popconfirm title="确认删除？" onConfirm={()=>this.delRecord(item)} okText="确认" cancelText="取消">
                         <Button>删除</Button>
                       </Popconfirm>,
                     ]}
@@ -64,10 +82,10 @@ class RespondentRecord extends PureComponent {
                 </List.Item>
               ) : (
                 <List.Item>
-                  <Link to={`/respondent/respondent-list/respondent-record/add-record`}>
-                  <Button type="dashed" className={styles.newButton}>
-                    <Icon type="plus" /> 新增记录
-                  </Button>
+                  <Link to={`/respondent/respondent-list/respondent-record/add-record?Id=${location.query.Id}`}>
+                    <Button type="dashed" className={styles.newButton}>
+                      <Icon type="plus" /> 新增记录
+                    </Button>
                   </Link>
                 </List.Item>
               )
