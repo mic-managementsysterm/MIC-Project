@@ -145,7 +145,6 @@ export default function request(url, option) {
       return response.json();
     })
     .catch(e => {
-      console.log("request error",e,url);
       if (e.message === "Request_Timeout") {
         message.error("请求超时");
         return;
