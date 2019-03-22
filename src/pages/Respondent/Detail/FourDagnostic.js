@@ -45,11 +45,12 @@ class FourDagnostic extends Component {
             <Description term="过敏史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.GMS}</Description>
             <Description term="体格检查" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.TGJC}</Description>
             <Description term="中医诊断" className={styles.term}>
-              {diagnosisData&&diagnosisData.Diagnoses
-                ? diagnosisData.Diagnoses.map((item, index) => {
-                  return <span key={index}>{item.DiagnoseName}、</span>;
-                })
-                : null}
+              {/*{diagnosisData&&diagnosisData.Diagnoses*/}
+                {/*? diagnosisData.Diagnoses.map((item, index) => {*/}
+                  {/*return <span key={index}>{item.DiagnoseName}、</span>;*/}
+                {/*})*/}
+                {/*: null}*/}
+              {diagnosisData.Diagnose}
             </Description>
             <Description term="四诊信息" className={styles.term}>
               {diagnosisData.Symptoms

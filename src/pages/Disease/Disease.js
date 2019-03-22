@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-// import router from 'umi/router';
 import {
   Row,
   Col,
@@ -96,6 +95,7 @@ const ManaForm = Form.create()(props => {
 
   return (
     <Modal
+      centered
       destroyOnClose
       width={640}
       title="疾病管理"
@@ -339,23 +339,25 @@ class RelateForm extends PureComponent {
 class Disease extends PureComponent {
   columns = [
     {
-      title: '姓名',
+      title: '疾病名称',
       dataIndex: 'Name',
-      render: text => <a onClick={() => this.previewItem(text)}>{text}</a>,
+      width: '40%',
     },
     {
       title: '拼音',
       dataIndex: 'PinYin',
+      width: '30%',
     },
     {
       title: '操作',
+      width: '30%',
       render: (text, record) => {
         const {disease:{dataSource}} = this.props;
         return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
-              <Button onClick={() => this.handleRelateVisible(true,record)} className="btn">疾病关联</Button>
-              <Button onClick={() => this.handleModalVisible(true,record)} className="btn">编辑</Button>
+              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>疾病关联</Button>
+              <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>编辑</Button>
             </div>
           ) : null
       },
@@ -392,10 +394,6 @@ class Disease extends PureComponent {
       type: 'disease/queryPage',
       payload: {...params},
     });
-  };
-
-  previewItem = () => {
-    // router.push(`/profile/basic/${id}`);
   };
 
   handleFormReset = () => {
@@ -520,7 +518,7 @@ class Disease extends PureComponent {
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
-              <Input placeholder="请输入姓名或身份证号码" style={{ width: 400,marginRight:20 }} />
+              <Input placeholder="请输入疾病名或拼音" style={{ width: 400,marginRight:20 }} />
             )}
             <Button type="primary" htmlType="submit">
                 查询
@@ -545,7 +543,7 @@ class Disease extends PureComponent {
       },
     };
     return (
-      <PageHeaderWrapper title="患者管理">
+      <PageHeaderWrapper title="疾病管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
@@ -558,8 +556,8 @@ class Disease extends PureComponent {
               onChange={this.handleStandardTableChange}
             />
           </div>
-          <ManaForm {...this.props}/>
-          <RelateForm {...this.props}/>
+          <ManaForm {...this.props} />
+          <RelateForm {...this.props} />
         </Card>
       </PageHeaderWrapper>
     );

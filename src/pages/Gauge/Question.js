@@ -34,7 +34,7 @@ componentWillMount(){
      }})
    }
     render(){
-      const {question:{questions},loading}=this.props
+      const {question:{questions},loading}=this.props;
       questions.map((que,index)=>{
         que.CreatedAt=moment(que.CreatedAt).format('YYYY-MM-DD HH:mm:ss')
       })
@@ -91,7 +91,7 @@ componentWillMount(){
                 <Button className={styles.btn2} style={{marginBottom:5,}} >添加</Button>
               </Link>
               </div>
-                <Table style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}></Table>
+                <Table style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}> </Table>
             </div>
           </PageHeaderWrapper>
         )

@@ -23,11 +23,20 @@ class AddRecord extends Component{
   }
 
   componentDidMount() {
-    const { dispatch,location } = this.props;
+    const { dispatch,location,addQues:{newQues} } = this.props;
     dispatch({
       type: 'addQues/getQues',
       payload:{
         Id:location.query.recordId
+      }
+    });
+    dispatch({
+      type: 'addQues/setStates',
+      payload:{
+        newQues:{
+          ...newQues,
+          RespondentId:location.query.recordId
+        }
       }
     })
   }
@@ -199,6 +208,7 @@ class AddRecord extends Component{
 
   render() {
     const { addQues:{Topics} , loading } = this.props;
+    console.log('@props',this.props)
     return(
       <PageHeaderWrapper title="新增问卷" loading={loading}>
         <div style={{ background: '#ECECEC', padding: '30px' }}>

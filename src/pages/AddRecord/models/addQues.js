@@ -5,7 +5,7 @@ export default {
 
   state: {
     newQues:{
-      RespondentId:"fb2413f6-7cea-ea8e-82b3-17b6a9327b68",
+      RespondentId:"",
       QuestionnaireId:"",
       QuestionnaireName:"",
       TotalScore:0,
@@ -22,6 +22,7 @@ export default {
   effects: {
     *getQues({ payload }, { call, put }) {
       const response = yield call(queryQues, payload);
+      console.log('@response',response);
       yield put({
         type: 'setNewQues',
         payload: response.Data,
@@ -47,6 +48,7 @@ export default {
             TopicId: item.Id,
             Order: item.Order,
             Score: 0,
+
             Images: []
           });
           newTopics.push({
