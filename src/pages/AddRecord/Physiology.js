@@ -18,17 +18,27 @@ const { TextArea } = Input;
 @Form.create()
 class Physiology extends PureComponent {
 
+  // 模拟获取记录Id
   componentDidMount(){
-    const { dispatch } = this.props;
+    const { dispatch,location,addPhy:{newPhy} } = this.props;
     dispatch({
       type: 'addPhy/getPhy',
       payload: {Id:"1001"},
     });
+    dispatch({
+      type: 'addQues/setStates',
+      payload:{
+        newPhy:{
+          ...newPhy,
+          RespondentId:location.query.recordId
+        }
+      }
+    })
   }
 
+  // 模拟输入GroupTime
   handleSubmit = () => {
     const { dispatch,addPhy:{newPhy} } = this.props;
-    // 模拟GroupTime
     newPhy.Infos.map(item => {
       item.GroupTime = "2019-03-22"
     });
