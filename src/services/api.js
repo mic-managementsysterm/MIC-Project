@@ -3,7 +3,7 @@ import request from '@/utils/request';
 
 //登录
 export async function login(params) {
-  return request(path = `/Api/user/change/login`,{
+  return request(`/Api/user/change/login`,{
     method: 'POST',
     body: {
       ...params,
@@ -45,7 +45,6 @@ export async function changePwd(params) {
 // 疾病
 export async function queryDisease(params) {
   return request(`/Api/disease/get/find?${stringify(params)}`);
-  // return request(`${Config.service}/disease/get/find?${stringify(params)}`);
 }
 
 export async function addDisease(params) {
