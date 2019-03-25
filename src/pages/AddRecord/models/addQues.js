@@ -27,8 +27,9 @@ export default {
         payload: response.Data,
       });
     },
-    *uploadQues({ payload }, { call, }) {
-      yield call(addOrUpdateQues, payload)
+    *uploadQues({ payload,callback }, { call, }) {
+      yield call(addOrUpdateQues, payload);
+      if(callback) callback()
     },
   },
   reducers: {

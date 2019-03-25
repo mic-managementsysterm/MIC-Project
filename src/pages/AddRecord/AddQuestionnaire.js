@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Row, Button, List, Radio, Upload, message } from 'antd';
+import { Row, Button, List, Radio, Upload, Spin } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './AddQuestionnaire.less';
 import router from 'umi/router';
@@ -12,7 +12,12 @@ const {Group} = Radio;
   loading:loading.models.addQues,
 }))
 class AddRecord extends Component{
-
+constructor(props){
+  super(props);
+  this.state={
+    loading: false,
+  }
+}
   componentDidMount() {
     const { dispatch,location,addQues:{newQues} } = this.props;
     dispatch({
@@ -34,6 +39,9 @@ class AddRecord extends Component{
 
   uploadQues = () =>{
     const { dispatch, addQues:{newQues} } = this.props;
+    this.setState({
+      loading: true,
+    });
     let Score = 0;
     newQues.Infos.map(item => {
       Score += item.Score
@@ -43,11 +51,14 @@ class AddRecord extends Component{
       type: 'addQues/uploadQues',
       payload:{
         ...newQues
-      }
-    })
-    message.loading('正在提交..', 2.5)
-      .then(() => message.success('提交成功', 2.5))
-      .then(() =>router.go(-2));
+      },
+      callback:()=>{
+        this.setState({
+          loading:false
+        });
+        router.go(-2);
+      },
+    });
   };
 
   insertImg = (index,img) => {
@@ -204,6 +215,7 @@ class AddRecord extends Component{
     const { addQues:{Topics} , loading } = this.props;
     return(
       <PageHeaderWrapper title="新增问卷" loading={loading}>
+        <Spin spinning={this.state.loading} tip={'正在提交'}>
         <div style={{ background: '#ECECEC', padding: '30px' }}>
           <div className={styles.quesList}>
             <List
@@ -219,6 +231,7 @@ class AddRecord extends Component{
             </Button>
           </div>
         </div>
+        </Spin>
       </PageHeaderWrapper>
     );
   }
