@@ -5,8 +5,9 @@ export default {
   state: {},
 
   effects: {
-    *upload({ payload }, { call, }) {
-      yield call(uploadMedical, payload)
+    *upload({ payload ,callback}, { call }) {
+      yield call(uploadMedical, payload);
+      if (callback) callback()
     },
   },
 };

@@ -35,9 +35,10 @@ componentWillMount(){
    }
     render(){
       const {question:{questions},loading}=this.props;
+      questions?
       questions.map((que,index)=>{
         que.CreatedAt=moment(que.CreatedAt).format('YYYY-MM-DD HH:mm:ss')
-      })
+      }):null
       const columns=[
         {
           title:'题目',

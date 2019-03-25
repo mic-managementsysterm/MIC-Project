@@ -38,6 +38,7 @@ export default {
           questions: response.Data
         }
       })
+      console.log('@questions',this.state.questions)
     },
     * getQuestion({ payload, callback }, { call, put }) {
       const response = yield call(getQuestion, payload);
