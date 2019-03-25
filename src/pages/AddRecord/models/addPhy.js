@@ -1,4 +1,4 @@
-import { queryPhy, addOrUpdatePhy } from '@/services/coustomApi/phyApi';
+import { queryPhy, addOrUpdatePhy } from '@/services/api';
 
 export default {
   namespace: 'addPhy',

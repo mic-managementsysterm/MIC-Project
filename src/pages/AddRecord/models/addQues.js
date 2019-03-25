@@ -1,4 +1,4 @@
-import { queryQues, addOrUpdateQues } from '@/services/coustomApi/addQuesApi';
+import { queryQues, addOrUpdateQues } from '@/services/api';
 
 export default {
   namespace: 'addQues',
