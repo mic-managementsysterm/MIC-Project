@@ -79,6 +79,13 @@ export default {
     '@antv/data-set': 'DataSet',
     bizcharts: 'BizCharts',
   },
+  proxy: {
+    '/Api': {
+      target: 'http://10.126.6.118:5010',
+      changeOrigin: true,
+      pathRewrite: { '^/Api': '' },
+    },
+  },
   ignoreMomentLocale: true,
   lessLoaderOptions: {
     javascriptEnabled: true,

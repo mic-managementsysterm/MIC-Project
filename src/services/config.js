@@ -1,4 +1,4 @@
-const service ="http://localhost:5010";
+const service ="http://10.126.6.118:5010";
 
 export default {
   service
