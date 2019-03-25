@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import {
-  Icon, Radio, Form, Input, Button,Checkbox, message
+  Icon, Radio, Form, Input, Button, Checkbox, message, Spin,
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physiology.less';
@@ -17,8 +17,13 @@ const { TextArea } = Input;
 }))
 @Form.create()
 class Physiology extends PureComponent {
+  constructor(props){
+    super(props)
+    this.state={
+      loading:false
+    }
+  }
 
-  // 模拟获取记录Id
   componentDidMount(){
     const { dispatch,location,addPhy:{newPhy} } = this.props;
     dispatch({
@@ -38,16 +43,21 @@ class Physiology extends PureComponent {
     });
   }
 
-  // 模拟输入GroupTime
   handleSubmit = () => {
     const { dispatch,addPhy:{newPhy} } = this.props;
+    this.setState({
+    loading:true
+  });
     dispatch({
       type: 'addPhy/uploadPhy',
       payload: {...newPhy},
+      callback:()=>{
+        this.setState({
+          loading:false
+        });
+        router.go(-2);
+      },
     });
-    message.loading('正在提交..', 2.5)
-      .then(() => message.success('提交成功', 2.5))
-      .then(() =>router.go(-2));
   };
 
   setInfos = (index,type,value,GroupName) => {
@@ -174,7 +184,9 @@ class Physiology extends PureComponent {
     return(
       <React.Fragment>
         {showGroup && <div className={styles.title}>{item.GroupName}</div>}
-        <FormItem {...formItemLayout} className={styles.form} style={{marginLeft:750}}>
+        <FormItem
+          wrapperCol={{ span: 15, offset: 11 }}
+          className={styles.form} >
           <Checkbox onChange={value => this.setInfos(index,"ItemChecked",value.target.checked,null)}>
             {item.Title}
           </Checkbox>
@@ -221,6 +233,7 @@ class Physiology extends PureComponent {
     };
     return(
       <PageHeaderWrapper title="生理数据采集" loading={loading}>
+        <Spin spinning={this.state.loading} tip={'正在提交'}>
         <div className={styles.content}>
           <Form hideRequiredMark style={{ marginTop: 8 }}>
             {this.renderTopic(Topics)}
@@ -230,6 +243,7 @@ class Physiology extends PureComponent {
             </FormItem>
           </Form>
         </div>
+        </Spin>
       </PageHeaderWrapper>
     )
   }

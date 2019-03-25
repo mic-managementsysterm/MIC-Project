@@ -21,8 +21,9 @@ export default {
         payload: response.Data,
       });
     },
-    *uploadPhy({ payload }, { call, }) {
-      yield call(addOrUpdatePhy, payload)
+    *uploadPhy({ payload, callback }, { call }) {
+      yield call(addOrUpdatePhy, payload);
+      if (callback) callback()
     },
   },
 

@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
-import { connect } from 'dva';import {
-  Form, Input,Spin, Tooltip, Icon, Cascader, Select, Button, AutoComplete,
+import { connect } from 'dva';
+import {
+  Form, Input,Spin, Button,
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import router from 'umi/router'
+import router from 'umi/router';
 import styles from './Diagnosis.less';
 const { TextArea } = Input;
 
@@ -39,18 +40,15 @@ class DiagnosisForm extends PureComponent {
 
       }
     });
-    const {loading}=this.props
     this.props.dispatch({
       type: 'addMedical/upload',
-      payload:upload,callback:()=>{
+      payload:upload,
+      callback:()=>{
         this.setState({
           loading:false
-        })
-        // const basePath = "/record/diagnosis";
-        router.push(`/respondent/respondent-list/respondent-record/add-record?Id=${this.props.location.query.Id}`)
-        // router.push('/respondent/respondent-list')
+        });
+        router.go(-2);
       }
-
     });
   };
 
@@ -71,7 +69,7 @@ class DiagnosisForm extends PureComponent {
    const {loading}=this.props;
     return (
       <PageHeaderWrapper title="四诊数据采集" >
-        <Spin spinning={this.state.loading} tip={'正在保存'}>
+        <Spin spinning={this.state.loading} tip={'正在提交'}>
         <div className={styles.content}>
           <Form   onSubmit={this.handleSubmit} className={styles.test}>
             <Form.Item
