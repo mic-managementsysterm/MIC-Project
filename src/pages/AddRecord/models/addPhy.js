@@ -37,10 +37,9 @@ export default {
           newObj.Infos.push({
             TopicId: item.Id,
             GroupName:item.GroupName,
-            GroupTime:"",
-            ItemChecked:false,
-            ItemValue:"",
-            ExceptionType:0,
+            ItemChecked:item.ItemChecked,
+            ItemValue:item.ItemValue,
+            ExceptionType:item.Exception,
           });
         });
       }
@@ -52,6 +51,7 @@ export default {
       };
     },
     setStates(state, { payload }) {
+      console.log(payload)
       return {
         ...state,
         ...payload,
@@ -59,15 +59,7 @@ export default {
     },
     setInfos(state, { payload }) {
       let newInfos = state.newPhy.Infos.slice();
-      if(payload.type === "GroupTime"){
-        newInfos.map(item => {
-          if(item.GroupName === payload.GroupName){
-            item.GroupTime = payload.value;
-          }
-        })
-      }else {
-        newInfos[payload.index][payload.type] = payload.value;
-      }
+      newInfos[payload.index][payload.type] = payload.value;
 
       return {
         ...state,

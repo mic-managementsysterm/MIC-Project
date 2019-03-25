@@ -21,26 +21,25 @@ class Physiology extends PureComponent {
   componentDidMount(){
     const { dispatch,location,addPhy:{newPhy} } = this.props;
     dispatch({
-      type: 'addPhy/getPhy',
-      payload: {Id:"1001"},
-    });
-    dispatch({
-      type: 'addQues/setStates',
+      type: 'addPhy/setStates',
       payload:{
         newPhy:{
           ...newPhy,
-          RespondentId:location.query.recordId
+          RespondentId:location.query.Id
         }
       }
     })
+    dispatch({
+      type: 'addPhy/getPhy',
+      payload: {
+        Id:location.query.recordId
+      }
+    });
   }
 
   // 模拟输入GroupTime
   handleSubmit = () => {
     const { dispatch,addPhy:{newPhy} } = this.props;
-    newPhy.Infos.map(item => {
-      item.GroupTime = "2019-03-22"
-    });
     dispatch({
       type: 'addPhy/uploadPhy',
       payload: {...newPhy},
@@ -171,7 +170,7 @@ class Physiology extends PureComponent {
     return(
       <React.Fragment>
         {showGroup && <div className={styles.title}>{item.GroupName}</div>}
-        <FormItem {...formItemLayout} className={styles.form} style={{textAlign:'center'}}>
+        <FormItem {...formItemLayout} className={styles.form} style={{marginLeft:750}}>
           <Checkbox onChange={value => this.setInfos(index,"ItemChecked",value.target.checked,null)}>
             {item.Title}
           </Checkbox>
