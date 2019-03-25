@@ -6,7 +6,6 @@ import {
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physiology.less';
 
-
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -22,26 +21,25 @@ class Physiology extends PureComponent {
   componentDidMount(){
     const { dispatch,location,addPhy:{newPhy} } = this.props;
     dispatch({
-      type: 'addPhy/getPhy',
-      payload: {Id:"1001"},
-    });
-    dispatch({
-      type: 'addQues/setStates',
+      type: 'addPhy/setStates',
       payload:{
         newPhy:{
           ...newPhy,
-          RespondentId:location.query.recordId
+          RespondentId:location.query.Id
         }
       }
     })
+    dispatch({
+      type: 'addPhy/getPhy',
+      payload: {
+        Id:location.query.recordId
+      }
+    });
   }
 
   // 模拟输入GroupTime
   handleSubmit = () => {
     const { dispatch,addPhy:{newPhy} } = this.props;
-    newPhy.Infos.map(item => {
-      item.GroupTime = "2019-03-22"
-    });
     dispatch({
       type: 'addPhy/uploadPhy',
       payload: {...newPhy},
@@ -172,10 +170,10 @@ class Physiology extends PureComponent {
     return(
       <React.Fragment>
         {showGroup && <div className={styles.title}>{item.GroupName}</div>}
-        <FormItem {...formItemLayout} className={styles.form}>
+        <FormItem {...formItemLayout} className={styles.form} style={{marginLeft:750}}>
           <Checkbox onChange={value => this.setInfos(index,"ItemChecked",value.target.checked,null)}>
             {item.Title}
-          </Checkbox>,
+          </Checkbox>
         </FormItem>
       </React.Fragment>
     )
@@ -223,8 +221,8 @@ class Physiology extends PureComponent {
           <Form hideRequiredMark style={{ marginTop: 8 }}>
             {this.renderTopic(Topics)}
             <FormItem {...submitFormLayout} className={styles.form}>
-              {/*<Button type="primary" htmlType="submit" style={{marginTop: 10, marginBottom: 10}}>提交</Button>*/}
-              <Button onClick={()=>this.handleSubmit()} style={{marginTop: 10, marginBottom: 10}}>提交</Button>
+              <Button type="primary" htmlType="submit" onClick={()=>this.handleSubmit()} style={{marginTop: 10, marginBottom: 10}}>提交</Button>
+              {/*<Button onClick={()=>this.handleSubmit()} style={{marginTop: 10, marginBottom: 10}}>提交</Button>*/}
             </FormItem>
           </Form>
         </div>

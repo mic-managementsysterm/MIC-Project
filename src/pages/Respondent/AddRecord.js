@@ -64,7 +64,7 @@ import router from 'umi/router';
         <div style={{ background: '#ECECEC', padding: '30px' }}>
           <div className={styles.cardList}>
             <List
-              rowKey="id"
+              rowKey="Id"
               loading={loading}
               grid={{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }}
               dataSource={data}

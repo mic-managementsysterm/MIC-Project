@@ -1,4 +1,4 @@
-import { queryDisease, addDisease, removeDisease, updateDisease} from '@/services/coustomApi/diseaseApi';
+import { queryDisease, addDisease, removeDisease, updateDisease} from '@/services/api';
 
 export default {
   namespace: 'disease',
