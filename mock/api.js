@@ -318,7 +318,7 @@ export default {
   'GET /api/tags': mockjs.mock({
     'list|100': [{ name: '@city', 'value|1-100': 150, 'type|0-2': 1 }],
   }),
-  'GET /api/fake_list': getFakeList,
-  'POST /api/fake_list': postFakeList,
-  'GET /api/captcha': getFakeCaptcha,
+  // 'GET /api/fake_list': getFakeList,
+  // 'POST /api/fake_list': postFakeList,
+  // 'GET /api/captcha': getFakeCaptcha,
 };

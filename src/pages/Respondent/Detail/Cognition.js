@@ -26,7 +26,7 @@ class Cognition extends Component {
     const { cognitionData = {} } = detail;
     const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.location.query;
     return (
-      <PageHeaderWrapper title="基础详情页" loading={loading}>
+      <PageHeaderWrapper title="记录详情页" loading={loading}>
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
             <Description term="用户姓名">{Name}</Description>

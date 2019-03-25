@@ -25,7 +25,6 @@ class DiagnosisForm extends PureComponent {
     this.setState({
       loading:true
     })
-    console.log("@loading",this.state.loading)
     let upload = {};
     this.props.form.validateFieldsAndScroll((err, values) => {
 
@@ -53,7 +52,6 @@ class DiagnosisForm extends PureComponent {
       }
 
     });
-    // console.log("@loading",this.state.loading)
   };
 
   render() {
@@ -70,8 +68,7 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-   const {loading}=this.props
-   // console.log("@loading22",this.state.loading)
+   const {loading}=this.props;
     return (
       <PageHeaderWrapper title="四诊数据采集" >
         <Spin spinning={this.state.loading} tip={'正在保存'}>

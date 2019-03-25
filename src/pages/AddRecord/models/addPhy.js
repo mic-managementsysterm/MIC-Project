@@ -51,7 +51,6 @@ export default {
       };
     },
     setStates(state, { payload }) {
-      console.log(payload)
       return {
         ...state,
         ...payload,

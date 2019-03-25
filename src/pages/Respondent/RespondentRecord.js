@@ -62,15 +62,14 @@ class RespondentRecord extends PureComponent {
                     className={styles.card}
                     actions={[
                       <Link to={`${item.path}&Name=${Name}&Gender=${Gender}&Phone=${Phone}&Born=${Born}&Address=${Address}&CreatedAt=${CreatedAt}`}>
-                        <Button>查看</Button>
+                        查看
                       </Link>,
                       <Popconfirm title="确认删除？" onConfirm={()=>this.delRecord(item)} okText="确认" cancelText="取消">
-                        <Button>删除</Button>
+                        删除
                       </Popconfirm>,
                     ]}
                   >
                     <Card.Meta
-                      avatar={<img alt="" className={styles.cardAvatar} src={item.avatar} />}
                       title={<a>{item.title}</a>}
                       description={
                         <Ellipsis className={styles.item} lines={3}>
