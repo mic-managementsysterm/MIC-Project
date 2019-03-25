@@ -77,7 +77,7 @@ import router from 'umi/router';
                       title={item.Name}
                       extra={<Button onClick={()=>this.addRecord(item)}>新增</Button>}
                     >
-                      Card content
+                      点击新增添加新记录。
                     </Card>
                   </List.Item>
                 )

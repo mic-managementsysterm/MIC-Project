@@ -521,7 +521,7 @@ class Respondent extends PureComponent {
       },
     };
     return (
-      <PageHeaderWrapper title="患者管理">
+      <PageHeaderWrapper title="受访者管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>

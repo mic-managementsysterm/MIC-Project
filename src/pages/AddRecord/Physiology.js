@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
+import router from 'umi/router';
 import {
-  Icon, Radio, Form, Input, Button,Checkbox
+  Icon, Radio, Form, Input, Button,Checkbox, message
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physiology.less';
@@ -44,6 +45,9 @@ class Physiology extends PureComponent {
       type: 'addPhy/uploadPhy',
       payload: {...newPhy},
     });
+    message.loading('正在提交..', 2.5)
+      .then(() => message.success('提交成功', 2.5))
+      .then(() =>router.go(-2));
   };
 
   setInfos = (index,type,value,GroupName) => {
@@ -208,7 +212,7 @@ class Physiology extends PureComponent {
 
 
   render() {
-    const { addPhy:{Topics} } = this.props;
+    const { addPhy:{Topics}, loading } = this.props;
     const submitFormLayout = {
       wrapperCol: {
         xs: { span: 24, offset: 14 },
@@ -216,7 +220,7 @@ class Physiology extends PureComponent {
       },
     };
     return(
-      <PageHeaderWrapper title="生理数据采集">
+      <PageHeaderWrapper title="生理数据采集" loading={loading}>
         <div className={styles.content}>
           <Form hideRequiredMark style={{ marginTop: 8 }}>
             {this.renderTopic(Topics)}

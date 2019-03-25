@@ -84,7 +84,7 @@ componentWillMount(){
         }
         ]
         return(
-          <PageHeaderWrapper loading={loading}>
+          <PageHeaderWrapper title="问卷管理" loading={loading}>
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
               <Link to={'/gauge/question-list/questionAdd-list'}>

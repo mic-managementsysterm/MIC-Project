@@ -1,4 +1,4 @@
-import {deleteQues,deleteGauge,deleteMedical,queryFakeList, removeFakeList, addFakeList, updateFakeList } from '@/services/api';
+import {deleteQues,deleteGauge,deleteMedical,queryFakeList } from '@/services/api';
 
 const format = (arr,) => {
   if(!Array.isArray(arr)){
@@ -11,6 +11,7 @@ const format = (arr,) => {
     let path = `/respondent/respondent-list/respondent-record/four-dagnostic?Id=${item.Id}`;
     let delAction = "list/delMedical";
     if(item.GaugeName){
+      let avatar = require('../assets/img/cognition.jpg');
       title = item.GaugeName;
       description = `创建时间：${item.CreatedAt}\n点击查看理化检查详情`;
       path = `/respondent/respondent-list/respondent-record/Physicochemical?Id=${item.Id}`

@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { Row, Button, List, Radio, Upload, message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './AddQuestionnaire.less';
+import router from 'umi/router';
 
 const {Group} = Radio;
 
@@ -11,16 +12,6 @@ const {Group} = Radio;
   loading:loading.models.addQues,
 }))
 class AddRecord extends Component{
-
-  componentWillMount() {
-    // const { dispatch, location } = this.props;
-    // dispatch({
-    //   type: 'addQues/setStates',
-    //   payload:{
-    //     Id:location.query.recordId
-    //   }
-    // })
-  }
 
   componentDidMount() {
     const { dispatch,location,addQues:{newQues} } = this.props;
@@ -54,6 +45,9 @@ class AddRecord extends Component{
         ...newQues
       }
     })
+    message.loading('正在提交..', 2.5)
+      .then(() => message.success('提交成功', 2.5))
+      .then(() =>router.go(-2));
   };
 
   insertImg = (index,img) => {
