@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { formatMessage, FormattedMessage } from 'umi/locale';
-import Link from 'umi/link';
-import { Checkbox, Alert, Icon } from 'antd';
+import { Checkbox } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
+const {  UserName, Password, Submit } = Login;
 
 @connect(({ login, loading }) => ({
   login,
@@ -52,7 +51,7 @@ class LoginPage extends Component {
         >
           <UserName
             name="userName"
-            placeholder={`${formatMessage({ id: 'app.login.userName' })}: admin or user`}
+            placeholder={`${formatMessage({ id: 'app.login.userName' })}`}
             rules={[
               {
                 required: true,
@@ -62,7 +61,7 @@ class LoginPage extends Component {
           />
           <Password
             name="password"
-            placeholder={`${formatMessage({ id: 'app.login.password' })}: ant.design`}
+            placeholder={`${formatMessage({ id: 'app.login.password' })}`}
             rules={[
               {
                 required: true,
