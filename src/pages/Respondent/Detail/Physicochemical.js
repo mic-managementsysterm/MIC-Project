@@ -52,11 +52,11 @@ class Physicochemical  extends Component {
             </Row>
               <Row className={styles.que}>
                 <Col span={6}>
-                  <ul><li>{item.Title}</li></ul>
+                  <ul><li>{item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ? item.Title : null }</li></ul>
                 </Col>
                 <Col span={6} offset={6}>
-                  <ul>
-                  <li>{item.ItemResult}{item.ExceptionType === '1' ? <Icon type='arrow-up' /> : <Icon type='arrow-down' /> }</li>
+                  <ul style={{marginLeft:15}}>
+                  <li>{item.ExceptionType === 0 ? '正常' : (item.ExceptionType === 1 ? <Icon type='arrow-up' /> : (item.ExceptionType === 2 ? <Icon type='arrow-down' /> : item.ItemValue)) }</li>
                   </ul>
                   </Col>
               </Row>
