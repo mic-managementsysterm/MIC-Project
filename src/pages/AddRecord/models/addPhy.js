@@ -1,11 +1,11 @@
-import { queryPhy, addOrUpdatePhy } from '@/services/coustomApi/phyApi';
+import { queryPhy, addOrUpdatePhy } from '@/services/api';
 
 export default {
   namespace: 'addPhy',
 
   state: {
     newPhy:{
-      RespondentId:"fb2413f6-7cea-ea8e-82b3-17b6a9327b68",
+      RespondentId:"",
       GaugeId:"",
       GaugeName:"",
       Infos:[],
@@ -21,8 +21,9 @@ export default {
         payload: response.Data,
       });
     },
-    *uploadPhy({ payload }, { call, }) {
-      yield call(addOrUpdatePhy, payload)
+    *uploadPhy({ payload, callback }, { call }) {
+      yield call(addOrUpdatePhy, payload);
+      if (callback) callback()
     },
   },
 
@@ -37,10 +38,9 @@ export default {
           newObj.Infos.push({
             TopicId: item.Id,
             GroupName:item.GroupName,
-            GroupTime:"",
-            ItemChecked:false,
-            ItemValue:"",
-            ExceptionType:0,
+            ItemChecked:item.ItemChecked,
+            ItemValue:item.ItemValue,
+            ExceptionType:item.Exception,
           });
         });
       }
@@ -59,15 +59,7 @@ export default {
     },
     setInfos(state, { payload }) {
       let newInfos = state.newPhy.Infos.slice();
-      if(payload.type === "GroupTime"){
-        newInfos.map(item => {
-          if(item.GroupName === payload.GroupName){
-            item.GroupTime = payload.value;
-          }
-        })
-      }else {
-        newInfos[payload.index][payload.type] = payload.value;
-      }
+      newInfos[payload.index][payload.type] = payload.value;
 
       return {
         ...state,

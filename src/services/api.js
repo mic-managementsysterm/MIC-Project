@@ -1,222 +1,174 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
-import Config from './config';
 
-export async function queryProjectNotice() {
-  return request('/api/project/notice');
-}
-
-export async function queryActivities() {
-  return request('/api/activities');
-}
-
-export async function queryRule(params) {
-  return request(`/api/rule?${stringify(params)}`);
-}
-
-export async function removeRule(params) {
-  return request('/api/rule', {
+//登录
+export async function login(params) {
+  return request(`/Api/user/change/login`,{
     method: 'POST',
     body: {
       ...params,
-      method: 'delete',
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
     },
   });
 }
 
-export async function addRule(params) {
-  return request('/api/rule', {
+export async function queryUser(params) {
+  return request(`/Api/user/get/getInfo?${stringify(params)}`);
+}
+
+export async function changeInfo(params) {
+  return request(`/Api/user/change/editInfo`,{
     method: 'POST',
     body: {
       ...params,
-      method: 'post',
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
     },
   });
 }
 
-export async function updateRule(params = {}) {
-  return request(`/api/rule?${stringify(params.query)}`, {
+export async function changePwd(params) {
+  return request(`/Api/user/change/passwd`,{
     method: 'POST',
     body: {
-      ...params.body,
-      method: 'update',
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
     },
   });
 }
 
-
+// 疾病
 export async function queryDisease(params) {
-  return request(`/api/disease?${stringify(params)}`);
-}
-
-export async function removeDisease(params) {
-  return request('/api/disease', {
-    method: 'POST',
-    body: {
-      ...params,
-      method: 'delete',
-    },
-  });
+  return request(`/Api/disease/get/find?${stringify(params)}`);
 }
 
 export async function addDisease(params) {
-  return request('/api/disease', {
+  return request(`/Api/disease/change/add`,{
     method: 'POST',
     body: {
       ...params,
-      method: 'post',
     },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
   });
 }
 
-export async function updateDisease(params = {}) {
-  return request(`/api/disease?${stringify(params.query)}`, {
+export async function updateDisease(params) {
+  return request(`/Api/disease/change/update`,{
     method: 'POST',
     body: {
-      ...params.body,
-      method: 'update',
+      ...params,
     },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
   });
 }
 
-
-export async function fakeSubmitForm(params) {
-  return request('/api/forms', {
+export async function removeDisease(params) {
+  return request(`/Api/disease/delete/batchDelete`,{
     method: 'POST',
-    body: params,
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    traditional:true
   });
 }
 
-export async function fakeChartData() {
-  return request('/api/fake_chart_data');
+// 疾病关联
+export async function queryRelate(params) {
+  return request(`/Api/disease/get/findSyndromeById?${stringify(params)}`);
 }
 
-export async function queryTags() {
-  return request('/api/tags');
+export async function queryRest(params) {
+  return request(`/Api/disease/get/findRestSyndrome?${stringify(params)}`);
 }
 
-export async function queryBasicProfile(id) {
-  return request(`/api/profile/basic?id=${id}`);
+export async function querySyndrome(params) {
+  return request(`/Api/syndrome/get/find?${stringify(params)}`);
 }
 
-export async function queryAdvancedProfile() {
-  return request('/api/profile/advanced');
+export async function updateRelate(params) {
+  return request(`/Api/disease/change/addSyndrome`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
+
+// 患者
+export async function queryVisit(params) {
+  return request(`/Api/visit/get/GetByKey?${stringify(params)}`);
+}
+
+export async function addOrUpdateVisit(params) {
+  return request(`/Api/visit/change/addOrUpdate`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
+
+export async function removeVisit(params) {
+  return request(`/Api/visit/delete/batchDelete`,{
+    method: 'POST',
+    body: {
+      ...params
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    traditional:true
+  });
 }
 
 export async function queryFakeList(params) {
-  return request(`http://localhost:5010/visit/get/GetRespondentRecord?${stringify(params)}`,{
-    // body: params,
-    // method: 'GET',
-  });
+  return request(`/Api/visit/get/GetRespondentRecord?${stringify(params)}`);
 }
-
-export async function removeFakeList(params) {
-  const { count = 5, ...restParams } = params;
-  return request(`/api/fake_list?count=${count}`, {
-    method: 'POST',
-    body: {
-      ...restParams,
-      method: 'delete',
-    },
-  });
-}
-
-export async function addFakeList(params) {
-  const { count = 5, ...restParams } = params;
-  return request(`/api/fake_list?count=${count}`, {
-    method: 'POST',
-    body: {
-      ...restParams,
-      method: 'post',
-    },
-  });
-}
-
-export async function updateFakeList(params) {
-  const { count = 5, ...restParams } = params;
-  return request(`/api/fake_list?count=${count}`, {
-    method: 'POST',
-    body: {
-      ...restParams,
-      method: 'update',
-    },
-  });
-}
-
-export async function fakeAccountLogin(params) {
-  return request('/api/login/account', {
-    method: 'POST',
-    body: params,
-  });
-}
-
-export async function fakeRegister(params) {
-  return request('/api/register', {
-    method: 'POST',
-    body: params,
-  });
-}
-
-export async function queryNotices(params = {}) {
-  return request(`/api/notices?${stringify(params)}`);
-}
-
-export async function getFakeCaptcha(mobile) {
-  return request(`/api/captcha?mobile=${mobile}`);
-}
-
-// export async function getAllQuestionnaire() {
-//   const path = `http://localhost:5010/questionnaire/get/getAll`;
-//   return request(path,{
-//     method: 'GET',
-//   });
-// }
 
 export async function getAllGauge() {
-  const path = `http://localhost:5010/gaugetable/get/lib`;
-  return request(path,{
-    method: 'GET',
-  });
+  return request( `/Api/gaugetable/get/lib`);
 }
 
 export async function getCognitionDetail(params) {
-  const path = `http://localhost:5010/questionnairerecord/get/getById?${stringify(params)}`;
-  return request(path,{
-    method: 'GET',
-  });
+  return request(`/Api/questionnairerecord/get/getById?${stringify(params)}`);
 }
 
 export async function getMMSEDetail(params) {
-  const path = `http://localhost:5010/questionnairerecord/get/getById?${stringify(params)}`;
-  return request(path,{
-    method: 'GET',
-  });
+  return request( `/Api/questionnairerecord/get/getById?${stringify(params)}`);
 }
 
 export async function getMOCADetail(params) {
-  const path = `http://localhost:5010/questionnairerecord/get/getById?${stringify(params)}`;
-  return request(path,{
-    method: 'GET',
-  });
+  return request(`/Api/questionnairerecord/get/getById?${stringify(params)}`);
 }
 
 export async function getDiagnosisDetail(params) {
-  const path = `http://localhost:5010/medicalrecord/get/getById?${stringify(params)}`;
-  return request(path,{
-    method: 'GET',
-  });
+  return request(`/Api/medicalrecord/get/getById?${stringify(params)}`);
 }
 
 export async function getPhysicochemicalDetail(params) {
-  const path = `http://localhost:5010/gaugerecord/get/getById?${stringify(params)}`;
-  return request(path,{
-    method: 'GET',
-  });
+  return request(`/Api/gaugerecord/get/getById?${stringify(params)}`);
 }
 
 export async function uploadMedical(params) {
-  const path = `http://localhost:5010/medicalrecord/change/addOrUpdateRecord`;
-  return request(path,{
+  return request(`/Api/medicalrecord/change/addOrUpdateRecord`,{
     method: 'POST',
     body: {
       ...params,
@@ -227,21 +179,8 @@ export async function uploadMedical(params) {
   });
 }
 
-export async function login(params) {
-  const path = `http://localhost:5010/user/change/login`;
-  return request(path,{
-    method: 'POST',
-    body: {
-      ...params,
-    },
-    headers:{
-      "Content-Type":"application/x-www-form-urlencoded"
-    },
-  });
-}
 export async function deleteMedical(params) {
-  const path = `http://localhost:5010/medicalrecord/delete/delete`;
-  return request(path,{
+  return request(`/Api/medicalrecord/delete/delete`,{
     method: 'POST',
     body: {
       ...params,
@@ -251,9 +190,9 @@ export async function deleteMedical(params) {
     },
   });
 }
+
 export async function deleteGauge(params) {
-  const path = `http://localhost:5010/gaugerecord/delete/byId`;
-  return request(path,{
+  return request(`/Api/gaugerecord/delete/byId`,{
     method: 'POST',
     body: {
       ...params,
@@ -263,20 +202,17 @@ export async function deleteGauge(params) {
     },
   });
 }
+
 export async function getQuestion(Id) {
-  const path = `${Config.service}/questionnaire/get/getById?${stringify(Id)}`;
-  return request(path)
+  return request(`/Api/questionnaire/get/getById?${stringify(Id)}`)
 }
 
 export async function getAllQuestionnaire() {
-  const path = `${Config.service}/questionnaire/get/getAll`;
-  return request(path);
+  return request(`/Api/questionnaire/get/getAll`);
 }
 
-
 export async function changeQuestion(params) {
-  const path=`${Config.service}/questionnaire/change/addOrUpdate`;
-  return request(path, {
+  return request(`/Api/questionnaire/change/addOrUpdate`, {
     method: 'POST',
     body: { ...params.body },
     headers: {
@@ -286,8 +222,7 @@ export async function changeQuestion(params) {
 }
 
 export async function deleteQuestion(Id) {
-  const path=`${Config.service}/questionnaire/delete/delete`;
-  return request(path,{
+  return request(`/Api/questionnaire/delete/delete`,{
     method:'POST',
     body:Id,
     headers:{
@@ -295,9 +230,9 @@ export async function deleteQuestion(Id) {
     }
   })
 }
+
 export async function deleteQues(params) {
-  const path = `http://localhost:5010/questionnairerecord/delete/delete`;
-  return request(path,{
+  return request(`/Api/questionnairerecord/delete/delete`,{
     method: 'POST',
     body: {
       ...params,
@@ -308,14 +243,12 @@ export async function deleteQues(params) {
   });
 }
 
-export async function getGauge(params) {
-  const path = `http://localhost:5010/gaugetable/get/getById?${stringify(params)}`;
-  return request(path);
+export async function queryQues(params) {
+  return request(`/Api/questionnaire/get/getById?${stringify(params)}`);
 }
 
-export async function addOrUpdateGauge(params) {
-  const path = `http://localhost:5010/gaugerecord/change/add`;
-  return request(path,{
+export async function addOrUpdateQues(params) {
+  return request(`/Api/questionnairerecord/change/addOrUpdate`,{
     method: 'POST',
     body: {
       ...params,
@@ -326,4 +259,18 @@ export async function addOrUpdateGauge(params) {
   });
 }
 
+export async function queryPhy(params) {
+  return request(`/Api/gaugetable/get/getById?${stringify(params)}`);
+}
 
+export async function addOrUpdatePhy(params) {
+  return request(`/Api/gaugerecord/change/add`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}

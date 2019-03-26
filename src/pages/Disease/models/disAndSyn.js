@@ -1,5 +1,4 @@
-import { queryRelate, queryRest, querySyndrome, updateRelate} from '@/services/coustomApi/diseaseApi';
-
+import { queryRelate, queryRest, querySyndrome, updateRelate} from '@/services/api';
 export default {
   namespace: 'disAndSyn',
 

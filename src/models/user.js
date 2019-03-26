@@ -1,4 +1,4 @@
-import { queryUser, changeInfo,changePwd } from '@/services/coustomApi/accountApi';
+import { queryUser, changeInfo,changePwd } from '@/services/api';
 import {message} from "antd"
 
 export default {

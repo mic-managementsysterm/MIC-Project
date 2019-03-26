@@ -35,9 +35,10 @@ componentWillMount(){
    }
     render(){
       const {question:{questions},loading}=this.props;
+      questions?
       questions.map((que,index)=>{
         que.CreatedAt=moment(que.CreatedAt).format('YYYY-MM-DD HH:mm:ss')
-      })
+      }):null
       const columns=[
         {
           title:'题目',
@@ -84,14 +85,14 @@ componentWillMount(){
         }
         ]
         return(
-          <PageHeaderWrapper loading={loading}>
+          <PageHeaderWrapper title="问卷管理" loading={loading}>
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
               <Link to={'/gauge/question-list/questionAdd-list'}>
                 <Button className={styles.btn2} style={{marginBottom:5,}} >添加</Button>
               </Link>
               </div>
-                <Table rowKey="Id" style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}> </Table>
+                <Table rowKey='Id' style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}> </Table>
             </div>
           </PageHeaderWrapper>
         )

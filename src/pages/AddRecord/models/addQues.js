@@ -1,4 +1,4 @@
-import { queryQues, addOrUpdateQues } from '@/services/coustomApi/addQuesApi';
+import { queryQues, addOrUpdateQues } from '@/services/api';
 
 export default {
   namespace: 'addQues',
@@ -27,8 +27,9 @@ export default {
         payload: response.Data,
       });
     },
-    *uploadQues({ payload }, { call, }) {
-      yield call(addOrUpdateQues, payload)
+    *uploadQues({ payload,callback }, { call, }) {
+      yield call(addOrUpdateQues, payload);
+      if(callback) callback()
     },
   },
   reducers: {

@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react';
-import { connect } from 'dva';import {
-  Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete,
+import { connect } from 'dva';
+import {
+  Form, Input,Spin, Button,
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import router from 'umi/router';
 import styles from './Diagnosis.less';
 const { TextArea } = Input;
 
@@ -12,10 +14,21 @@ const { TextArea } = Input;
   loading: loading.models.addMedical,
 }))
 class DiagnosisForm extends PureComponent {
+  constructor(props){
+    super(props)
+    this.state={
+      loading:false
+    }
+  }
+
   handleSubmit = (e) => {
     e.preventDefault();
+    this.setState({
+      loading:true
+    })
+    let upload = {};
     this.props.form.validateFieldsAndScroll((err, values) => {
-      let upload = {};
+
       if (!err) {
         upload.RespondentId = this.props.location.query.Id;
         upload.ZS = values.ZS;
@@ -24,10 +37,17 @@ class DiagnosisForm extends PureComponent {
         upload.GMS = values.GMS;
         upload.TGJC = values.TGJC;
         upload.Diagnose = values.Diagnose;
-        this.props.dispatch({
-          type: 'addMedical/upload',
-          payload:upload
+
+      }
+    });
+    this.props.dispatch({
+      type: 'addMedical/upload',
+      payload:upload,
+      callback:()=>{
+        this.setState({
+          loading:false
         });
+        router.go(-2);
       }
     });
   };
@@ -46,11 +66,12 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-
+   const {loading}=this.props;
     return (
-      <PageHeaderWrapper title="四诊数据采集">
+      <PageHeaderWrapper title="四诊数据采集" >
+        <Spin spinning={this.state.loading} tip={'正在提交'}>
         <div className={styles.content}>
-          <Form  onSubmit={this.handleSubmit} className={styles.test}>
+          <Form   onSubmit={this.handleSubmit} className={styles.test}>
             <Form.Item
               label="主诉"
               labelCol={{ span: 5 }}
@@ -134,6 +155,7 @@ class DiagnosisForm extends PureComponent {
             </Form.Item>
           </Form>
         </div>
+        </Spin>
       </PageHeaderWrapper>
     );
   }

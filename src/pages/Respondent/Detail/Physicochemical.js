@@ -26,7 +26,7 @@ class Physicochemical  extends Component {
     const { physicochemicalData = {} } = detail;
     const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.location.query;
     return (
-      <PageHeaderWrapper title="基础详情页" loading={loading}>
+      <PageHeaderWrapper title="记录详情页" loading={loading}>
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
             <Description term="用户姓名">{Name}</Description>
@@ -52,11 +52,16 @@ class Physicochemical  extends Component {
             </Row>
               <Row className={styles.que}>
                 <Col span={6}>
-                  <ul><li>{item.Title}</li></ul>
+                  <ul><li>{item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ? item.Title : (item.GroupName === '静息心电图' ? item.Title : null) }</li></ul>
                 </Col>
                 <Col span={6} offset={6}>
-                  <ul>
-                  <li>{item.ItemResult}{item.ExceptionType === '1' ? <Icon type='arrow-up' /> : <Icon type='arrow-down' /> }</li>
+                  <ul style={{marginLeft:10}}>
+                  <li>{
+                    item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ?
+                      (item.ExceptionType === 0 ? '正常' : (item.ExceptionType === 1 ? <Icon type='arrow-up' /> : (item.ExceptionType === 2 ? <Icon type='arrow-down' /> :  null)))
+                      :
+                      (item.GroupName === '静息心电图' ? (item.Title === '心率' ? item.ItemValue : (item.ItemChecked ? '有' : '无')) : item.ItemValue)
+                  }</li>
                   </ul>
                   </Col>
               </Row>
