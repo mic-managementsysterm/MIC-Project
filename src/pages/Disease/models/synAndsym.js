@@ -4,7 +4,7 @@ export default {
   namespace: 'synAndSym',
 
   state: {
-    diseaseId:"",
+    syndromeId:"",
     relateSym:[],
     restSym:[],
 
@@ -69,7 +69,7 @@ export default {
     changeId(state, action){
       return {
         ...state,
-        diseaseId:action.payload
+        syndromeId:action.payload
       }
     },
     set(state, action) {
