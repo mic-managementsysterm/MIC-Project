@@ -26,6 +26,16 @@ export default [
             name: 'diseaseList',
             component: './Disease/Disease',
           },
+          {
+            path: '/disease/syndrome-list',
+            name: 'syndromeList',
+            component: './Disease/Syndrome',
+          },
+          {
+            path: '/disease/symptom-list',
+            name: 'symptomList',
+            component: './Disease/Symptom',
+          },
         ],
       },
       //量表管理

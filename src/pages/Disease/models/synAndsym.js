@@ -1,12 +1,12 @@
-import { queryRelate, querySyndrome, updateRelate} from '@/services/api';
+import { queryRelateSym, querySymptom, updateRelateSym} from '@/services/api';
 
 export default {
-  namespace: 'disAndSyn',
+  namespace: 'synAndSym',
 
   state: {
     diseaseId:"",
-    relateSyn:[],
-    restSyn:[],
+    relateSym:[],
+    restSym:[],
 
     restKey:'',
     restPagination:{
@@ -25,7 +25,7 @@ export default {
       if(callback) callback()
     },
     *queryRelate({ payload }, { call, put }) {
-      const response = yield call(queryRelate, payload);
+      const response = yield call(queryRelateSym, payload);
       const {Data} = response;
       yield put({
         type: 'set',
@@ -34,14 +34,14 @@ export default {
         },
       });
     },
-    *querySyn({ payload, callback }, { call, put }) {
-      const response = yield call(querySyndrome, payload);
+    *querySym({ payload, callback }, { call, put }) {
+      const response = yield call(querySymptom, payload);
       const {Data:{rows,pagesize,pageindex,total}} = response;
       yield put({
         type: 'setRest',
         payload: {
           restKey:payload.key,
-          restSyn:rows,
+          restSym:rows,
           restPagination:{
             total: total,
             pageSize:pagesize,
@@ -52,7 +52,7 @@ export default {
       if (callback) callback();
     },
     *updateRelate({ payload, callback }, { call }) {
-      yield call(updateRelate, payload);
+      yield call(updateRelateSym, payload);
       if (callback) callback();
     },
     *setStates({ payload }, { put }) {
@@ -79,13 +79,13 @@ export default {
       };
     },
     setRest(state, action) {
-      let { restSyn,restPagination,restKey } = action.payload;
+      let { restSym,restPagination,restKey } = action.payload;
       let rest = [];
-      if(Array.isArray(restSyn)){
-        rest = restSyn.slice();
-        let relateSynText = JSON.stringify(state.relateSyn);
+      if(Array.isArray(restSym)){
+        rest = restSym.slice();
+        let relateSymText = JSON.stringify(state.relateSym);
         rest.map(item=>{
-          if(relateSynText.indexOf(item.Id) !== -1){
+          if(relateSymText.indexOf(item.Id) !== -1){
             item.disabled = true
           }
         });
@@ -94,7 +94,7 @@ export default {
       return {
         ...state,
         restKey,
-        restSyn:rest,
+        restSym:rest,
         restPagination
       };
     },

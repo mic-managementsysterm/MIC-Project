@@ -1,7 +1,7 @@
-import { queryDisease, addDisease, removeDisease, updateDisease} from '@/services/api';
+import { querySyndrome, addSyndrome, removeSyndrome, updateSyndrome} from '@/services/api';
 
 export default {
-  namespace: 'disease',
+  namespace: 'syndrome',
 
   state: {
     dataSource:[],
@@ -14,18 +14,17 @@ export default {
     modalVisible: false,
     relateModalVisible: false,
     selectedRows: [],
-    Disease : {
+    Syndrome : {
       Id: "",
       Name: "",
       PinYin:"",
-      Prevalent:false,
     },
     formValues: {},
   },
 
   effects: {
-    *queryDisease({ payload }, { call, put }) {
-      const response = yield call(queryDisease, payload);
+    *querySyndrome({ payload }, { call, put }) {
+      const response = yield call(querySyndrome, payload);
       if(response.Success){
         yield put({
           type: 'set',
@@ -38,16 +37,16 @@ export default {
         });
       }
     },
-    *addDisease({ payload, callback }, { call }) {
-      yield call(addDisease, payload);
+    *addSyndrome({ payload, callback }, { call }) {
+      yield call(addSyndrome, payload);
       if (callback) callback();
     },
-    *removeDisease({ payload, callback }, { call }) {
-      yield call(removeDisease, payload);
+    *removeSyndrome({ payload, callback }, { call }) {
+      yield call(removeSyndrome, payload);
       if (callback) callback();
     },
-    *updateDisease({ payload, callback }, { call }) {
-      yield call(updateDisease, payload);
+    *updateSyndrome({ payload, callback }, { call }) {
+      yield call(updateSyndrome, payload);
       if (callback) callback();
     },
     *setStates({ payload, callback }, { put }) {
