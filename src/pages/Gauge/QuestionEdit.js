@@ -23,9 +23,9 @@ class QuestionEdit extends React.Component {
     this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
     this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
-    this.handleDatePick = this.handleDatePick.bind(this);
+    // this.handleDatePick = this.handleDatePick.bind(this);
     this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
-    this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
+    // this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
     this.handleIndex=this.handleIndex.bind(this);
     this.handleChange=this.handleChange.bind(this);
     this.beforeUpload=this.beforeUpload.bind(this);
@@ -48,20 +48,14 @@ class QuestionEdit extends React.Component {
             GroupName:       null,
             TotalScore:      null,
             Type:            null,
-            CreatedAt:       null /* 2018-07-23 10:04:30 */
+            // CreatedAt:       null /* 2018-07-23 10:04:30 */
           }
         ],
-        CreatedAt:  null,
+        // CreatedAt:  null,
       }
       ,
-      date:null,
-      title:'这里是标题',
+      defaultGroupName:null,
       fileList:[],
-      props : {
-        action: '//jsonplaceholder.typicode.com/posts/',
-        listType: 'picture',
-        defaultFileList: [...fileList],
-      },
       indexCurrent:null,
       loading1:false,
       loading2:false,
@@ -75,7 +69,7 @@ class QuestionEdit extends React.Component {
     })
   }
   componentWillMount(){
-    const Id=this.props.location.state.Id
+    const Id=this.props.location.query.Id
     this.getQuestion(Id)
 
   }
@@ -123,8 +117,12 @@ class QuestionEdit extends React.Component {
       GroupName:'',
       TotalScore:null,
       Title: '类型一',
-      CreatedAt:'',
     };
+    if (this.state.defaultGroupName){
+      newQuestion.GroupName=this.state.defaultGroupName
+    }else {
+
+    }
     this.state.questions.Topics.push(newQuestion)
     this.setState( {
       questions: this.state.questions,
@@ -214,8 +212,12 @@ class QuestionEdit extends React.Component {
       Type: 1,
       TotalScore:null,
       Title: '类型二',
-      CreatedAt:'',
     };
+    if (this.state.defaultGroupName){
+      newQuestion.GroupName=this.state.defaultGroupName
+    }else {
+
+    }
     this.state.questions.Topics.push(newQuestion)
     this.setState({
       questions: this.state.questions,
@@ -232,8 +234,10 @@ class QuestionEdit extends React.Component {
         questions: questions
       });
     }else {
+
       questions.Topics[questionIndex].GroupName = e.target.value;
       this.setState({
+        defaultGroupName:e.target.value,
         questions: questions
       });
     }
@@ -269,13 +273,13 @@ class QuestionEdit extends React.Component {
   }
 
 
-  handleDatePick(date, dateString) {
-    const {questions}=this.state
-    questions.CreatedAt=dateString
-    this.setState({
-      questions:questions
-    })
-  }
+  // handleDatePick(date, dateString) {
+  //   const {questions}=this.state
+  //   questions.CreatedAt=dateString
+  //   this.setState({
+  //     questions:questions
+  //   })
+  // }
 
   handleSaveQuestionnaire(body) {
     this.setState({
@@ -284,42 +288,51 @@ class QuestionEdit extends React.Component {
     const {question:{question},dispatch}=this.props
     // question=body
     dispatch({
-        type:'question/changeQuestion',
-        payload: {body},callback:()=>{
-          this.setState({
-            showLoading:false
-          })
-          router.push('/gauge/question-list')
+        type: 'question/changeQuestion',
+        payload: { body }, callback: () => {
+          const { question: { res } } = this.props
+          if (res.Success) {
+            this.setState({
+              showLoading: false
+            })
+            router.push('/gauge/question-list')
+            message.success('保存成功')
+          } else {
+            this.setState({
+              showLoading: false
+            })
+            message.error(res.Message)
+          }
         }
       }
     )
   }
 
-  handleReleaseQuestionnaire() {
-    let me = this;
-
-    if (this.state.questions.length === 0) {
-      message.warning({
-        title: '请添加至少一个问题'
-      });
-    } else if (this.state.date === '') {
-      message.warning({
-        title: '请选择截止日期'
-      });
-    } else {
-      message.confirm({
-        title: '确定发布问卷吗？',
-        content: '截止日期为 ' + this.state.date,
-        onOk() {
-          const index = me.state.index;
-          list[index] = Object.assign({}, {...me.state, stage: '发布中'});
-          localStorage.list = JSON.stringify(list);
-          window.location.reload();
-          me.props.history.push('/');
-        }
-      });
-    }
-  }
+  // handleReleaseQuestionnaire() {
+  //   let me = this;
+  //
+  //   if (this.state.questions.length === 0) {
+  //     message.warning({
+  //       title: '请添加至少一个问题'
+  //     });
+  //   } else if (this.state.date === '') {
+  //     message.warning({
+  //       title: '请选择截止日期'
+  //     });
+  //   } else {
+  //     message.confirm({
+  //       title: '确定发布问卷吗？',
+  //       content: '截止日期为 ' + this.state.date,
+  //       onOk() {
+  //         const index = me.state.index;
+  //         list[index] = Object.assign({}, {...me.state, stage: '发布中'});
+  //         localStorage.list = JSON.stringify(list);
+  //         window.location.reload();
+  //         me.props.history.push('/');
+  //       }
+  //     });
+  //   }
+  // }
 
   onChangeInt=(value,quesIndex)=>{
     let { questions } = this.state;
@@ -395,10 +408,12 @@ class QuestionEdit extends React.Component {
       if (question.Type === 0||1) {
         return (
           <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
+            <div>
+            <span>题目类型</span>
+            <Input value={question.GroupName} style={{ borderStyle: 'none', width: '90%', marginLeft: 3,marginBottom:10 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
+            </div>
             <span>Q{questionIndex + 1}</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
-            <span>题目类型</span>
-            <Input value={question.GroupName} style={{ borderStyle: 'none', width: '50%', marginLeft: 3,marginTop:10 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
             <Row style={{float:'right'}}>
               <span >总分：</span>
               <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
