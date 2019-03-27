@@ -34,6 +34,7 @@ export default {
             current:response.Data.pageindex,
             pageSize:response.Data.pagesize,
             total:response.Data.total,
+            searchKey:payload.key
           },
         });
       }
