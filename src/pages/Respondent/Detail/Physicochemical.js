@@ -46,25 +46,27 @@ class Physicochemical  extends Component {
             physicochemicalData&&physicochemicalData.RecordInfos ? physicochemicalData.RecordInfos.map((item,index) =>{
             return(
             <div key={index}>
-            <Row className={styles.groupName}>
+            <Row className={styles.groupName} style={{ backgroundColor: (index>0 && physicochemicalData.RecordInfos[index-1].GroupName == item.GroupName)?
+                null: '#edf8fa' }}>
               {(index>0 && physicochemicalData.RecordInfos[index-1].GroupName == item.GroupName)?
-                null:item.GroupName}
+                null: item.GroupName}
             </Row>
               <Row className={styles.que}>
                 <Col span={6}>
-                  <ul><li>{item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ? item.Title : (item.GroupName === '静息心电图' ? item.Title : null) }</li></ul>
+                  <ul><li>{item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ? item.Title : (item.GroupName === '静息心电图' ? item.Title : item.ItemValue) }</li></ul>
                 </Col>
                 <Col span={6} offset={6}>
-                  <ul style={{marginLeft:10}}>
+                  <ul style={{marginLeft: item.ExceptionType === 0 ? 15 : 20, color: item.ExceptionType === 0  ? '': 'red' }}>
                   <li>{
                     item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ?
                       (item.ExceptionType === 0 ? '正常' : (item.ExceptionType === 1 ? <Icon type='arrow-up' /> : (item.ExceptionType === 2 ? <Icon type='arrow-down' /> :  null)))
                       :
-                      (item.GroupName === '静息心电图' ? (item.Title === '心率' ? item.ItemValue : (item.ItemChecked ? '有' : '无')) : item.ItemValue)
+                      (item.GroupName === '静息心电图' ? (item.Title === '心率' ? item.ItemValue : (item.ItemChecked ? <Icon type="check" /> : <Icon type="close" />)) : null)
                   }</li>
                   </ul>
                   </Col>
               </Row>
+              <Divider className={styles.line} />
             </div>
             )
           }) : null}

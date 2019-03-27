@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import {
-  Icon, Radio, Form, Input, Button, Checkbox, message, Spin,
+  Icon, Radio, Form, Input, Button, Checkbox, Spin,
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physiology.less';
@@ -126,7 +126,7 @@ class Physiology extends PureComponent {
               },
             ],
           })(
-            <RadioGroup onChange={value => this.setInfos(index,"ExceptionType",value.target.value,null)}>
+            <RadioGroup defaultValue={0} onChange={value => this.setInfos(index,"ExceptionType",value.target.value,null)}>
               <Radio value={0}>正常</Radio>
               <Radio value={1}>异常<Icon type="arrow-up" /></Radio>
               <Radio value={2}>异常<Icon type="arrow-down" /></Radio>
@@ -239,7 +239,6 @@ class Physiology extends PureComponent {
             {this.renderTopic(Topics)}
             <FormItem {...submitFormLayout} className={styles.form}>
               <Button type="primary" htmlType="submit" onClick={()=>this.handleSubmit()} style={{marginTop: 10, marginBottom: 10}}>提交</Button>
-              {/*<Button onClick={()=>this.handleSubmit()} style={{marginTop: 10, marginBottom: 10}}>提交</Button>*/}
             </FormItem>
           </Form>
         </div>

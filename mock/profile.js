@@ -1351,5 +1351,5 @@ export default {
       data
     });
   },
-  'GET /api/questionnaire/get/getAll': addRecord,
+  // 'GET /api/questionnaire/get/getAll': addRecord,
 };

@@ -18,6 +18,8 @@ export default {
   'menu.respondent.addRecord': '新增记录',
   'menu.record': '新增记录',
   'menu.record.diagnosis': '四诊',
+  'menu.record.addDiagnosis': '中医诊断',
+  'menu.record.diagnosisInfo': '四诊信息',
   'menu.record.physiology': '生理',
   'menu.record.addQuestionnaire': '问卷',
   'menu.exception': '异常页',

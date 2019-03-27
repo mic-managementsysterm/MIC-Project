@@ -121,6 +121,16 @@ export default [
             component: './AddRecord/Diagnosis',
           },
           {
+            path: '/record/diagnosis/addDiagnosis',
+            name: 'addDiagnosis',
+            component: './AddRecord/AddDiagnosis',
+          },
+          {
+            path: '/record/diagnosis/diagnosisInfo',
+            name: 'diagnosisInfo',
+            component: './AddRecord/DiagnosisInfo',
+          },
+          {
             path: '/record/physiology',
             name: 'physiology',
             component: './AddRecord/Physiology',
