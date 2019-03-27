@@ -41,16 +41,15 @@ const clearRespondent = {
   Phone: "",
   IDCard: "",
   Address: "",
-  RecordUserId: "3c5e636a-c182-4ad7-a7b1-9205bbe534f5",
+  RecordUserId: "",
   CreatedAt: ""
 };
 const setInfo = {};
 
 const ManaForm = Form.create()(props => {
-  const { respondent: { Respondent,modalVisible,pageSize,current,searchKey }, form, dispatch,  } = props;
+  const { respondent: { Respondent,modalVisible,pageSize,current,searchKey }, form, dispatch,currentUser } = props;
 
   setInfo.setBaseInfo =() =>{
-    console.log(Respondent)
     Object.keys(form.getFieldsValue()).forEach(key => {
       const obj = {};
       obj[key] = Respondent[key] || null;
@@ -71,6 +70,9 @@ const ManaForm = Form.create()(props => {
       Respondent.Phone = fieldsValue.Phone;
       Respondent.IDCard = fieldsValue.IDCard;
       Respondent.Address = fieldsValue.Address;
+      if(Respondent.RecordUserId === ''){
+        Respondent.RecordUserId = currentUser.Id;
+      }
       dispatch({
         type: 'respondent/addOrUpRespondent',
         payload: {
@@ -204,8 +206,9 @@ const ManaForm = Form.create()(props => {
 });
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ respondent, loading }) => ({
+@connect(({ respondent, loading,user }) => ({
   respondent,
+  currentUser:user.currentUser,
   loading: loading.models.rule,
 }))
 @Form.create()
