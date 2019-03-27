@@ -46,7 +46,7 @@ export default [
             component: './Gauge/QuestionAdd',
           },
           {
-            path: '/gauge/question-list/questionEdit-list',
+            path: `/gauge/question-list/questionEdit-list`,
             hideInMenu:true,
             name: 'questionEdit',
             component: './Gauge/QuestionEdit',

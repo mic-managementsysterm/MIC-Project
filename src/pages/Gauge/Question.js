@@ -71,10 +71,9 @@ componentWillMount(){
           render:(text,record)=>(
             questions.length>=1?
             (   <div className={styles.operation}>
-          <Link to={{
-            pathname:'/gauge/question-list/questionEdit-list',
-            state:{Id:record.Id}
-          }}>
+          <Link to={
+            `/gauge/question-list/questionEdit-list?Id=${record.Id}`
+          }>
           <Button className={styles.btn}>编辑</Button>
           </Link>
           <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>

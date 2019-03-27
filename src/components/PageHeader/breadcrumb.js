@@ -5,6 +5,7 @@ import styles from './index.less';
 import { urlToList } from '../_utils/pathTools';
 
 export const getBreadcrumb = (breadcrumbNameMap, url) => {
+  console.log('@url',url)
   let breadcrumb = breadcrumbNameMap[url];
   if (!breadcrumb) {
     Object.keys(breadcrumbNameMap).forEach(item => {

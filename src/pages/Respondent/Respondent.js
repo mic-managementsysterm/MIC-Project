@@ -17,6 +17,7 @@ import {
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Respondent.less';
+import moment from 'moment';
 
 const FormItem = Form.Item;
 FormItem.className = styles["ant-form-item"];
@@ -219,7 +220,8 @@ class UpdateForm extends PureComponent {
   };
 
   render() {
-    const {respondent: { Respondent,updateModalVisible }, form } = this.props;
+    const {respondent: { Respondent,updateModalVisible }, form ,record} = this.props;
+    console.log('@record',Respondent)
     return (
       <Modal
         width={640}
@@ -232,21 +234,29 @@ class UpdateForm extends PureComponent {
       >
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
           {form.getFieldDecorator('Name', {
-            rules: [{ required: true, message: '请输入姓名！', min: 1 }],
-          })(<Input placeholder="请输入姓名" />)}
+            rules: [{ required: true, message: '请输入姓名！', min: 1 },
+            ],
+            initialValue:Respondent.Name
+          })(<Input  />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
-          <RadioGroup
+          {form.getFieldDecorator('Gender', {
+            // rules: [{ required: true, message: '请输入姓名！', min: 1 },
+            // ],
+            initialValue:Respondent.Gender
+          })( <RadioGroup
             onChange={value => {Respondent.Gender = value.target.value}}
-            defaultValue={0}
+
           >
             <Radio value={1}>男</Radio>
             <Radio value={0}>女</Radio>
-          </RadioGroup>
+          </RadioGroup>)}
+
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
           <DatePicker
             placeholder="请选择患者出生日期"
+            defaultValue={moment(Respondent.Born)}
             onChange={value => {Respondent.Born = value && value.format("YYYY-MM-DD")}}
             style={{paddingBottom: 5}}
           />
@@ -254,11 +264,12 @@ class UpdateForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="教育程度">
           {form.getFieldDecorator('Education', {
             rules: [{ message: '请输入教育程度'}],
+            initialValue:Respondent.Education
           })(<Input placeholder="请输入教育程度" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="婚姻状况">
           <Select
-            defaultValue={0}
+            defaultValue={Respondent.MaritalStatus}
             style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
             placeholder="请选择患者婚姻状况"
             onChange={value => {Respondent.MaritalStatus = value}}
@@ -269,7 +280,7 @@ class UpdateForm extends PureComponent {
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="居住状况">
           <Select
-            defaultValue={0}
+            defaultValue={Respondent.DwellingStatus}
             style={{ width: 120,paddingBottom: 10}}
             placeholder="请选择患者居住状况"
             onChange={value => {Respondent.DwellingStatus = value}}
@@ -282,21 +293,25 @@ class UpdateForm extends PureComponent {
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="爱好">
           {form.getFieldDecorator('Hobby', {
             rules: [{ message: '请输入爱好' }],
+            initialValue:Respondent.Hobby
           })(<Input placeholder="请输入爱好" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">
           {form.getFieldDecorator('Phone', {
             rules: [{  message: '请输入手机号码！', min: 11 }],
+            initialValue:Respondent.Phone
           })(<Input placeholder="请输入手机号码" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="身份证号码">
           {form.getFieldDecorator('IDCard', {
             rules: [{ required: true, message: '请输入身份证号码！', min: 15 }],
+            initialValue:Respondent.IDCard
           })(<Input placeholder="请输入身份证号码" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="居住地址">
           {form.getFieldDecorator('Address', {
             rules: [{  message: '请输入居住地址！' }],
+            initialValue:Respondent.Address
           })(<Input placeholder="请输入居住地址" />)}
         </FormItem>
       </Modal>
@@ -520,6 +535,7 @@ class Respondent extends PureComponent {
         current:current
       },
     };
+    // console.log('@data',data)
     return (
       <PageHeaderWrapper title="受访者管理">
         <Card bordered={false}>
