@@ -16,10 +16,9 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import styles from './Respondent.less';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-
-import styles from './Respondent.less';
 
 const FormItem = Form.Item;
 FormItem.className = styles["ant-form-item"];
@@ -345,6 +344,9 @@ class Respondent extends PureComponent {
   handleModalVisible = async(flag,record) => {
     const newObj =Object.assign({},record)
     const { dispatch } = this.props;
+    if(!record){
+      clearRespondent.Born = moment(new Date()).format('YYYY-MM-DD')
+    }
     await dispatch({
       type: 'respondent/setStates',
       payload: {
