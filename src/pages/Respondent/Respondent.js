@@ -148,7 +148,7 @@ const ManaForm = Form.create()(props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
         <DatePicker
-          defaultValue={moment(Respondent.Born,'YYYY-MM-DD')}
+          defaultValue={Respondent.Born?moment(Respondent.Born,'YYYY-MM-DD'):moment(new Date())}
           placeholder="请选择患者出生日期"
           onChange={value => bornChange(value)}
         />
@@ -344,6 +344,9 @@ class Respondent extends PureComponent {
   handleModalVisible = async(flag,record) => {
     const newObj =Object.assign({},record)
     const { dispatch } = this.props;
+    if(!record){
+      clearRespondent.Born = moment(new Date()).format('YYYY-MM-DD')
+    }
     await dispatch({
       type: 'respondent/setStates',
       payload: {
