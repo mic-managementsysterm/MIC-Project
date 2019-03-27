@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input,Spin, Button,
+  Form, Input,Spin, Button, AutoComplete
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
@@ -9,9 +9,10 @@ import styles from './Diagnosis.less';
 const { TextArea } = Input;
 
 
-@connect(({ addMedical, loading }) => ({
+@connect(({ addMedical, getDisease, loading }) => ({
   addMedical,
-  loading: loading.models.addMedical,
+  getDisease,
+  loading: loading.models.addMedical && loading.models.getDisease,
 }))
 class DiagnosisForm extends PureComponent {
   constructor(props){
@@ -19,6 +20,14 @@ class DiagnosisForm extends PureComponent {
     this.state={
       loading:false
     }
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'getDisease/getDisease',
+      payload: "",
+    });
   }
 
   handleSubmit = (e) => {
@@ -54,6 +63,7 @@ class DiagnosisForm extends PureComponent {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const {getDisease: {dataSource}} = this.props;
     const tailFormItemLayout = {
       wrapperCol: {
         xs: {
@@ -66,7 +76,6 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-   const {loading}=this.props;
     return (
       <PageHeaderWrapper title="四诊数据采集" >
         <Spin spinning={this.state.loading} tip={'正在提交'}>
@@ -83,7 +92,13 @@ class DiagnosisForm extends PureComponent {
                   required: true, message: '请输入主诉!',
                 }],
               })(
-                <TextArea />
+                <AutoComplete
+                  dataSource={dataSource}
+                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                  placeholder="请输入主诉"
+                >
+                  <Input />
+                </AutoComplete>
               )}
             </Form.Item>
             <Form.Item
@@ -97,7 +112,13 @@ class DiagnosisForm extends PureComponent {
                   required: true, message: '请输入现病史！',
                 }],
               })(
-                <TextArea  />
+                <AutoComplete
+                  dataSource={dataSource}
+                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                  placeholder="请输入现病史"
+                >
+                  <Input />
+                </AutoComplete>
               )}
             </Form.Item>
             <Form.Item
@@ -111,7 +132,13 @@ class DiagnosisForm extends PureComponent {
                   required: true, message: '请输入既往史!',
                 }],
               })(
-                <TextArea />
+                <AutoComplete
+                  dataSource={dataSource}
+                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                  placeholder="请输入既往史"
+                >
+                  <Input />
+                </AutoComplete>
               )}
             </Form.Item>
             <Form.Item
@@ -123,7 +150,13 @@ class DiagnosisForm extends PureComponent {
               {getFieldDecorator('GMS', {
                 rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
               })(
-                <TextArea />
+                <AutoComplete
+                  dataSource={dataSource}
+                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                  placeholder="请输入过敏史"
+                >
+                  <Input />
+                </AutoComplete>
               )}
             </Form.Item>
             <Form.Item
@@ -135,7 +168,13 @@ class DiagnosisForm extends PureComponent {
               {getFieldDecorator('TGJC', {
                 rules: [{ required: true, message: '请输入体格检查!' }],
               })(
-                <TextArea />
+                <AutoComplete
+                  dataSource={dataSource}
+                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                  placeholder="请输入体格检查"
+                >
+                  <Input />
+                </AutoComplete>
               )}
             </Form.Item>
             <Form.Item
@@ -147,7 +186,19 @@ class DiagnosisForm extends PureComponent {
               {getFieldDecorator('Diagnose', {
                 rules: [{ required: true, message: '请输入中医诊断!' }],
               })(
-                <TextArea />
+                <Input type={'button'} placeholder='新增诊断' onClick={() => router.push(`/record/diagnosis/addDiagnosis`)} ></Input>
+              )}
+            </Form.Item>
+            <Form.Item
+              label="四诊信息"
+              labelCol={{ span: 5 }}
+              wrapperCol={{ span: 15 }}
+              className={styles.form}
+            >
+              {getFieldDecorator('DiagnoseInfo', {
+                rules: [{ required: true, message: '请输入四诊信息!' }],
+              })(
+                <Input type={'button'} placeholder='新增四诊信息' />
               )}
             </Form.Item>
             <Form.Item {...tailFormItemLayout} className={styles.form}>
