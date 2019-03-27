@@ -16,9 +16,9 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './Respondent.less';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import styles from './Respondent.less';
 
 const FormItem = Form.Item;
 FormItem.className = styles["ant-form-item"];
