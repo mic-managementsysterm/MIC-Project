@@ -20,8 +20,6 @@ export default {
   'menu.respondent.addRecord': 'Add Record',
   'menu.record': 'Record',
   'menu.record.diagnosis': 'Diagnosis',
-  'menu.record.addDiagnosis': 'Add Diagnosis',
-  'menu.record.diagnosisInfo': 'Diagnosis Info',
   'menu.record.physiology': 'Physiology',
   'menu.record.addQuestionnaire': 'Add Questionnaire',
   'menu.exception': 'Exception',

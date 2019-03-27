@@ -1,11 +1,19 @@
-import { queryRelate, queryRest, querySyndrome, updateRelate} from '@/services/api';
+import { queryRelate, querySyndrome, updateRelate} from '@/services/api';
+
 export default {
   namespace: 'disAndSyn',
 
   state: {
     diseaseId:"",
     relateSyn:[],
-    restSyn:[]
+    restSyn:[],
+
+    restKey:'',
+    restPagination:{
+      total: 0,
+      pageSize:8,
+      current:1
+    }
   },
 
   effects: {
@@ -18,30 +26,27 @@ export default {
     },
     *queryRelate({ payload }, { call, put }) {
       const response = yield call(queryRelate, payload);
+      const {Data} = response;
       yield put({
         type: 'set',
         payload: {
-          relateSyn:response.Data || []
+          relateSyn:Data || [],
         },
       });
     },
-    *queryRest({ payload, callback }, { call, put }) {
-      const response = yield call(queryRest, payload);
-      const {Data:{rows}} = response
-      yield put({
-        type: 'set',
-        payload: {
-          restSyn:rows || []
-        },
-      });
-      if (callback) callback();
-    },
-    *querySynEff({ payload, callback }, { call, put }) {
+    *querySyn({ payload, callback }, { call, put }) {
       const response = yield call(querySyndrome, payload);
+      const {Data:{rows,pagesize,pageindex,total}} = response;
       yield put({
-        type: 'querySyn',
+        type: 'setRest',
         payload: {
-          restSyn:response.Data
+          restKey:payload.key,
+          restSyn:rows,
+          restPagination:{
+            total: total,
+            pageSize:pagesize,
+            current:pageindex
+          }
         },
       });
       if (callback) callback();
@@ -73,19 +78,24 @@ export default {
         ...action.payload,
       };
     },
-    querySyn(state, action) {
-      let { restSyn } = action.payload;
+    setRest(state, action) {
+      let { restSyn,restPagination,restKey } = action.payload;
       let rest = [];
-      if(restSyn.constructor.prototype === Array.prototype){
+      if(Array.isArray(restSyn)){
         rest = restSyn.slice();
         let relateSynText = JSON.stringify(state.relateSyn);
-        restSyn = rest.filter( item => relateSynText.indexOf(item.Id) < 0 )
-      }else {
-        restSyn = []
+        rest.map(item=>{
+          if(relateSynText.indexOf(item.Id) !== -1){
+            item.disabled = true
+          }
+        });
       }
+
       return {
         ...state,
-        restSyn,
+        restKey,
+        restSyn:rest,
+        restPagination
       };
     },
   },

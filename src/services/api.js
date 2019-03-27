@@ -89,16 +89,27 @@ export async function queryRelate(params) {
   return request(`/Api/disease/get/findSyndromeById?${stringify(params)}`);
 }
 
-export async function queryRest(params) {
-  return request(`/Api/disease/get/findRestSyndrome?${stringify(params)}`);
+export async function updateRelate(params) {
+  return request(`/Api/disease/change/addSyndrome`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    traditional:true
+  });
 }
 
+
+// 证型
 export async function querySyndrome(params) {
   return request(`/Api/syndrome/get/find?${stringify(params)}`);
 }
 
-export async function updateRelate(params) {
-  return request(`/Api/disease/change/addSyndrome`,{
+export async function addSyndrome(params) {
+  return request(`/Api/syndrome/change/add`,{
     method: 'POST',
     body: {
       ...params,
@@ -108,6 +119,93 @@ export async function updateRelate(params) {
     }
   });
 }
+
+export async function updateSyndrome(params) {
+  return request(`/Api/syndrome/change/update`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
+
+export async function removeSyndrome(params) {
+  return request(`/Api/syndrome/delete/batchDelete`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    traditional:true
+  });
+}
+
+// 证型关联
+export async function queryRelateSym(params) {
+  return request(`/Api/syndrome/get/findSymptomById?${stringify(params)}`);
+}
+
+export async function updateRelateSym(params) {
+  return request(`/Api/syndrome/change/addSymptom`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    traditional:true
+  });
+}
+
+
+// 症状
+export async function querySymptom(params) {
+  return request(`/Api/symptom/get/find?${stringify(params)}`);
+}
+
+export async function addSymptom(params) {
+  return request(`/Api/symptom/change/add`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
+
+export async function updateSymptom(params) {
+  return request(`/Api/symptom/change/update`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    }
+  });
+}
+
+export async function removeSymptom(params) {
+  return request(`/Api/symptom/delete/batchDelete`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    traditional:true
+  });
+}
+
 
 // 患者
 export async function queryVisit(params) {
@@ -141,10 +239,6 @@ export async function removeVisit(params) {
 
 export async function queryFakeList(params) {
   return request(`/Api/visit/get/GetRespondentRecord?${stringify(params)}`);
-}
-
-export async function getAllQuestionnaire() {
-  return request(`/Api/questionnaire/get/getAll`);
 }
 
 export async function getAllGauge() {
@@ -209,6 +303,10 @@ export async function deleteGauge(params) {
 
 export async function getQuestion(Id) {
   return request(`/Api/questionnaire/get/getById?${stringify(Id)}`)
+}
+
+export async function getAllQuestionnaire() {
+  return request(`/Api/questionnaire/get/getAll`);
 }
 
 export async function changeQuestion(params) {

@@ -16,9 +16,9 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import styles from './Respondent.less';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import styles from './Respondent.less';
 
 const FormItem = Form.Item;
 FormItem.className = styles["ant-form-item"];
@@ -148,7 +148,7 @@ const ManaForm = Form.create()(props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
         <DatePicker
-          defaultValue={Respondent.Born?moment(Respondent.Born,'YYYY-MM-DD'):moment(new Date())}
+          defaultValue={moment(Respondent.Born,'YYYY-MM-DD')}
           placeholder="请选择患者出生日期"
           onChange={value => bornChange(value)}
         />

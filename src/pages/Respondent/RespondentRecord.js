@@ -48,26 +48,6 @@ class RespondentRecord extends PureComponent {
     const { Name, Gender, Phone, Born,Address,CreatedAt } = location.query;
     return (
       <PageHeaderWrapper title="患者详情">
-        <Card
-          style={{marginBottom:5}}
-          title={Name}>
-          {
-            Phone? <p><span>电话号码:</span>
-              <span>{Phone}</span></p>:null
-          }
-          {
-            Gender? <p> <span>性别:</span>
-              <span>{Gender}</span></p>:null
-          }
-          {
-            Born? <p> <span>出生日期:</span>
-              <span>{Born}</span></p>:null
-          }
-          {
-            Address? <p><span>家庭地址:</span>
-              <span>{Address}</span></p>:null
-          }
-        </Card>
         <div className={styles.cardList}>
           <List
             rowKey="Id"

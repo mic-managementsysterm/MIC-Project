@@ -26,6 +26,16 @@ export default [
             name: 'diseaseList',
             component: './Disease/Disease',
           },
+          {
+            path: '/disease/syndrome-list',
+            name: 'syndromeList',
+            component: './Disease/Syndrome',
+          },
+          {
+            path: '/disease/symptom-list',
+            name: 'symptomList',
+            component: './Disease/Symptom',
+          },
         ],
       },
       //量表管理
@@ -46,7 +56,7 @@ export default [
             component: './Gauge/QuestionAdd',
           },
           {
-            path: `/gauge/question-list/questionEdit-list`,
+            path: '/gauge/question-list/questionEdit-list',
             hideInMenu:true,
             name: 'questionEdit',
             component: './Gauge/QuestionEdit',
@@ -119,16 +129,6 @@ export default [
             path: '/record/diagnosis',
             name: 'diagnosis',
             component: './AddRecord/Diagnosis',
-          },
-          {
-            path: '/record/diagnosis/addDiagnosis',
-            name: 'addDiagnosis',
-            component: './AddRecord/AddDiagnosis',
-          },
-          {
-            path: '/record/diagnosis/diagnosisInfo',
-            name: 'diagnosisInfo',
-            component: './AddRecord/DiagnosisInfo',
           },
           {
             path: '/record/physiology',

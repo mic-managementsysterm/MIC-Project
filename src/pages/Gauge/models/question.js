@@ -27,8 +27,7 @@ export default {
       ],
       CreatedAt:  null,
     },
-    Id:'',
-    res:null
+    Id:''
   },
   effects: {
     * fetchQuestionList({ payload }, { call, put }) {
@@ -52,13 +51,7 @@ export default {
     },
 
     *changeQuestion({payload,callback},{call,put}){
-      const response= yield call(changeQuestion,payload);
-      yield put({
-        type:'show',
-        payload:{
-          res:response
-        }
-      })
+        yield call(changeQuestion,payload);
       if (callback) callback()
     },
     *deleteQuestions({payload,callback},{call,put}){

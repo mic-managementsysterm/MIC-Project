@@ -10,25 +10,26 @@ import {
   Modal,
   message,
   Table,
-  Popconfirm,
   Radio
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Disease.less';
+import Syndrome from "./Syndrome";
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const {Search} = Input;
 FormItem.className = styles["ant-form-item"];
+
 const ClearDisease = {
   Id: "",
   Name: "",
   PinYin:"",
   Prevalent:false,
-  CreatedAt: "0000-00-00 00:00:00"
 };
+const setInfo = {};
 
 const getValue = obj =>
   Object.keys(obj)
@@ -37,7 +38,16 @@ const getValue = obj =>
 
 
 const ManaForm = Form.create()(props => {
-  const { disease:{Disease, modalVisible}, form,dispatch} = props;
+  const { disease:{Disease, modalVisible,pageSize,current,searchKey}, form,dispatch} = props;
+
+  setInfo.setBaseInfo = () => {
+    Object.keys(form.getFieldsValue()).forEach(key => {
+      const obj = {};
+      obj[key] = Disease[key] || null;
+      form.setFieldsValue(obj);
+    });
+  };
+
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -54,7 +64,11 @@ const ManaForm = Form.create()(props => {
           callback:()=>{
             dispatch({
               type: 'disease/queryDisease',
-              payload: {},
+              payload: {
+                pagesize:pageSize,
+                pageindex:1,
+                key:''
+              },
             });
           }
         });
@@ -67,7 +81,11 @@ const ManaForm = Form.create()(props => {
           callback:()=>{
             dispatch({
               type: 'disease/queryDisease',
-              payload: {},
+              payload: {
+                pagesize:pageSize,
+                pageindex:current,
+                key:searchKey
+              },
             });
           }
         });
@@ -116,7 +134,7 @@ const ManaForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
         <RadioGroup
           onChange={value => {Disease.Prevalent = value.target.value}}
-          defaultValue={false}
+          defaultValue={Disease.Prevalent || false}
         >
           <Radio value={true}>是</Radio>
           <Radio value={false}>否</Radio>
@@ -149,12 +167,9 @@ class RelateForm extends PureComponent {
       key: 'operate',
       align: 'center',
       render: (text,record)=>(
-        record
-          ? (
-            <Popconfirm title="确认删除?" onConfirm={()=>this.deleteSyn(record)} okText="确认" cancelText="取消">
-              <Button>删除</Button>
-            </Popconfirm>
-          ):null
+        record ?
+          <Button onClick={()=>this.deleteSyn(record)}>删除</Button>
+          :null
       ),
     }];
 
@@ -173,12 +188,9 @@ class RelateForm extends PureComponent {
       key: 'operate',
       align: 'center',
       render: (text,record)=>(
-        record
-          ? (
-            <Popconfirm title="确认添加?" onConfirm={()=>this.addSyn(record)} okText="确认" cancelText="取消">
-              <Button>添加</Button>
-            </Popconfirm>
-          ):null
+        record ?
+          <Button onClick={()=>this.addSyn(record)} disabled={record.disabled}>添加</Button>
+          :null
       ),
     }];
 
@@ -203,8 +215,8 @@ class RelateForm extends PureComponent {
       message.warning("Already Relate");
       return
     }
-    rest = rest.filter(item=>{
-      return item.Id !==record.Id
+    rest.map(item=>{
+      item.Id ===record.Id && (item.disabled = true)
     });
     dispatch({
       type: 'disAndSyn/setStates',
@@ -220,7 +232,9 @@ class RelateForm extends PureComponent {
     let relate = relateSyn.slice();
     let rest = restSyn.slice();
 
-    rest.push( record );
+    rest.map( item=>{
+      item.Id === record.Id && (item.disabled =false)
+    } );
     relate = relate.filter(item => item.Id !== record.Id);
     dispatch({
       type: 'disAndSyn/setStates',
@@ -232,11 +246,13 @@ class RelateForm extends PureComponent {
   };
 
   searchSyndrome = (value) => {
-    const { dispatch } = this.props;
+    const { dispatch }  = this.props;
     dispatch({
-      type: 'disAndSyn/querySynEff',
+      type: 'disAndSyn/querySyn',
       payload: {
         key:value,
+        pagesize:8,
+        pageindex:1
       },
     });
   };
@@ -275,8 +291,26 @@ class RelateForm extends PureComponent {
     });
   };
 
+  onRestChange = (pagination, filtersArg, sorter) => {
+    const { dispatch,disAndSyn:{restKey} } = this.props;
+
+    const params = {
+      currentPage: pagination.current,
+      pageSize: pagination.pageSize,
+    };
+
+    dispatch({
+      type: 'disAndSyn/querySyn',
+      payload: {
+        pagesize:params.pageSize,
+        pageindex:params.currentPage,
+        key:restKey
+      },
+    });
+  };
+
   render() {
-    const { relateModalVisible, disAndSyn:{relateSyn,restSyn} } = this.props;
+    const { relateModalVisible, disAndSyn:{relateSyn,restSyn,restPagination} } = this.props;
     return (
       <Modal
         centered
@@ -295,6 +329,7 @@ class RelateForm extends PureComponent {
           <Col span={12} className="breadcrumb-title">
             <div className={styles["syndrome-title"]}>已关联证型</div>
             <Table
+              pagination={{pageSize:8}}
               dataSource={relateSyn}
               columns={this.columns1}
               rowKey={item => item.Id}
@@ -310,15 +345,11 @@ class RelateForm extends PureComponent {
               />
             </div>
             <Table
-              pagination={{
-                onChange: (page) => {
-                  console.log(page);
-                },
-                pageSize: 9,
-              }}
+              pagination={restPagination}
               dataSource={restSyn}
               columns={this.columns2}
               rowKey={item => item.Id}
+              onChange={(p,f,s)=>this.onRestChange(p,f,s)}
             />
           </Col>
         </Row>
@@ -330,9 +361,9 @@ class RelateForm extends PureComponent {
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ disease,respondent, loading }) => ({
+@connect(({ disease,disAndSyn, loading }) => ({
   disease,
-  respondent,
+  disAndSyn,
   loading: loading.models.disease,
 }))
 @Form.create()
@@ -365,15 +396,19 @@ class Disease extends PureComponent {
   ];
 
   componentDidMount(){
-    const { dispatch } = this.props;
+    const { dispatch,disease:{current,pageSize,searchKey} } = this.props;
     dispatch({
       type: 'disease/queryDisease',
-      payload: "",
+      payload: {
+        pagesize:pageSize,
+        pageindex:current,
+        key:searchKey
+      },
     });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,disease:{formValues} } = this.props;
+    const { dispatch,disease:{formValues,searchKey} } = this.props;
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
@@ -389,25 +424,35 @@ class Disease extends PureComponent {
     if (sorter.field) {
       params.sorter = `${sorter.field}_${sorter.order}`;
     }
-
     dispatch({
-      type: 'disease/queryPage',
-      payload: {...params},
+      type: 'disease/queryDisease',
+      payload: {
+        pagesize:params.pageSize,
+        pageindex:params.currentPage,
+        key:searchKey
+      },
     });
   };
 
   handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form, dispatch,disease:{pageSize} } = this.props;
     form.resetFields();
     dispatch({
       type: 'disease/setStates',
       payload: {
-        formValues:{}
+        formValues:{},
+        current:1,
+        pageSize:pageSize,
+        searchKey:''
       },
     });
     dispatch({
       type: 'disease/queryDisease',
-      payload: {},
+      payload: {
+        pagesize:pageSize,
+        pageindex:1,
+        key:''
+      },
     });
   };
 
@@ -423,32 +468,43 @@ class Disease extends PureComponent {
 
   handleSearch = e => {
     e.preventDefault();
-    const { dispatch, form } = this.props;
+    const { dispatch, form,disease:{pageSize} } = this.props;
     form.validateFields((err, fieldsValue) => {
       const { key } = fieldsValue;
       dispatch({
+        type: 'disease/setStates',
+        payload: {
+          searchKey:key,
+        },
+      });
+      dispatch({
         type: 'disease/queryDisease',
         payload: {
-          key:key
+          key,
+          pagesize:pageSize,
+          pageindex:1,
         },
       });
     });
   };
 
-  handleModalVisible = (flag, record) => {
-    let newRecord = Object.assign({},record)
+  handleModalVisible = async(flag, record) => {
+    let newRecord = Object.assign({},record);
     const { dispatch } = this.props;
-    dispatch({
+    await dispatch({
       type: 'disease/setStates',
       payload: {
         modalVisible:!!flag,
         Disease:record ? newRecord:ClearDisease,
       },
     });
+    if(flag && record){
+      setInfo.setBaseInfo();
+    }
   };
 
   handleDelete = () => {
-    const { dispatch,disease:{selectedRows} } = this.props;
+    const { dispatch,disease:{selectedRows,pageSize,current,searchKey} } = this.props;
     let Ids = [];
     selectedRows.map(item => {
       Ids.push(item.Id)
@@ -467,7 +523,11 @@ class Disease extends PureComponent {
         });
         dispatch({
           type: 'disease/queryDisease',
-          payload: {},
+          payload: {
+            pagesize:pageSize,
+            pageindex:current,
+            key:searchKey
+          },
         });
       }
     });
@@ -491,11 +551,19 @@ class Disease extends PureComponent {
       callback:()=>{
         dispatch({
           type: 'disAndSyn/queryRelate',
-          payload:{DiseaseId:record.Id}
+          payload:{
+            DiseaseId:record.Id,
+            pagesize:8,
+            pageindex:1
+          }
         });
         dispatch({
-          type: 'disAndSyn/queryRest',
-          payload:{DiseaseId:record.Id}
+          type: 'disAndSyn/querySyn',
+          payload:{
+            key:'',
+            pagesize:8,
+            pageindex:1,
+          }
         });
       }
     });
@@ -533,11 +601,11 @@ class Disease extends PureComponent {
   };
 
   render() {
-    const { disease: { showSource,selectedRows,dataSource,pageSize,current }, loading, } = this.props;
+    const { disease: {selectedRows,dataSource,pageSize,current,total }, loading, } = this.props;
     const data ={
-      list: showSource,
+      list: dataSource,
       pagination: {
-        total: dataSource?dataSource.length:0,
+        total: total|| 0,
         pageSize:pageSize,
         current:current
       },
@@ -548,6 +616,7 @@ class Disease extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
+              rowKey='Id'
               selectedRows={selectedRows || []}
               loading={loading}
               data={data}
