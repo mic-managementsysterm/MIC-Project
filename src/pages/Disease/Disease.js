@@ -16,17 +16,20 @@ import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Disease.less';
+import Syndrome from "./Syndrome";
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const {Search} = Input;
 FormItem.className = styles["ant-form-item"];
+
 const ClearDisease = {
   Id: "",
   Name: "",
   PinYin:"",
   Prevalent:false,
 };
+const setInfo = {};
 
 const getValue = obj =>
   Object.keys(obj)
@@ -35,7 +38,16 @@ const getValue = obj =>
 
 
 const ManaForm = Form.create()(props => {
-  const { disease:{Disease, modalVisible}, form,dispatch} = props;
+  const { disease:{Disease, modalVisible,pageSize,current,searchKey}, form,dispatch} = props;
+
+  setInfo.setBaseInfo = () => {
+    Object.keys(form.getFieldsValue()).forEach(key => {
+      const obj = {};
+      obj[key] = Disease[key] || null;
+      form.setFieldsValue(obj);
+    });
+  };
+
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -52,7 +64,11 @@ const ManaForm = Form.create()(props => {
           callback:()=>{
             dispatch({
               type: 'disease/queryDisease',
-              payload: {},
+              payload: {
+                pagesize:pageSize,
+                pageindex:1,
+                key:''
+              },
             });
           }
         });
@@ -65,7 +81,11 @@ const ManaForm = Form.create()(props => {
           callback:()=>{
             dispatch({
               type: 'disease/queryDisease',
-              payload: {},
+              payload: {
+                pagesize:pageSize,
+                pageindex:current,
+                key:searchKey
+              },
             });
           }
         });
@@ -114,7 +134,7 @@ const ManaForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
         <RadioGroup
           onChange={value => {Disease.Prevalent = value.target.value}}
-          defaultValue={false}
+          defaultValue={Disease.Prevalent || false}
         >
           <Radio value={true}>是</Radio>
           <Radio value={false}>否</Radio>
@@ -468,20 +488,23 @@ class Disease extends PureComponent {
     });
   };
 
-  handleModalVisible = (flag, record) => {
-    let newRecord = Object.assign({},record)
+  handleModalVisible = async(flag, record) => {
+    let newRecord = Object.assign({},record);
     const { dispatch } = this.props;
-    dispatch({
+    await dispatch({
       type: 'disease/setStates',
       payload: {
         modalVisible:!!flag,
         Disease:record ? newRecord:ClearDisease,
       },
     });
+    if(flag && record){
+      setInfo.setBaseInfo();
+    }
   };
 
   handleDelete = () => {
-    const { dispatch,disease:{selectedRows} } = this.props;
+    const { dispatch,disease:{selectedRows,pageSize,current,searchKey} } = this.props;
     let Ids = [];
     selectedRows.map(item => {
       Ids.push(item.Id)
@@ -500,7 +523,11 @@ class Disease extends PureComponent {
         });
         dispatch({
           type: 'disease/queryDisease',
-          payload: {},
+          payload: {
+            pagesize:pageSize,
+            pageindex:current,
+            key:searchKey
+          },
         });
       }
     });
@@ -589,6 +616,7 @@ class Disease extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
+              rowKey='Id'
               selectedRows={selectedRows || []}
               loading={loading}
               data={data}

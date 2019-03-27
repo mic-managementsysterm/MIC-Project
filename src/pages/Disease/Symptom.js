@@ -14,7 +14,6 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-
 import styles from './Symptom.less';
 
 const FormItem = Form.Item;
@@ -67,6 +66,7 @@ const TypeData = [
     ]
   },
 ];
+const setInfo={};
 
 FormItem.className = styles["ant-form-item"];
 const ClearSymptom = {
@@ -90,8 +90,30 @@ const getValue = obj =>
 @Form.create()
 class ManaForm extends PureComponent{
 
+  constructor(props){
+    super(props);
+    this.setBaseInfo = this.setBaseInfo.bind(this)
+  }
+
+  componentWillMount(){
+    setInfo.setBaseInfo = this.setBaseInfo;
+  }
+
+  setBaseInfo = () => {
+    const { symptom:{Symptom}, form } = this.props;
+    Object.keys(form.getFieldsValue()).forEach(key => {
+      const obj = {};
+      obj[key] = Symptom[key] || null;
+      form.setFieldsValue(obj);
+    });
+  };
+
   okHandle = () => {
-    const {dispatch,form,symptom:{Symptom,pageSize}} = this.props;
+    const {dispatch,form,symptom:{Symptom,pageSize,searchKey,current}} = this.props;
+    if(!Symptom.SymptomTypeName){
+      message.error('症状类型尚未选择');
+      return
+    }
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       Symptom.Name = fieldsValue.Name;
@@ -130,8 +152,8 @@ class ManaForm extends PureComponent{
               type: 'symptom/querySymptom',
               payload: {
                 pagesize:pageSize,
-                pageindex:1,
-                key:''
+                pageindex:current,
+                key:searchKey
               },
             });
           }
@@ -143,7 +165,7 @@ class ManaForm extends PureComponent{
   handleCancel = () => {
     const {dispatch} = this.props;
     dispatch({
-      type: 'symptom/setStates',
+      type: 'symptom/set',
       payload: {
         modalVisible:false,
         Symptom:ClearSymptom,
@@ -176,13 +198,13 @@ class ManaForm extends PureComponent{
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拼音">
           {form.getFieldDecorator('PinYin', {
-            rules: [{ message: '请输入症状拼音缩写！'}],
+            rules: [{ required: true, message: '请输入症状拼音缩写！'}],
           })(<Input placeholder="请输入症状拼音缩写" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
           <RadioGroup
             onChange={value => {Symptom.Prevalent = value.target.value}}
-            defaultValue={false}
+            defaultValue={Symptom.Prevalent || false}
           >
             <Radio value={true}>是</Radio>
             <Radio value={false}>否</Radio>
@@ -192,6 +214,7 @@ class ManaForm extends PureComponent{
           <Cascader
             options={TypeData}
             onChange={this.onChange}
+            defaultValue={Symptom.SymptomTypeName?[Symptom.Type,Symptom.SymptomTypeName] : null}
           />
         </FormItem>
       </Modal>
@@ -328,20 +351,23 @@ class Symptom extends PureComponent {
     });
   };
 
-  handleModalVisible = (flag, record) => {
-    let newRecord = Object.assign({},record)
+  handleModalVisible = async(flag, record) => {
+    let newRecord = Object.assign({},record);
     const { dispatch } = this.props;
-    dispatch({
+    await dispatch({
       type: 'symptom/setStates',
       payload: {
         modalVisible:!!flag,
         Symptom:record ? newRecord:ClearSymptom,
       },
     });
+    if(flag && record){
+      setInfo.setBaseInfo();
+    }
   };
 
   handleDelete = () => {
-    const { dispatch,symptom:{selectedRows,pageSize} } = this.props;
+    const { dispatch,symptom:{selectedRows,pageSize,searchKey,current} } = this.props;
     let Ids = [];
     selectedRows.map(item => {
       Ids.push(item.Id)
@@ -362,8 +388,8 @@ class Symptom extends PureComponent {
           type: 'symptom/querySymptom',
           payload: {
             pagesize:pageSize,
-            pageindex:1,
-            key:''
+            pageindex:current,
+            key:searchKey
           },
         });
       }
@@ -418,6 +444,7 @@ class Symptom extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
+              rowKey='Id'
               selectedRows={selectedRows || []}
               loading={loading}
               data={data}
@@ -426,7 +453,7 @@ class Symptom extends PureComponent {
               onChange={this.handleStandardTableChange}
             />
           </div>
-          <ManaForm {...this.props} />
+          <ManaForm />
         </Card>
       </PageHeaderWrapper>
     );

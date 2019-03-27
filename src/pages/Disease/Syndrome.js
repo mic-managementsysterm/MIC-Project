@@ -19,11 +19,13 @@ import styles from './Syndrome.less';
 const FormItem = Form.Item;
 const {Search} = Input;
 FormItem.className = styles["ant-form-item"];
+
 const ClearSyndrome = {
   Id: "",
   Name: "",
   PinYin:"",
 };
+const setInfo={};
 
 const getValue = obj =>
   Object.keys(obj)
@@ -32,7 +34,7 @@ const getValue = obj =>
 
 
 const ManaForm = Form.create()(props => {
-  const { syndrome:{Syndrome, modalVisible,pageSize}, form,dispatch} = props;
+  const { syndrome:{Syndrome, modalVisible,pageSize,current,searchKey}, form,dispatch} = props;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -66,9 +68,9 @@ const ManaForm = Form.create()(props => {
             dispatch({
               type: 'syndrome/querySyndrome',
               payload: {
-                key:'',
+                key:searchKey,
                 pagesize:pageSize,
-                pageindex:1,
+                pageindex:current,
               },
             });
           }
@@ -92,6 +94,14 @@ const ManaForm = Form.create()(props => {
         modalVisible:false,
         Syndrome:ClearSyndrome,
       },
+    });
+  };
+
+  setInfo.setBaseInfo = () => {
+    Object.keys(form.getFieldsValue()).forEach(key => {
+      const obj = {};
+      obj[key] = Syndrome[key] || null;
+      form.setFieldsValue(obj);
     });
   };
 
@@ -463,20 +473,23 @@ class Syndrome extends PureComponent {
     });
   };
 
-  handleModalVisible = (flag, record) => {
+  handleModalVisible = async(flag, record) => {
     let newRecord = Object.assign({},record)
     const { dispatch } = this.props;
-    dispatch({
+    await dispatch({
       type: 'syndrome/setStates',
       payload: {
         modalVisible:!!flag,
         Syndrome:record ? newRecord:ClearSyndrome,
       },
     });
+    if(flag && record){
+      setInfo.setBaseInfo();
+    }
   };
 
   handleDelete = () => {
-    const { dispatch,syndrome:{selectedRows,pageSize} } = this.props;
+    const { dispatch,syndrome:{selectedRows,pageSize,current,searchKey} } = this.props;
     let Ids = [];
     selectedRows.map(item => {
       Ids.push(item.Id)
@@ -496,9 +509,9 @@ class Syndrome extends PureComponent {
         dispatch({
           type: 'syndrome/querySyndrome',
           payload: {
-            key:'',
+            key:searchKey,
             pagesize:pageSize,
-            pageindex:1,
+            pageindex:current,
           },
         });
       }
@@ -588,6 +601,7 @@ class Syndrome extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
+              rowKey='Id'
               selectedRows={selectedRows || []}
               loading={loading}
               data={data}

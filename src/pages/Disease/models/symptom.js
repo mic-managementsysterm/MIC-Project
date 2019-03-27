@@ -60,7 +60,7 @@ export default {
         message.error(response.Message || response.InnerMessage)
       }
     },
-    *setStates({ payload, callback }, { put }) {
+    *setStates ({ payload, callback }, { put }) {
       yield put({
         type: 'set',
         payload: {
