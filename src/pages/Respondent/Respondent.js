@@ -16,8 +16,10 @@ import {
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './Respondent.less';
 import moment from 'moment';
+import 'moment/locale/zh-cn';
+
+import styles from './Respondent.less';
 
 const FormItem = Form.Item;
 FormItem.className = styles["ant-form-item"];
@@ -27,11 +29,12 @@ const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
+
 const clearRespondent = {
   Id: "",
   Name: "",
   Gender: 0,
-  Born: "1949-10-01",
+  Born: "",
   Education: "",
   MaritalStatus: 0,
   DwellingStatus: 0,
@@ -39,39 +42,65 @@ const clearRespondent = {
   Phone: "",
   IDCard: "",
   Address: "",
-  RecordUserId: "3c5e636a-c182-4ad7-a7b1-9205bbe534f5",
+  RecordUserId: "",
   CreatedAt: ""
 };
+const setInfo = {};
 
-const CreateForm = Form.create()(props => {
-  const { respondent: { Respondent,modalVisible }, form, dispatch,  } = props;
+const ManaForm = Form.create()(props => {
+  const { respondent: { Respondent,modalVisible,pageSize,current,searchKey }, form, dispatch,currentUser } = props;
+
+  setInfo.setBaseInfo =() =>{
+    Object.keys(form.getFieldsValue()).forEach(key => {
+      const obj = {};
+      obj[key] = Respondent[key] || null;
+      form.setFieldsValue(obj);
+    });
+  };
+
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
+      if(!Respondent.Born){
+        message.error('请选择出生日期！')
+        return
+      }
       Respondent.Name = fieldsValue.Name;
       Respondent.Education = fieldsValue.Education;
       Respondent.Hobby = fieldsValue.Hobby;
       Respondent.Phone = fieldsValue.Phone;
       Respondent.IDCard = fieldsValue.IDCard;
       Respondent.Address = fieldsValue.Address;
+      if(Respondent.RecordUserId === ''){
+        Respondent.RecordUserId = currentUser.Id;
+      }
       dispatch({
         type: 'respondent/addOrUpRespondent',
         payload: {
           ...Respondent,
         },
-        callback:()=>{
-          dispatch({
-            type: 'respondent/queryRespondent',
-          });
+        callback:(res)=>{
+          if(res.Success){
+            dispatch({
+              type: 'respondent/queryRespondent',
+              payload:{
+                pagesize:pageSize,
+                pageindex:current,
+                key:searchKey
+              }
+            });
+            dispatch({
+              type: 'respondent/setStates',
+              payload: {
+                Respondent:clearRespondent,
+                modalVisible:false
+              },
+            });
+            form.resetFields();
+          } else {
+            message.error(res.Message || res.InnerMessage)
+          }
         }
-      });
-      form.resetFields();
-      dispatch({
-        type: 'respondent/setStates',
-        payload: {
-          Respondent:clearRespondent,
-          modalVisible:false
-        },
       });
     });
   };
@@ -85,6 +114,14 @@ const CreateForm = Form.create()(props => {
         modalVisible:false
       },
     });
+  };
+
+  const bornChange = (value) =>{
+    if(value){
+      Respondent.Born = value.format("YYYY-MM-DD")
+    }else {
+      Respondent.Born = ''
+    }
   };
 
   return (
@@ -104,16 +141,17 @@ const CreateForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
         <RadioGroup
           onChange={value => {Respondent.Gender = value.target.value}}
-          defaultValue={0}
+          defaultValue={Respondent.Gender|| 0}
         >
-          <Radio value={1}>男</Radio>
-          <Radio value={0}>女</Radio>
+          <Radio value={0}>男</Radio>
+          <Radio value={1}>女</Radio>
         </RadioGroup>
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
         <DatePicker
+          defaultValue={Respondent.Born?moment(Respondent.Born,'YYYY-MM-DD'):moment(new Date())}
           placeholder="请选择患者出生日期"
-          onChange={value => {Respondent.Born = value.format("YYYY-MM-DD")}}
+          onChange={value => bornChange(value)}
         />
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="教育程度">
@@ -123,7 +161,7 @@ const CreateForm = Form.create()(props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="婚姻状况">
         <Select
-          defaultValue={0}
+          defaultValue={Respondent.MaritalStatus || 0}
           style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
           placeholder="请选择患者婚姻状况"
           onChange={value => {Respondent.MaritalStatus = value}}
@@ -134,7 +172,7 @@ const CreateForm = Form.create()(props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="居住状况">
         <Select
-          defaultValue={0}
+          defaultValue={Respondent.DwellingStatus || 0}
           style={{ width: 120,paddingBottom: 10}}
           placeholder="请选择患者居住状况"
           onChange={value => {Respondent.DwellingStatus = value}}
@@ -168,160 +206,10 @@ const CreateForm = Form.create()(props => {
   );
 });
 
-@Form.create()
-class UpdateForm extends PureComponent {
-  formLayout = {
-    labelCol: { span: 7 },
-    wrapperCol: { span: 13 },
-  };
-
-  handleUpdateIn = () =>{
-    const { respondent: { Respondent }, form, dispatch } = this.props;
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      Respondent.Name = fieldsValue.Name;
-      Respondent.Education = fieldsValue.Education;
-      Respondent.Hobby = fieldsValue.Hobby;
-      Respondent.Phone = fieldsValue.Phone;
-      Respondent.IDCard = fieldsValue.IDCard;
-      Respondent.Address = fieldsValue.Address;
-      dispatch({
-        type: 'respondent/addOrUpRespondent',
-        payload: {
-          ...Respondent,
-        },
-        callback:()=>{
-          dispatch({
-            type: 'respondent/queryRespondent',
-          });
-        }
-      });
-      form.resetFields();
-      dispatch({
-        type: 'respondent/setStates',
-        payload: {
-          Respondent:clearRespondent,
-          updateModalVisible:false
-        },
-      });
-    });
-  };
-
-  onCancel =() =>{
-    const { form, dispatch } = this.props;
-    form.resetFields();
-    dispatch({
-      type: 'respondent/setStates',
-      payload: {
-        Respondent:clearRespondent,
-        updateModalVisible:false
-      },
-    });
-  };
-
-  render() {
-    const {respondent: { Respondent,updateModalVisible }, form ,record} = this.props;
-    console.log('@record',Respondent)
-    return (
-      <Modal
-        width={640}
-        bodyStyle={{ padding: '32px 40px 48px' }}
-        destroyOnClose
-        title="编辑信息"
-        visible={updateModalVisible}
-        onCancel={() => this.onCancel()}
-        onOk={() => this.handleUpdateIn()}
-      >
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="姓名">
-          {form.getFieldDecorator('Name', {
-            rules: [{ required: true, message: '请输入姓名！', min: 1 },
-            ],
-            initialValue:Respondent.Name
-          })(<Input  />)}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
-          {form.getFieldDecorator('Gender', {
-            // rules: [{ required: true, message: '请输入姓名！', min: 1 },
-            // ],
-            initialValue:Respondent.Gender
-          })( <RadioGroup
-            onChange={value => {Respondent.Gender = value.target.value}}
-
-          >
-            <Radio value={1}>男</Radio>
-            <Radio value={0}>女</Radio>
-          </RadioGroup>)}
-
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="出生日期">
-          <DatePicker
-            placeholder="请选择患者出生日期"
-            defaultValue={moment(Respondent.Born)}
-            onChange={value => {Respondent.Born = value && value.format("YYYY-MM-DD")}}
-            style={{paddingBottom: 5}}
-          />
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="教育程度">
-          {form.getFieldDecorator('Education', {
-            rules: [{ message: '请输入教育程度'}],
-            initialValue:Respondent.Education
-          })(<Input placeholder="请输入教育程度" />)}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="婚姻状况">
-          <Select
-            defaultValue={Respondent.MaritalStatus}
-            style={{ width: 120, paddingRight:  20, paddingBottom: 10}}
-            placeholder="请选择患者婚姻状况"
-            onChange={value => {Respondent.MaritalStatus = value}}
-          >
-            <Option value={0}>未婚</Option>
-            <Option value={1}>已婚</Option>
-          </Select>
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="居住状况">
-          <Select
-            defaultValue={Respondent.DwellingStatus}
-            style={{ width: 120,paddingBottom: 10}}
-            placeholder="请选择患者居住状况"
-            onChange={value => {Respondent.DwellingStatus = value}}
-          >
-            <Option value={0}>独自居住</Option>
-            <Option value={1}>夫妻同居</Option>
-            <Option value={2}>子女同居</Option>
-          </Select>
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="爱好">
-          {form.getFieldDecorator('Hobby', {
-            rules: [{ message: '请输入爱好' }],
-            initialValue:Respondent.Hobby
-          })(<Input placeholder="请输入爱好" />)}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="手机号码">
-          {form.getFieldDecorator('Phone', {
-            rules: [{  message: '请输入手机号码！', min: 11 }],
-            initialValue:Respondent.Phone
-          })(<Input placeholder="请输入手机号码" />)}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="身份证号码">
-          {form.getFieldDecorator('IDCard', {
-            rules: [{ required: true, message: '请输入身份证号码！', min: 15 }],
-            initialValue:Respondent.IDCard
-          })(<Input placeholder="请输入身份证号码" />)}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="居住地址">
-          {form.getFieldDecorator('Address', {
-            rules: [{  message: '请输入居住地址！' }],
-            initialValue:Respondent.Address
-          })(<Input placeholder="请输入居住地址" />)}
-        </FormItem>
-      </Modal>
-    );
-  }
-}
-
 /* eslint react/no-multi-comp:0 */
-@connect(({ respondent, loading }) => ({
+@connect(({ respondent, loading,user }) => ({
   respondent,
+  currentUser:user.currentUser,
   loading: loading.models.rule,
 }))
 @Form.create()
@@ -336,6 +224,9 @@ class Respondent extends PureComponent {
     {
       title: '性别',
       dataIndex: 'Gender',
+      render: (text,record) =>{
+        return record.Gender === 0 ? '男':'女'
+      }
     },
     {
       title: '出生日期',
@@ -352,14 +243,13 @@ class Respondent extends PureComponent {
     {
       title: '操作',
       render: (text, record) => {
-        const {respondent:{dataSource}} = this.props;
-        return dataSource && dataSource.length >= 1
+        return record
           ? (
             <div key={record.Id}>
               <Link to={`/respondent/respondent-list/respondent-record?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
                 <Button className={styles.btn}>查看</Button>
               </Link>
-              <Button onClick={() => this.handleUpdateModalVisible(true,record)}>编辑</Button>
+              <Button onClick={() => this.handleModalVisible(true,record)}>编辑</Button>
             </div>
           ) : null
       },
@@ -367,14 +257,19 @@ class Respondent extends PureComponent {
   ];
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch,respondent:{pageSize,current,searchKey} } = this.props;
     dispatch({
       type: 'respondent/queryRespondent',
+      payload:{
+        pagesize:pageSize,
+        pageindex:current,
+        key:searchKey,
+      }
     });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch, formValues } = this.props;
+    const { dispatch, formValues,respondent:{searchKey} } = this.props;
 
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
@@ -393,9 +288,11 @@ class Respondent extends PureComponent {
     }
 
     dispatch({
-      type: 'respondent/queryPage',
-      payload: {
-        ...params
+      type: 'respondent/queryRespondent',
+      payload:{
+        pagesize:params.pageSize,
+        pageindex:params.currentPage,
+        key:searchKey,
       },
     });
   };
@@ -405,7 +302,7 @@ class Respondent extends PureComponent {
   };
 
   handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form, dispatch,respondent:{pageSize} } = this.props;
     form.resetFields();
     dispatch({
       type: 'respondent/setStates',
@@ -413,7 +310,11 @@ class Respondent extends PureComponent {
     });
     dispatch({
       type: 'respondent/queryRespondent',
-      payload: {},
+      payload:{
+        pagesize:pageSize,
+        pageindex:1,
+        key:'',
+      },
     });
   };
 
@@ -427,46 +328,38 @@ class Respondent extends PureComponent {
 
   handleSearch = e => {
     e.preventDefault();
-    const { dispatch, form } = this.props;
+    const { dispatch, form,respondent:{pageSize} } = this.props;
     form.validateFields((err, fieldsValue) => {
       const { key } = fieldsValue;
       dispatch({
         type: 'respondent/queryRespondent',
-        payload: {
-          key:key
-        },
+        payload:{
+          pagesize:pageSize,
+          pageindex:1,
+          key:key,
+        }
       });
     });
   };
 
-  handleModalVisible = flag => {
+  handleModalVisible = async(flag,record) => {
+    const newObj =Object.assign({},record)
     const { dispatch } = this.props;
-    dispatch({
-      type: 'respondent/setStates',
-      payload: {modalVisible:!!flag},
-    });
-  };
-
-  handleUpdateModalVisible = (flag, record) => {
-    const { dispatch } = this.props;
-    let newRecord = Object.assign({},record);
-    if(flag){
-      newRecord.MaritalStatus = 0;
-      newRecord.DwellingStatus = 0;
-      newRecord.Gender = 0;
-    }
-    dispatch({
+    await dispatch({
       type: 'respondent/setStates',
       payload: {
-        updateModalVisible:!!flag,
-        Respondent:record?newRecord:clearRespondent
+        modalVisible:!!flag,
+        Respondent:record?newObj:clearRespondent
       },
     });
+    if(flag && record){
+      setInfo.setBaseInfo();
+    }
+
   };
 
-
   handleDelete = () => {
-    const { dispatch, respondent: { selectedRows }, } = this.props;
+    const { dispatch, respondent: { selectedRows,pageSize,current,searchKey }, } = this.props;
     let Ids =[];
     selectedRows.map(item => {
       Ids.push(item.Id)
@@ -479,7 +372,11 @@ class Respondent extends PureComponent {
       callback:() => {
         dispatch({
           type: 'respondent/queryRespondent',
-          payload: {},
+          payload:{
+            pagesize:pageSize,
+            pageindex:current,
+            key:searchKey,
+          },
         })
       }
     });
@@ -526,22 +423,22 @@ class Respondent extends PureComponent {
   }
 
   render() {
-    const { respondent: { showSource,selectedRows,dataSource,pageSize,current }, loading, } = this.props;
+    const { respondent: { selectedRows,dataSource,pageSize,current,total }, loading, } = this.props;
     const data ={
-      list: showSource,
+      list: dataSource,
       pagination: {
-        total: dataSource?dataSource.length:0,
+        total: total||0,
         pageSize:pageSize,
         current:current
       },
     };
-    // console.log('@data',data)
     return (
       <PageHeaderWrapper title="受访者管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
+              rowKey='Id'
               selectedRows={selectedRows || []}
               loading={loading}
               data={data}
@@ -551,8 +448,7 @@ class Respondent extends PureComponent {
             />
           </div>
         </Card>
-        <CreateForm {...this.props} />
-        <UpdateForm {...this.props} />
+        <ManaForm {...this.props} />
       </PageHeaderWrapper>
     );
   }
