@@ -8,6 +8,9 @@ export default {
     showSource:[],
     current:1,
     pageSize:10,
+    total:0,
+    searchKey:'',
+
     modalVisible: false,
     updateModalVisible: false,
     selectedRows: [],
@@ -15,7 +18,7 @@ export default {
       Id: "",
       Name: "",
       Gender: 0,
-      Born: "1949-10-01",
+      Born: "",
       Education: "",
       MaritalStatus: 0,
       DwellingStatus: 0,
@@ -23,7 +26,7 @@ export default {
       Phone: "",
       IDCard: "",
       Address: "",
-      RecordUserId: "3c5e636a-c182-4ad7-a7b1-9205bbe534f5",
+      RecordUserId: "",
       CreatedAt: ""
     },
 
@@ -34,11 +37,14 @@ export default {
   effects: {
     *queryRespondent({ payload ,callback}, { call, put }) {
       const response = yield call(queryVisit, payload);
+      const{rows,pageindex,pagesize,total} =response.Data;
       yield put({
         type: 'set',
         payload: {
-          dataSource:response.Data,
-          showSource:response.Data
+          dataSource:rows,
+          current:pageindex,
+          pageSize:pagesize,
+          total:total,
         },
       });
       if(callback) callback();
@@ -48,8 +54,9 @@ export default {
       if (callback) callback();
     },
     *addOrUpRespondent({ payload, callback }, { call }) {
-      yield call(addOrUpdateVisit, payload);
-      if (callback) callback();
+       const response = yield call(addOrUpdateVisit, payload);
+      if (callback) callback(response);
+
     },
     *setStates({ payload }, { put }) {
       yield put({
@@ -66,18 +73,6 @@ export default {
       return {
         ...state,
         ...action.payload,
-      };
-    },
-    queryPage(state, action) {
-      let { payload } = action;
-      let start = (payload.currentPage - 1) * payload.pageSize;
-      let end = start + payload.pageSize;
-      let newSource = state.dataSource.slice(start,end);
-      return {
-        ...state,
-        showSource:newSource,
-        current:payload.currentPage,
-        pageSize:payload.pageSize,
       };
     },
   },
