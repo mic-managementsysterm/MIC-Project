@@ -7,8 +7,9 @@ import router from 'umi/router';
 
 const {Group} = Radio;
 
-@connect(({addQues,loading}) =>({
+@connect(({addQues,routerParams,loading}) =>({
   addQues,
+  routerParams,
   loading:loading.models.addQues,
 }))
 class AddRecord extends Component{
@@ -19,11 +20,11 @@ constructor(props){
   }
 }
   componentDidMount() {
-    const { dispatch,location,addQues:{newQues} } = this.props;
+    const { dispatch,routerParams,addQues:{newQues} } = this.props;
     dispatch({
       type: 'addQues/getQues',
       payload:{
-        Id:location.query.recordId
+        Id:routerParams.RecordAddId
       }
     });
     dispatch({
@@ -31,7 +32,7 @@ constructor(props){
       payload:{
         newQues:{
           ...newQues,
-          RespondentId:location.query.recordId
+          RespondentId:routerParams.Respondent.Id
         }
       }
     })
