@@ -6,17 +6,18 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Physicochemical.less';
 const { Description } = DescriptionList;
 
-@connect(({ detail, loading }) => ({
+@connect(({ detail,routerParams, loading }) => ({
   detail,
+  routerParams,
   loading: loading.effects['detail/fetchPhysicochemicalDetail'],
 }))
 class Physicochemical  extends Component {
   componentDidMount() {
-    const { dispatch, location } = this.props;
+    const { dispatch, routerParams } = this.props;
     dispatch({
       type: 'detail/fetchPhysicochemicalDetail',
       payload: {
-        Id:  location.query.Id ? location.query.Id : '',
+        Id:  routerParams.RecordId,
       },
     });
   }
@@ -24,7 +25,7 @@ class Physicochemical  extends Component {
   render() {
     const { detail = {}, loading } = this.props;
     const { physicochemicalData = {} } = detail;
-    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.location.query;
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.routerParams.Respondent;
     return (
       <PageHeaderWrapper title="记录详情页" loading={loading}>
         <Card bordered={false}>

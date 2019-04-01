@@ -6,17 +6,18 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import GaugeDetail from '@/components/GaugeDetail';
 const { Description } = DescriptionList;
 
-@connect(({ detail, loading }) => ({
+@connect(({ detail,routerParams, loading }) => ({
   detail,
+  routerParams,
   loading: loading.effects['detail/fetchCognitionDetail'],
 }))
 class Cognition extends Component {
   componentDidMount() {
-    const { dispatch, location } = this.props;
+    const { dispatch, routerParams } = this.props;
     dispatch({
       type: 'detail/fetchCognitionDetail',
       payload: {
-        Id: location.query.Id ? location.query.Id : '',
+        Id: routerParams.RecordId,
       },
     });
   }
@@ -24,7 +25,7 @@ class Cognition extends Component {
   render() {
     const { loading , detail= {}} = this.props;
     const { cognitionData = {} } = detail;
-    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.location.query;
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.routerParams.Respondent;
     return (
       <PageHeaderWrapper title="记录详情页" loading={loading}>
         <Card bordered={false}>
