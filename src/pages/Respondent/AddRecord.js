@@ -6,8 +6,9 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './RespondentRecord.less';
 import router from 'umi/router';
 
-@connect(({record,loading}) =>({
+@connect(({record,routerParams,loading}) =>({
   record,
+  routerParams,
   loading:loading.models.record,
 }))
  class AddRecord extends Component{
@@ -21,30 +22,37 @@ import router from 'umi/router';
    dispatch({
      type: 'record/fetchAllQuestionnaire',
    })
- }
+ };
 
   getAllGauge = () =>{
     const { dispatch } = this.props;
     dispatch({
       type: 'record/fetchAllGauge'
     })
-  }
+  };
+
+  setAddId = (addId,path) => {
+    const { dispatch} = this.props;
+    dispatch({
+      type: 'routerParams/set',
+      payload:{
+        RecordAddId:addId,
+      },
+    });
+    router.push(`${path}`);
+  };
 
   addRecord = (item) => {
-    const {record:{allQuestionnaireData,allGaugeData},location} =this.props;
-    let basePath ="";
+    const {record:{allQuestionnaireData,allGaugeData}} =this.props;
     if(allGaugeData.includes(item)){
-      basePath = "/record/physiology";
-      router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`);
+      this.setAddId(item.Id,'/record/physiology');
       return
     }
     if(allQuestionnaireData.includes(item)){
-      basePath = "/record/add-questionnaire";
-      router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`);
+      this.setAddId(item.Id,'/record/add-questionnaire');
       return
     }
-    basePath = "/record/diagnosis";
-    router.push(`${basePath}?Id=${location.query.Id}&recordId=${item.Id}`)
+    this.setAddId(item.Id,'/record/diagnosis');
   };
 
 

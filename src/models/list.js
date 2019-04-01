@@ -8,13 +8,12 @@ const format = (arr,) => {
   arr.map( item => {
     let title = "四诊记录表";
     let description = `创建时间：${item.CreatedAt}\n主诉：${item.ZS}`;
-    let path = `/respondent/respondent-list/respondent-record/four-dagnostic?Id=${item.Id}`;
+    let path = `/respondent/respondent-list/respondent-record/four-dagnostic`;
     let delAction = "list/delMedical";
     if(item.GaugeName){
-      let avatar = require('../assets/img/cognition.jpg');
       title = item.GaugeName;
       description = `创建时间：${item.CreatedAt}\n点击查看理化检查详情`;
-      path = `/respondent/respondent-list/respondent-record/Physicochemical?Id=${item.Id}`
+      path = `/respondent/respondent-list/respondent-record/Physicochemical`;
       delAction = "list/delGauge";
     }
     if(item.QuestionnaireName){
@@ -33,7 +32,6 @@ const format = (arr,) => {
         default:
           path = "/exception/404"
       }
-      path += `?Id=${item.Id}`;
       delAction = "list/delQues";
     }
     newArr.push({

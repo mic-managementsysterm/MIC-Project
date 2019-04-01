@@ -11,8 +11,9 @@ const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
-@connect(({addPhy,loading}) =>({
+@connect(({addPhy,routerParams,loading}) =>({
   addPhy,
+  routerParams,
   loading:loading.models.addPhy,
 }))
 @Form.create()
@@ -25,20 +26,20 @@ class Physiology extends PureComponent {
   }
 
   componentDidMount(){
-    const { dispatch,location,addPhy:{newPhy} } = this.props;
+    const { dispatch,routerParams,addPhy:{newPhy} } = this.props;
     dispatch({
       type: 'addPhy/setStates',
       payload:{
         newPhy:{
           ...newPhy,
-          RespondentId:location.query.Id
+          RespondentId:routerParams.Respondent.Id
         }
       }
-    })
+    });
     dispatch({
       type: 'addPhy/getPhy',
       payload: {
-        Id:location.query.recordId
+        Id:routerParams.RecordAddId
       }
     });
   }

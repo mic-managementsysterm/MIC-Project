@@ -9,8 +9,9 @@ import styles from './Diagnosis.less';
 const { TextArea } = Input;
 
 
-@connect(({ addMedical, loading }) => ({
+@connect(({ addMedical,routerParams, loading }) => ({
   addMedical,
+  routerParams,
   loading: loading.models.addMedical,
 }))
 class DiagnosisForm extends PureComponent {
@@ -25,12 +26,12 @@ class DiagnosisForm extends PureComponent {
     e.preventDefault();
     this.setState({
       loading:true
-    })
+    });
     let upload = {};
     this.props.form.validateFieldsAndScroll((err, values) => {
 
       if (!err) {
-        upload.RespondentId = this.props.location.query.Id;
+        upload.RespondentId = this.props.routerParams.Respondent.Id;
         upload.ZS = values.ZS;
         upload.XBS = values.XBS;
         upload.JWS = values.JWS;

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import Link from "umi/link";
+import router from 'umi/router';
 import {
   Row,
   Col,
@@ -206,8 +206,9 @@ const ManaForm = Form.create()(props => {
 });
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ respondent, loading,user }) => ({
+@connect(({ respondent, loading,user,routerParams }) => ({
   respondent,
+  routerParams,
   currentUser:user.currentUser,
   loading: loading.models.rule,
 }))
@@ -245,9 +246,7 @@ class Respondent extends PureComponent {
         return record
           ? (
             <div key={record.Id}>
-              <Link to={`/respondent/respondent-list/respondent-record?Id=${record.Id}&Name=${record.Name}&Gender=${record.Gender}&Phone=${record.Phone}&Born=${record.Born}&Address=${record.Address}&CreatedAt=${record.CreatedAt}`}>
-                <Button className={styles.btn}>查看</Button>
-              </Link>
+              <Button className={styles.btn} onClick={() => this.handlePush(record)}>查看</Button>
               <Button onClick={() => this.handleModalVisible(true,record)}>编辑</Button>
             </div>
           ) : null
@@ -266,6 +265,17 @@ class Respondent extends PureComponent {
       }
     });
   }
+
+  handlePush = (record) => {
+    const { dispatch} = this.props;
+    dispatch({
+      type: 'routerParams/set',
+      payload:{
+        Respondent:record,
+      },
+    });
+    router.push(router.push(`/respondent/respondent-list/respondent-record`))
+  };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch, formValues,respondent:{searchKey} } = this.props;
