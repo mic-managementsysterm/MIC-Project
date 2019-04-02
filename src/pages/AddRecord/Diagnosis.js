@@ -18,7 +18,6 @@ const TabPane = Tabs.TabPane;
   disAndSyn,
   loading: loading.models.addMedical && loading.models.getDisease&&loading.models.getSyndrome&&loading.models.disease&&loading.models.disAndSyn,
   routerParams,
-
 }))
 class DiagnosisForm extends PureComponent {
   constructor(props){
@@ -127,15 +126,6 @@ class DiagnosisForm extends PureComponent {
   handleDiagnosisAdd=()=>{
     this.setState({
       modalVisible:true
-    })
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'getDisease/getDisease',
-      payload: "",
-    });
-    dispatch({
-      type: 'getSyndrome/getSyndrome',
-      payload: ''
     })
   }
   handleCancel=()=>{
@@ -267,6 +257,7 @@ class DiagnosisForm extends PureComponent {
       type: 'disease/setStates',
       payload: {
         modalVisible:false,
+        relateSyn:[]
         // Disease:ClearDisease,
       },
     });
@@ -331,10 +322,8 @@ class DiagnosisForm extends PureComponent {
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
-      getDisease: {diseaseData},
       disAndSyn:{relateSyn,restSyn,restPagination},
-      getSyndrome: {syndromeData},
-      disease:{dataSource, selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },
+      disease:{diseaseData,dataSource, selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },
       loading,
     } = this.props;
     const tailFormItemLayout = {

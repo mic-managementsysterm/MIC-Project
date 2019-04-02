@@ -2,13 +2,14 @@ import { queryDisease, addDisease, removeDisease, updateDisease} from '@/service
 
 export default {
   namespace: 'disease',
-
+  diseaseData:[],
   state: {
     dataSource:[],
     current:1,
     pageSize:10,
     total:0,
     searchKey:'',
+
 
 
     modalVisible: false,
