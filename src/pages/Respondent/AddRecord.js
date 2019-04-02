@@ -45,14 +45,14 @@ import router from 'umi/router';
   addRecord = (item) => {
     const {record:{allQuestionnaireData,allGaugeData}} =this.props;
     if(allGaugeData.includes(item)){
-      this.setAddId(item.Id,'/record/physiology');
+      this.setAddId(item.Id,'/respondent/respondent-list/respondent-record/add-record/physiology');
       return
     }
     if(allQuestionnaireData.includes(item)){
-      this.setAddId(item.Id,'/record/add-questionnaire');
+      this.setAddId(item.Id,'/respondent/respondent-list/respondent-record/add-record/add-questionnaire');
       return
     }
-    this.setAddId(item.Id,'/record/diagnosis');
+    this.setAddId(item.Id,'/respondent/respondent-list/respondent-record/add-record/diagnosis');
   };
 
 
