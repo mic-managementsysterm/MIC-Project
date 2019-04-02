@@ -515,6 +515,25 @@ class DiagnosisForm extends PureComponent {
                  onChange={this.handleStandardTableChange}
                />
             </Modal>
+               <Modal
+                 centered
+                 destroyOnClose
+                 width={640}
+                 title="关联证型"
+                 visible={modalVisible}
+                 onOk={()=>{this.handleRelateOk()}}
+                 onCancel={() => this.handleCancelRelate()}
+               >
+                 <StandardTable
+                   selectedRows={selectRelateRows }
+                   pagination={{pageSize:8}}
+                   dataSource={relateSyn}
+                   onSelectRow={this.handleSelectRelateRows}
+                   onChange={this.handleStandardTableChange}
+                   columns={this.columns1}
+                   rowKey={item => item.Id}
+                 />
+               </Modal>
             </Form.Item>
             <Form.Item
               label="四诊信息"
