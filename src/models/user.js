@@ -14,11 +14,17 @@ export default {
     *fetchCurrent({payload}, { call, put }) {
       const avatar =require("../assets/image/admin.jpg");
       const response = yield call(queryUser,payload);
-      response.Data.avatar = avatar;
-      yield put({
-        type: 'saveCurrentUser',
-        payload: response.Data,
-      });
+      if(response.Success){
+        response.Data.avatar = avatar;
+        yield put({
+          type: 'saveCurrentUser',
+          payload: response.Data,
+        });
+      }else {
+        yield put({
+          type: 'login/logout',
+        });
+      }
     },
     *changeBaseInfo({payload, callback}, { call, put }) {
       const response = yield call(changeInfo,payload);

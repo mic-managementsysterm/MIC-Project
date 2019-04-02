@@ -3,6 +3,8 @@ export default {
   'menu.login': '登录',
   'menu.disease': '疾病管理',
   'menu.disease.diseaseList': '疾病关联',
+  'menu.disease.syndromeList': '证型管理',
+  'menu.disease.symptomList': '症状管理',
   'menu.gauge': '量表管理',
   'menu.gauge.question': '量表',
   'menu.gauge.questionAdd': '新增问卷',
