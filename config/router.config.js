@@ -116,29 +116,23 @@ export default [
             component: './Respondent/AddRecord',
             hideInMenu:true,
           },
-        ],
-      },
-      //新增记录
-      {
-        path: '/record',
-        icon: 'table',
-        name: 'record',
-        hideInMenu:true,
-        routes: [
           {
-            path: '/record/diagnosis',
+            path: '/respondent/respondent-list/respondent-record/add-record/diagnosis',
             name: 'diagnosis',
             component: './AddRecord/Diagnosis',
+            hideInMenu:true,
           },
           {
-            path: '/record/physiology',
+            path: '/respondent/respondent-list/respondent-record/add-record/physiology',
             name: 'physiology',
             component: './AddRecord/Physiology',
+            hideInMenu:true,
           },
           {
-            path: '/record/add-questionnaire',
+            path: '/respondent/respondent-list/respondent-record/add-record/add-questionnaire',
             name: 'addQuestionnaire',
             component: './AddRecord/AddQuestionnaire',
+            hideInMenu:true,
           },
         ],
       },

@@ -3,6 +3,7 @@ import {Spin , Button, Input, Icon,InputNumber,Upload ,Row,message } from 'antd'
 import { UploadChangeParam } from 'antd/lib/upload/interface';
 import router from 'umi/router';
 import { connect } from 'dva';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 const list=[];
 const fileList=[];
 
@@ -492,6 +493,7 @@ class QuestionEdit extends React.Component {
   render() {
     const {question:{showLoading}}=this.props
     return (
+      <PageHeaderWrapper title="问卷编辑">
       <Spin spinning={this.state.showLoading} tip={'正在保存'}>
         <div>
           {this.getTitle()}
@@ -516,6 +518,7 @@ class QuestionEdit extends React.Component {
           {this.getFooter()}
         </div>
       </Spin>
+      </PageHeaderWrapper>
     );
   }
 }
