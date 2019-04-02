@@ -31,7 +31,7 @@ class Cognition extends Component {
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
             <Description term="用户姓名">{Name}</Description>
-            <Description term="用户性别">{Gender}</Description>
+            <Description term="用户性别">{Gender === 0 ? '男' : '女'}</Description>
             <Description term="联系电话">{Phone}</Description>
             <Description term="出生日期">{Born}</Description>
             <Description term="家庭地址">{Address}</Description>

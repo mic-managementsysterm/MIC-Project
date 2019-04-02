@@ -31,7 +31,7 @@ class Physicochemical  extends Component {
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
             <Description term="用户姓名">{Name}</Description>
-            <Description term="用户性别">{Gender}</Description>
+            <Description term="用户性别">{Gender === 0 ? '男' : '女'}</Description>
             <Description term="联系电话">{Phone}</Description>
             <Description term="出生日期">{Born}</Description>
             <Description term="家庭地址">{Address}</Description>
@@ -53,19 +53,20 @@ class Physicochemical  extends Component {
             </Row>
               <Row className={styles.que}>
                 <Col span={6}>
-                  <ul><li>{item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ? item.Title : (item.GroupName === '静息心电图' ? item.Title : null) }</li></ul>
+                  <ul><li>{item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ? item.Title : (item.GroupName === '静息心电图' ? item.Title : item.ItemValue) }</li></ul>
                 </Col>
                 <Col span={6} offset={6}>
-                  <ul style={{marginLeft:10}}>
+                  <ul style={{marginLeft: item.ExceptionType === 0 ? 12 : (item.ExceptionType ===1 || item.ExceptionType === 2 ? 15: (item.ItemChecked ? 15 : 15)), color: item.ExceptionType === 0 ? (item.ItemChecked ? 'red' : '') : 'red'}}>
                   <li>{
                     item.GroupName === '血常规(RBC)' || item.GroupName === '血糖' || item.GroupName === '肝、肾功能' ?
                       (item.ExceptionType === 0 ? '正常' : (item.ExceptionType === 1 ? <Icon type='arrow-up' /> : (item.ExceptionType === 2 ? <Icon type='arrow-down' /> :  null)))
                       :
-                      (item.GroupName === '静息心电图' ? (item.Title === '心率' ? item.ItemValue : (item.ItemChecked ? '有' : '无')) : item.ItemValue)
+                      (item.GroupName === '静息心电图' ? (item.Title === '心率' ? item.ItemValue : (item.ItemChecked ? <Icon type="check" /> : <Icon type="close" />)) : null)
                   }</li>
                   </ul>
                   </Col>
               </Row>
+              <Divider className={styles.line} />
             </div>
             )
           }) : null}

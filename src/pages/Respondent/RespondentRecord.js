@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { Card, Button, Icon, List, Popconfirm } from 'antd';
+import { Card, Button, Icon, List, Popconfirm, Divider } from 'antd';
+import DescriptionList from '@/components/DescriptionList';
 import Ellipsis from '@/components/Ellipsis';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './RespondentRecord.less';
+const { Description } = DescriptionList;
 
 @connect(({ list,routerParams, loading }) => ({
   list,
@@ -61,8 +63,19 @@ class RespondentRecord extends PureComponent {
       list: { records },
       loading,
     } = this.props;
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.routerParams.Respondent;
     return (
       <PageHeaderWrapper title="患者详情">
+        <Card>
+        <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
+          <Description term="用户姓名">{Name}</Description>
+          <Description term="用户性别">{Gender === 0 ? '男' : '女'}</Description>
+          <Description term="联系电话">{Phone}</Description>
+          <Description term="出生日期">{Born}</Description>
+          <Description term="家庭地址">{Address}</Description>
+          <Description term="创建时间">{CreatedAt}</Description>
+        </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
         <div className={styles.cardList}>
           <List
             rowKey="Id"
@@ -104,6 +117,7 @@ class RespondentRecord extends PureComponent {
             }
           />
         </div>
+        </Card>
       </PageHeaderWrapper>
     );
   }

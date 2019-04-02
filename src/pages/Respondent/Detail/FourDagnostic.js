@@ -32,7 +32,7 @@ class FourDagnostic extends Component {
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
             <Description term="用户姓名">{Name}</Description>
-            <Description term="用户性别">{Gender}</Description>
+            <Description term="用户性别">{Gender === 0 ? '男' : '女'}</Description>
             <Description term="联系电话">{Phone}</Description>
             <Description term="出生日期">{Born}</Description>
             <Description term="家庭地址">{Address}</Description>
@@ -59,6 +59,9 @@ class FourDagnostic extends Component {
                   return <span key={index}>{item.SymptomName}、</span>;
                 })
                 : null}
+            </Description>
+            <Description term="四诊照片" className={styles.term}>
+              {/*{ diagnosisData.MedicalImgs == false ? null : <img src={`http://210.41.215.16:5010${diagnosisData.MedicalImgs[0].Url}`} className={styles.img} />}*/}
             </Description>
           </DescriptionDetail>
         </Card>
