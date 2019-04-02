@@ -35,10 +35,9 @@ export default {
   reducers: {
     set(state, action) {
       const {payload} = action;
-      console.log('payload',payload)
       for(let key in payload){
         if(payload.hasOwnProperty(key)){
-          sessionStorage.setItem(key,JSON.stringify(payload[key]))
+          payload[key] && sessionStorage.setItem(key,JSON.stringify(payload[key]))
         }
       }
       return {
