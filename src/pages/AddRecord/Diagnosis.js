@@ -10,13 +10,15 @@ import styles from './Diagnosis.less';
 const { TextArea } = Input;
 const TabPane = Tabs.TabPane;
 
-@connect(({ addMedical, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
+@connect(({ addMedical,routerParams, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
   addMedical,
   getDisease,
   getSyndrome,
   disease,
   disAndSyn,
   loading: loading.models.addMedical && loading.models.getDisease&&loading.models.getSyndrome&&loading.models.disease&&loading.models.disAndSyn,
+  routerParams,
+
 }))
 class DiagnosisForm extends PureComponent {
   constructor(props){
@@ -94,11 +96,11 @@ class DiagnosisForm extends PureComponent {
     e.preventDefault();
     this.setState({
       loading:true
-    })
+    });
     let upload = {};
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        upload.RespondentId = this.props.location.query.Id;
+        upload.RespondentId = this.props.routerParams.Respondent.Id;
         upload.ZS = values.ZS;
         upload.XBS = values.XBS;
         upload.JWS = values.JWS;

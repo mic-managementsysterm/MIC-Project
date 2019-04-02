@@ -71,9 +71,10 @@ componentWillMount(){
           render:(text,record)=>(
             questions.length>=1?
             (   <div className={styles.operation}>
-          <Link to={
-            `/gauge/question-list/questionEdit-list?Id=${record.Id}`
-          }>
+          <Link to={{
+            pathname:'/gauge/question-list/questionEdit-list',
+            state:{Id:record.Id}
+          }}>
           <Button className={styles.btn}>编辑</Button>
           </Link>
           <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>
@@ -84,7 +85,7 @@ componentWillMount(){
         }
         ]
         return(
-          <PageHeaderWrapper title="问卷管理" loading={loading}>
+          <PageHeaderWrapper title="量表管理" loading={loading}>
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
               <Link to={'/gauge/question-list/questionAdd-list'}>

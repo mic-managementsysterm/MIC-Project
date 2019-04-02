@@ -1,28 +1,31 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import Link from "umi/link";
-import { Card, Button, Icon, List, Popconfirm } from 'antd';
+import router from 'umi/router';
+import { Card, Button, Icon, List, Popconfirm, Divider } from 'antd';
+import DescriptionList from '@/components/DescriptionList';
 import Ellipsis from '@/components/Ellipsis';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './RespondentRecord.less';
+const { Description } = DescriptionList;
 
-@connect(({ list, loading }) => ({
+@connect(({ list,routerParams, loading }) => ({
   list,
+  routerParams,
   loading: loading.models.list,
 }))
 class RespondentRecord extends PureComponent {
   componentDidMount() {
-    const { dispatch, location } = this.props;
+    const { dispatch, routerParams } = this.props;
     dispatch({
       type: 'list/getRecords',
       payload: {
-        RespondentId: location.query.Id,
+        RespondentId: routerParams.Respondent.Id,
       },
     });
   }
 
   delRecord = (item) => {
-    const { dispatch,location } = this.props;
+    const { dispatch,routerParams } = this.props;
     dispatch({
       type: item.delAction,
       payload: {
@@ -32,42 +35,47 @@ class RespondentRecord extends PureComponent {
         dispatch({
           type: 'list/getRecords',
           payload: {
-            RespondentId: location.query.Id,
+            RespondentId: routerParams.Respondent.Id,
           },
         });
       }
     });
   };
 
+  handlePush= (item) => {
+    const { dispatch} = this.props;
+    dispatch({
+      type: 'routerParams/set',
+      payload:{
+        RecordId:item.Id,
+      },
+    });
+    router.push(`${item.path}`)
+  };
+
+  handleAddRecord = () => {
+    router.push(`/respondent/respondent-list/respondent-record/add-record`)
+  };
+
+
   render() {
     const {
       list: { records },
       loading,
-      location
     } = this.props;
-    const { Name, Gender, Phone, Born,Address,CreatedAt } = location.query;
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.routerParams.Respondent;
     return (
       <PageHeaderWrapper title="患者详情">
-        <Card
-          style={{marginBottom:5}}
-          title={Name}>
-          {
-            Phone? <p><span>电话号码:</span>
-              <span>{Phone}</span></p>:null
-          }
-          {
-            Gender? <p> <span>性别:</span>
-              <span>{Gender}</span></p>:null
-          }
-          {
-            Born? <p> <span>出生日期:</span>
-              <span>{Born}</span></p>:null
-          }
-          {
-            Address? <p><span>家庭地址:</span>
-              <span>{Address}</span></p>:null
-          }
-        </Card>
+        <Card>
+        <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
+          <Description term="用户姓名">{Name}</Description>
+          <Description term="用户性别">{Gender === 0 ? '男' : '女'}</Description>
+          <Description term="联系电话">{Phone}</Description>
+          <Description term="出生日期">{Born}</Description>
+          <Description term="家庭地址">{Address}</Description>
+          <Description term="创建时间">{CreatedAt}</Description>
+        </DescriptionList>
+          <Divider style={{ marginBottom: 32 }} />
         <div className={styles.cardList}>
           <List
             rowKey="Id"
@@ -81,9 +89,9 @@ class RespondentRecord extends PureComponent {
                     hoverable
                     className={styles.card}
                     actions={[
-                      <Link to={`${item.path}&Name=${Name}&Gender=${Gender}&Phone=${Phone}&Born=${Born}&Address=${Address}&CreatedAt=${CreatedAt}`}>
+                      <a onClick={() => this.handlePush(item)}>
                         查看
-                      </Link>,
+                      </a>,
                       <Popconfirm title="确认删除？" onConfirm={()=>this.delRecord(item)} okText="确认" cancelText="取消">
                         删除
                       </Popconfirm>,
@@ -101,16 +109,15 @@ class RespondentRecord extends PureComponent {
                 </List.Item>
               ) : (
                 <List.Item>
-                  <Link to={`/respondent/respondent-list/respondent-record/add-record?Id=${location.query.Id}`}>
-                    <Button type="dashed" className={styles.newButton}>
-                      <Icon type="plus" /> 新增记录
-                    </Button>
-                  </Link>
+                  <Button type="dashed" className={styles.newButton} onClick={() => this.handleAddRecord()}>
+                    <Icon type="plus" /> 新增记录
+                  </Button>
                 </List.Item>
               )
             }
           />
         </div>
+        </Card>
       </PageHeaderWrapper>
     );
   }

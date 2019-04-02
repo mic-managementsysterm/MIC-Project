@@ -241,10 +241,6 @@ export async function queryFakeList(params) {
   return request(`/Api/visit/get/GetRespondentRecord?${stringify(params)}`);
 }
 
-export async function getAllQuestionnaire() {
-  return request(`/Api/questionnaire/get/getAll`);
-}
-
 export async function getAllGauge() {
   return request( `/Api/gaugetable/get/lib`);
 }
@@ -307,6 +303,10 @@ export async function deleteGauge(params) {
 
 export async function getQuestion(Id) {
   return request(`/Api/questionnaire/get/getById?${stringify(Id)}`)
+}
+
+export async function getAllQuestionnaire() {
+  return request(`/Api/questionnaire/get/getAll`);
 }
 
 export async function changeQuestion(params) {

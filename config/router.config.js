@@ -56,7 +56,7 @@ export default [
             component: './Gauge/QuestionAdd',
           },
           {
-            path: `/gauge/question-list/questionEdit-list`,
+            path: '/gauge/question-list/questionEdit-list',
             hideInMenu:true,
             name: 'questionEdit',
             component: './Gauge/QuestionEdit',
@@ -116,39 +116,23 @@ export default [
             component: './Respondent/AddRecord',
             hideInMenu:true,
           },
-        ],
-      },
-      //新增记录
-      {
-        path: '/record',
-        icon: 'table',
-        name: 'record',
-        hideInMenu:true,
-        routes: [
           {
-            path: '/record/diagnosis',
+            path: '/respondent/respondent-list/respondent-record/add-record/diagnosis',
             name: 'diagnosis',
             component: './AddRecord/Diagnosis',
+            hideInMenu:true,
           },
           {
-            path: '/record/diagnosis/addDiagnosis',
-            name: 'addDiagnosis',
-            component: './AddRecord/AddDiagnosis',
-          },
-          {
-            path: '/record/diagnosis/diagnosisInfo',
-            name: 'diagnosisInfo',
-            component: './AddRecord/DiagnosisInfo',
-          },
-          {
-            path: '/record/physiology',
+            path: '/respondent/respondent-list/respondent-record/add-record/physiology',
             name: 'physiology',
             component: './AddRecord/Physiology',
+            hideInMenu:true,
           },
           {
-            path: '/record/add-questionnaire',
+            path: '/respondent/respondent-list/respondent-record/add-record/add-questionnaire',
             name: 'addQuestionnaire',
             component: './AddRecord/AddQuestionnaire',
+            hideInMenu:true,
           },
         ],
       },

@@ -7,17 +7,18 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from  './FourDagnostic.less';
 const { Description } = DescriptionList;
 
-@connect(({ detail, loading }) => ({
+@connect(({ detail,routerParams, loading }) => ({
   detail,
+  routerParams,
   loading: loading.effects['detail/fetchDiagnosisDetail'],
 }))
 class FourDagnostic extends Component {
   componentDidMount() {
-    const { dispatch,location } = this.props;
+    const { dispatch,routerParams } = this.props;
     dispatch({
       type: 'detail/fetchDiagnosisDetail',
       payload: {
-        Id: location.query.Id ? location.query.Id : '',
+        Id: routerParams.RecordId,
       },
     });
   }
@@ -25,13 +26,13 @@ class FourDagnostic extends Component {
   render() {
     const { detail = {}, loading } = this.props;
     const { diagnosisData = {} } = detail;
-    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.location.query;
+    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.routerParams.Respondent;
     return (
       <PageHeaderWrapper title="记录详情页" loading={loading}>
         <Card bordered={false}>
           <DescriptionList size="large" title="用户信息" style={{ marginBottom: 32 }}>
             <Description term="用户姓名">{Name}</Description>
-            <Description term="用户性别">{Gender}</Description>
+            <Description term="用户性别">{Gender === 0 ? '男' : '女'}</Description>
             <Description term="联系电话">{Phone}</Description>
             <Description term="出生日期">{Born}</Description>
             <Description term="家庭地址">{Address}</Description>
@@ -58,6 +59,9 @@ class FourDagnostic extends Component {
                   return <span key={index}>{item.SymptomName}、</span>;
                 })
                 : null}
+            </Description>
+            <Description term="四诊照片" className={styles.term}>
+              {/*{ diagnosisData.MedicalImgs == false ? null : <img src={`http://210.41.215.16:5010${diagnosisData.MedicalImgs[0].Url}`} className={styles.img} />}*/}
             </Description>
           </DescriptionDetail>
         </Card>
