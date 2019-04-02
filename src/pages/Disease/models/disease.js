@@ -10,7 +10,7 @@ export default {
     total:0,
     searchKey:'',
 
-
+    diseaseData:[],
     modalVisible: false,
     relateModalVisible: false,
     selectedRows: [],
