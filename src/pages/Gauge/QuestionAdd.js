@@ -1,8 +1,8 @@
 import React from 'react';
-import {Spin , DatePicker, Button, Input, Checkbox, Icon,InputNumber,Upload ,Row,message } from 'antd';
-import { UploadChangeParam } from 'antd/lib/upload/interface';
+import {Spin , DatePicker, Button, Input, Icon,InputNumber,Upload ,Row,message } from 'antd';
 import router from 'umi/router';
 import { connect } from 'dva';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 const list=[]
 const fileList=[]
 
@@ -437,6 +437,7 @@ class questionAdd extends React.Component {
   render() {
     const {question:{showLoading}}=this.props
     return (
+      <PageHeaderWrapper title="新增问卷" >
       <Spin spinning={this.state.showLoading} tip={'正在保存'}>
         <div>
           {this.getTitle()}
@@ -458,6 +459,7 @@ class questionAdd extends React.Component {
           {this.getFooter()}
         </div>
       </Spin>
+      </PageHeaderWrapper>
     );
   }
 }

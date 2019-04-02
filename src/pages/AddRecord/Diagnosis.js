@@ -3,8 +3,8 @@ import { connect } from 'dva';
 import {
   Form, Input,Spin, Button,
 } from 'antd';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Diagnosis.less';
 const { TextArea } = Input;
 
