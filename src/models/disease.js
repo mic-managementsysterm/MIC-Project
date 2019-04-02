@@ -2,7 +2,7 @@ import { queryDisease, addDisease, removeDisease, updateDisease} from '@/service
 
 export default {
   namespace: 'disease',
-  diseaseData:[],
+
   state: {
     dataSource:[],
     current:1,
@@ -10,8 +10,7 @@ export default {
     total:0,
     searchKey:'',
 
-
-
+    diseaseData:[],
     modalVisible: false,
     relateModalVisible: false,
     selectedRows: [],
