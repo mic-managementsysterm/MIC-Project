@@ -14,6 +14,8 @@ export default {
     modalVisible: false,
     relateModalVisible: false,
     selectedRows: [],
+    selectDiseaseRows:[],
+    selectRelateRows:[],
     Disease : {
       Id: "",
       Name: "",
