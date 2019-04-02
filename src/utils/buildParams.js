@@ -1,5 +1,5 @@
 let gettype = Object.prototype.toString;
-const DataType = {
+export const DataType = {
   isObj: function (o) {
     return gettype.call(o) == "[object Object]";
   },
