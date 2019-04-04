@@ -1,22 +1,20 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, Cascader, Table, message, Col, Row,Tag
+  Form, Input, Spin, Button, AutoComplete, Modal, Tabs,Table, Checkbox , Col, Row,Tag
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
 import styles from './Diagnosis.less';
-const { TextArea } = Input;
-const TabPane = Tabs.TabPane;
 
-@connect(({ addMedical,routerParams, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
+const {TabPane} = Tabs;
+
+@connect(({ addMedical,routerParams,disease,disAndSyn, loading }) => ({
   addMedical,
-  getDisease,
-  getSyndrome,
   disease,
   disAndSyn,
-  loading: loading.models.addMedical && loading.models.getDisease&&loading.models.getSyndrome&&loading.models.disease&&loading.models.disAndSyn,
+  loading: loading.models.addMedical &&loading.models.disease&&loading.models.disAndSyn,
   routerParams,
 }))
 class DiagnosisForm extends PureComponent {
@@ -25,9 +23,11 @@ class DiagnosisForm extends PureComponent {
     this.state={
       loading:false,
       modalVisible:false,
-      selectedRows:[]
+      selectedRows:[],
+      visible:false,
     }
   }
+
   columns = [
     {
       title: '疾病名称',
@@ -53,6 +53,7 @@ class DiagnosisForm extends PureComponent {
       },
     },
   ];
+
   columns1= [
     {
       title: '证型名称',
@@ -73,12 +74,9 @@ class DiagnosisForm extends PureComponent {
           :null
       ),
     }];
+
   componentDidMount() {
     const { dispatch ,disease:{current,pageSize,searchKey}} = this.props;
-    dispatch({
-      type: 'getDisease/getDisease',
-      payload: "",
-    });
     dispatch({
       type: 'disease/queryDisease',
       payload: {
@@ -123,11 +121,13 @@ class DiagnosisForm extends PureComponent {
       }
     });
   };
+
   handleDiagnosisAdd=()=>{
     this.setState({
       modalVisible:true
     })
   }
+
   handleCancel=()=>{
     this.setState({
       modalVisible:false
@@ -194,6 +194,7 @@ class DiagnosisForm extends PureComponent {
       },
     });
   };
+
   handleSelectRelateRows=rows=>{
     const { dispatch ,disease:{selectRelateRows}} = this.props;
     dispatch({
@@ -264,6 +265,7 @@ class DiagnosisForm extends PureComponent {
    let rows=[]
    this.handleSelectRelateRows(rows)
   };
+
   renderSimpleForm() {
     const {form: { getFieldDecorator },disease:{selectedRows}} = this.props;
     return (
@@ -295,6 +297,7 @@ class DiagnosisForm extends PureComponent {
       },
     });
 }
+
   handleDieaseOk=()=>{
     const {disease:{selectRelateRows,selectDiseaseRows}}=this.props
   this.setState({
@@ -303,6 +306,7 @@ class DiagnosisForm extends PureComponent {
   })
     console.log('@select',this.state.selectedRows)
 }
+
   handleClose=(removedTag,int)=>{
     const { dispatch ,disease:{selectDiseaseRows,selectRelateRows}} = this.props;
     if (int===1) {
@@ -319,6 +323,22 @@ class DiagnosisForm extends PureComponent {
       this.handleSelectRelateRows(rows)
     }
   }
+
+  callback = (key) =>{
+    console.log(key);
+  }
+
+  showModal = () =>{
+    this.setState({
+      visible: true
+    })
+  }
+
+  onChange = (e) =>{
+    console.log(`checked = ${e.target.checked}`);
+  }
+
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
@@ -346,201 +366,187 @@ class DiagnosisForm extends PureComponent {
         current:current
       },
     }
-    const Tags=() =>{
-      console.log('@log')
-      const {disease:{
-        selectDiseaseRows,selectRelateRows
-      }}=this.props
-      selectDiseaseRows.map((disease,index)=>{
-          <Tag>{disease.Name}</Tag>
-      })
-    }
-
 
     return (
-      <PageHeaderWrapper title="四诊数据采集" >
-        <Spin spinning={this.state.loading} tip={'正在提交'}>
-        <div className={styles.content}>
-          <Form   onSubmit={this.handleSubmit} className={styles.test}>
-            <Form.Item
-              label="主诉"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {getFieldDecorator('ZS', {
+      <PageHeaderWrapper title="四诊数据采集">
+        <Spin spinning={this.state.loading} tip="正在提交">
+          <div className={styles.content}>
+            <Form onSubmit={this.handleSubmit} className={styles.test}>
+              <Form.Item
+                label="主诉"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {getFieldDecorator('ZS', {
                 rules: [{
                   required: true, message: '请输入主诉!',
                 }],
               })(
-                <AutoComplete
-                  dataSource={diseaseData}
-                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                  placeholder="请输入主诉"
-                >
-                  <Input />
 
-                </AutoComplete>
+                <Input />
               )}
-            </Form.Item>
-            <Form.Item
-              label="现病史"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {getFieldDecorator('XBS', {
+              </Form.Item>
+              <Form.Item
+                label="现病史"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {getFieldDecorator('XBS', {
                 rules: [{
                   required: true, message: '请输入现病史！',
                 }],
               })(
-                <AutoComplete
-                  dataSource={diseaseData}
-                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                  placeholder="请输入现病史"
-                >
-                  <Input />
-                </AutoComplete>
+                <Input />
               )}
-            </Form.Item>
-            <Form.Item
-              label="既往史"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {getFieldDecorator('JWS', {
+              </Form.Item>
+              <Form.Item
+                label="既往史"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {getFieldDecorator('JWS', {
                 rules: [{
                   required: true, message: '请输入既往史!',
                 }],
               })(
-                <AutoComplete
-                  dataSource={diseaseData}
-                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                  placeholder="请输入既往史"
-                >
-                  <Input />
-                </AutoComplete>
+                <Input />
               )}
-            </Form.Item>
-            <Form.Item
-              label="过敏史"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {getFieldDecorator('GMS', {
+              </Form.Item>
+              <Form.Item
+                label="过敏史"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {getFieldDecorator('GMS', {
                 rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
               })(
-                <AutoComplete
-                  dataSource={diseaseData}
-                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                  placeholder="请输入过敏史"
-                >
-                  <Input />
-                </AutoComplete>
+                <Input />
               )}
-            </Form.Item>
-            <Form.Item
-              label="体格检查"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {getFieldDecorator('TGJC', {
+              </Form.Item>
+              <Form.Item
+                label="体格检查"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {getFieldDecorator('TGJC', {
                 rules: [{ required: true, message: '请输入体格检查!' }],
               })(
-                <AutoComplete
-                  dataSource={diseaseData}
-                  filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                  placeholder="请输入体格检查"
-                >
-                  <Input />
-                </AutoComplete>
+                <Input />
               )}
-            </Form.Item>
-            <Form.Item
-              label="中医诊断"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {/*{getFieldDecorator('Diagnose', {*/}
-                {/*rules: [{ required: true, message: '请输入中医诊断!' }],*/}
-              {/*})(*/}
-                {/*<div>*/}
+              </Form.Item>
+              <Form.Item
+                label="中医诊断"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {/* {getFieldDecorator('Diagnose', { */}
+                {/* rules: [{ required: true, message: '请输入中医诊断!' }], */}
+                {/* })( */}
+                {/* <div> */}
                 <Button onClick={()=>{this.handleDiagnosisAdd()}}>添加诊断</Button>
-              {
+                {
                 selectDiseaseRows.map((disease,index)=>{
-                return <Tag key={disease.Id} closable  onClose={() => this.handleClose(disease,1)}>{disease.Name}</Tag>
+                return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}>{disease.Name}</Tag>
               })
               }
-              {
+                {
                 selectRelateRows.map((relate,index)=>{
-                return <Tag key={relate.Id} closable  onClose={() => this.handleClose(relate,2)}>{relate.Name}</Tag>
+                return <Tag key={relate.Id} closable onClose={() => this.handleClose(relate,2)}>{relate.Name}</Tag>
               })
               }
-                {/*</div>*/}
-              {/*)}*/}
-            </Form.Item>
-             <Form.Item>
-             <Modal
-             centered
-               destroyOnClose
-              width={640}
-              title="诊断列表"
-              visible={this.state.modalVisible}
-              onOk={()=>{this.handleDieaseOk()}}
-              onCancel={() => this.handleCancel()}
-            >
-               <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
-               <StandardTable
-                 rowKey='Id'
-                 selectedRows={selectDiseaseRows }
-                 loading={loading}
-                 data={data}
-                 columns={this.columns}
-                 onSelectRow={this.handleSelectRows}
-                 onChange={this.handleStandardTableChange}
-               />
-            </Modal>
-               <Modal
-                 centered
-                 destroyOnClose
-                 width={640}
-                 title="关联证型"
-                 visible={modalVisible}
-                 onOk={()=>{this.handleRelateOk()}}
-                 onCancel={() => this.handleCancelRelate()}
-               >
-                 <StandardTable
-                   selectedRows={selectRelateRows }
-                   pagination={{pageSize:8}}
-                   dataSource={relateSyn}
-                   onSelectRow={this.handleSelectRelateRows}
-                   onChange={this.handleStandardTableChange}
-                   columns={this.columns1}
-                   rowKey={item => item.Id}
-                 />
-               </Modal>
-            </Form.Item>
-            <Form.Item
-              label="四诊信息"
-              labelCol={{ span: 5 }}
-              wrapperCol={{ span: 15 }}
-              className={styles.form}
-            >
-              {/*{getFieldDecorator('DiagnoseInfo', {*/}
-                {/*rules: [{ required: true, message: '请输入四诊信息!' }],*/}
-              {/*})(*/}
-                {/*<Input type={'button'} placeholder='新增四诊信息' />*/}
-              {/*)}*/}
-            </Form.Item>
-            <Form.Item {...tailFormItemLayout} className={styles.form}>
-              <Button type="primary" htmlType="submit" style={{ marginBottom: 20 }}>提交</Button>
-            </Form.Item>
-          </Form>
-        </div>
+                {/* </div> */}
+                {/* )} */}
+              </Form.Item>
+              <Form.Item>
+                <Modal
+                  centered
+                  destroyOnClose
+                  width={640}
+                  title="诊断列表"
+                  visible={this.state.modalVisible}
+                  onOk={()=>{this.handleDieaseOk()}}
+                  onCancel={() => this.handleCancel()}
+                >
+                  <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
+                  <StandardTable
+                    rowKey='Id'
+                    selectedRows={selectDiseaseRows}
+                    loading={loading}
+                    data={data}
+                    columns={this.columns}
+                    onSelectRow={this.handleSelectRows}
+                    onChange={this.handleStandardTableChange}
+                  />
+                </Modal>
+                <Modal
+                  centered
+                  destroyOnClose
+                  width={640}
+                  title="关联证型"
+                  visible={modalVisible}
+                  onOk={()=>{this.handleRelateOk()}}
+                  onCancel={() => this.handleCancelRelate()}
+                >
+                  <StandardTable
+                    selectedRows={selectRelateRows}
+                    pagination={{pageSize:8}}
+                    dataSource={relateSyn}
+                    onSelectRow={this.handleSelectRelateRows}
+                    onChange={this.handleStandardTableChange}
+                    columns={this.columns1}
+                    rowKey={item => item.Id}
+                  />
+                </Modal>
+              </Form.Item>
+              <Form.Item
+                label="四诊信息"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {getFieldDecorator('DiagnoseInfo', {
+                 rules: [{ required: true, message: '请输入四诊信息!' }],
+                 })(
+                   <div style={{ display: 'flex' }}>
+                     <AutoComplete>
+                       <Input />
+                     </AutoComplete>
+                     <Button onClick={() => {this.showModal()}}>更多</Button>
+                   </div>
+                 )}
+              </Form.Item>
+              <Form.Item>
+                {/* {this.renderFourDiagnosis()} */}
+                {this.state.visible ?
+                  <Tabs onChange={this.callback} type="card">
+                    <TabPane tab="望" key="1">
+                      {
+                        dataSource.map(item=>{
+                          console.log('@item',item)
+                          return
+                            <Row style={{ display: 'flex' }}>
+                              <Col span={12}>{item.Name}</Col>
+                              <Col span={12}><Checkbox onChange={this.onChange} /></Col>
+                            </Row>
+                        })
+                      }
+                    </TabPane>
+                    <TabPane tab="闻" key="2">Content of Tab Pane 2</TabPane>
+                    <TabPane tab="问" key="3">Content of Tab Pane 3</TabPane>
+                    <TabPane tab="切" key="4">Content of Tab Pane 3</TabPane>
+                  </Tabs> : null}
+              </Form.Item>
+              <Form.Item {...tailFormItemLayout} className={styles.form}>
+                <Button type="primary" htmlType="submit" style={{ marginBottom: 20 }}>提交</Button>
+              </Form.Item>
+            </Form>
+          </div>
         </Spin>
       </PageHeaderWrapper>
     );

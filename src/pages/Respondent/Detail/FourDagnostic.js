@@ -5,6 +5,7 @@ import DescriptionList from '@/components/DescriptionList';
 import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from  './FourDagnostic.less';
+
 const { Description } = DescriptionList;
 
 @connect(({ detail,routerParams, loading }) => ({
@@ -46,11 +47,11 @@ class FourDagnostic extends Component {
             <Description term="过敏史" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.GMS}</Description>
             <Description term="体格检查" className={styles.term}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{diagnosisData.TGJC}</Description>
             <Description term="中医诊断" className={styles.term}>
-              {/*{diagnosisData&&diagnosisData.Diagnoses*/}
-                {/*? diagnosisData.Diagnoses.map((item, index) => {*/}
-                  {/*return <span key={index}>{item.DiagnoseName}、</span>;*/}
-                {/*})*/}
-                {/*: null}*/}
+              {/* {diagnosisData&&diagnosisData.Diagnoses */}
+              {/* ? diagnosisData.Diagnoses.map((item, index) => { */}
+              {/* return <span key={index}>{item.DiagnoseName}、</span>; */}
+              {/* }) */}
+              {/* : null} */}
               {diagnosisData.Diagnose}
             </Description>
             <Description term="四诊信息" className={styles.term}>
@@ -61,7 +62,7 @@ class FourDagnostic extends Component {
                 : null}
             </Description>
             <Description term="四诊照片" className={styles.term}>
-              {/*{ diagnosisData.MedicalImgs == false ? null : <img src={`http://210.41.215.16:5010${diagnosisData.MedicalImgs[0].Url}`} className={styles.img} />}*/}
+              {/* { diagnosisData.MedicalImgs == false ? null : <img src={`http://210.41.215.16:5010${diagnosisData.MedicalImgs[0].Url}`} className={styles.img} />} */}
             </Description>
           </DescriptionDetail>
         </Card>
