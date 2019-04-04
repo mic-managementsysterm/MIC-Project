@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs,Table, Checkbox , Col, Row,Tag
+  Form, Input, Spin, Button, AutoComplete, Modal, Tabs,Radio, message, Icon, Row,Tag, Col, Checkbox
 } from 'antd';
-import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
 import styles from './Diagnosis.less';
+const Option = AutoComplete.Option
 
 const {TabPane} = Tabs;
 
@@ -25,55 +25,14 @@ class DiagnosisForm extends PureComponent {
       modalVisible:false,
       selectedRows:[],
       visible:false,
+      diagnoseData:[],
+      diagnoseType:'see',
+      searchText:'',
+      fourDiagnoseData: [],
+      fourDiagnoseType:'see',
+      data: [],
     }
   }
-
-  columns = [
-    {
-      title: '疾病名称',
-      dataIndex: 'Name',
-      width: '40%',
-    },
-    {
-      title: '拼音',
-      dataIndex: 'PinYin',
-      width: '30%',
-    },
-    {
-      title: '操作',
-      width: '30%',
-      render: (text, record) => {
-        const {disease:{dataSource}} = this.props;
-        return dataSource && dataSource.length >= 1
-          ? (
-            <div key={record.Id}>
-              <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>关联证型</Button>
-            </div>
-          ) : null
-      },
-    },
-  ];
-
-  columns1= [
-    {
-      title: '证型名称',
-      dataIndex: 'Name',
-      align: 'center',
-    },{
-      title: '证型拼音',
-      dataIndex: 'PinYin',
-      align: 'center',
-    },{
-      title: '操作',
-      dataIndex: 'operate',
-      key: 'operate',
-      align: 'center',
-      render: (text,record)=>(
-        record ?
-          <Button onClick={()=>this.deleteSyn(record)}>删除</Button>
-          :null
-      ),
-    }];
 
   componentDidMount() {
     const { dispatch ,disease:{current,pageSize,searchKey}} = this.props;
@@ -128,63 +87,6 @@ class DiagnosisForm extends PureComponent {
     })
   }
 
-  handleCancel=()=>{
-    this.setState({
-      modalVisible:false
-    })
-    let rows=[]
-    this.handleSelectRows(rows)
-}
-
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,disease:{formValues,searchKey} } = this.props;
-    const filters = Object.keys(filtersArg).reduce((obj, key) => {
-      const newObj = { ...obj };
-      newObj[key] = getValue(filtersArg[key]);
-      return newObj;
-    }, {});
-
-    const params = {
-      currentPage: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-      ...filters,
-    };
-    if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
-    }
-    dispatch({
-      type: 'disease/queryDisease',
-      payload: {
-        pagesize:params.pageSize,
-        pageindex:params.currentPage,
-        key:searchKey
-      },
-    });
-  };
-
-  handleFormReset = () => {
-    const { form, dispatch,disease:{pageSize} } = this.props;
-    form.resetFields();
-    dispatch({
-      type: 'disease/setStates',
-      payload: {
-        formValues:{},
-        current:1,
-        pageSize:pageSize,
-        searchKey:''
-      },
-    });
-    dispatch({
-      type: 'disease/queryDisease',
-      payload: {
-        pagesize:pageSize,
-        pageindex:1,
-        key:''
-      },
-    });
-  };
-
   handleSelectRows = rows => {
     const { dispatch } = this.props;
     dispatch({
@@ -204,108 +106,6 @@ class DiagnosisForm extends PureComponent {
       },
     });
   };
-
-  handleSearch = e => {
-    e.preventDefault();
-    const { dispatch, form,disease:{pageSize} } = this.props;
-    form.validateFields((err, fieldsValue) => {
-      const { key } = fieldsValue;
-      dispatch({
-        type: 'disease/setStates',
-        payload: {
-          searchKey:key,
-        },
-      });
-      dispatch({
-        type: 'disease/queryDisease',
-        payload: {
-          key,
-          pagesize:pageSize,
-          pageindex:1,
-        },
-      });
-    });
-  };
-
-  handleModalVisible = async(flag, record) => {
-    let newRecord = Object.assign({},record);
-    console.log('@record',record)
-    const { dispatch } = this.props;
-    await dispatch({
-      type: 'disease/setStates',
-      payload: {
-        modalVisible:!!flag,
-        // Disease:record ? newRecord:ClearDisease,
-      },callback:()=>{
-        dispatch({
-          type:'disAndSyn/queryRelate',
-          payload:{
-            DiseaseId:record.Id,
-            pagesize:8,
-            pageindex:1
-          }
-        })
-      },
-    });
-    // if(flag && record){
-    //   setInfo.setBaseInfo();
-    // }
-  };
-
- handleCancelRelate = () => {
-   const {dispatch}=this.props
-    dispatch({
-      type: 'disease/setStates',
-      payload: {
-        modalVisible:false,
-        relateSyn:[]
-        // Disease:ClearDisease,
-      },
-    });
-   let rows=[]
-   this.handleSelectRelateRows(rows)
-  };
-
-  renderSimpleForm() {
-    const {form: { getFieldDecorator },disease:{selectedRows}} = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row type="flex" justify="space-between">
-          <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
-            {getFieldDecorator('key')(
-              <Input placeholder="请输入疾病名或拼音" style={{ width: 400,marginRight:20 }} />
-            )}
-            <Button type="primary" htmlType="submit">
-                查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-            </Button>
-          </span>
-        </Row>
-      </Form>
-    );
-  };
-
-  handleRelateOk=()=>{
-    const { dispatch ,disease:{selectRelateRows}} = this.props;
-    dispatch({
-      type: 'disease/setStates',
-      payload: {
-        modalVisible:false,
-        // Disease:ClearDisease,
-      },
-    });
-}
-
-  handleDieaseOk=()=>{
-    const {disease:{selectRelateRows,selectDiseaseRows}}=this.props
-  this.setState({
-    modalVisible:false,
-    selectedRows:selectDiseaseRows.concat(selectRelateRows)
-  })
-    console.log('@select',this.state.selectedRows)
-}
 
   handleClose=(removedTag,int)=>{
     const { dispatch ,disease:{selectDiseaseRows,selectRelateRows}} = this.props;
@@ -328,16 +128,93 @@ class DiagnosisForm extends PureComponent {
     console.log(key);
   }
 
-  showModal = () =>{
+  handleMore = () =>{
     this.setState({
       visible: true
     })
   }
 
-  onChange = (e) =>{
-    console.log(`checked = ${e.target.checked}`);
-  }
+ changeTab = (type) =>{
+   const {dispatch} =this.props;
+   const {searchText} =this.state;
+   dispatch({
+     type: 'addMedical/getSym',
+     payload: {
+       type:type,
+       key:'',
+       pagesize:10,
+       pageindex:1,
+     },
+     callback:(res)=>{
+       this.setState({
+         fourDiagnoseData:res,
+         fourDiagnoseType:type
+       })
+     }
+   });
+ }
 
+
+renderRow = () =>{
+    const { fourDiagnoseData,data } = this.state;
+    let da = data;
+  console.log('@fourDiagnoseData',fourDiagnoseData)
+    return fourDiagnoseData.map(item=>{
+      return <Button onClick={() =>this.setState({data : da.push(item)})}>{item.Name}</Button>
+  })
+}
+  //auto
+  renderOption = (item) => {
+    return (
+      <Option key={item.Id} text={item.Name}>
+        <span>{item.Name+`\t`+item.PinYin}</span>
+      </Option>
+    );
+  };
+
+  onSearch = (v) => {
+    const {dispatch} =this.props;
+    const {diagnoseType} =this.state;
+    dispatch({
+      type: 'addMedical/getSym',
+      payload: {
+        type:diagnoseType,
+        key:v,
+        pagesize:10,
+        pageindex:1,
+      },
+      callback:(res)=>{
+        this.setState({
+          diagnoseData:res,
+          searchText:v,
+        })
+      }
+    });
+  };
+
+  onTyChange = (type) => {
+    const {dispatch} =this.props;
+    const {searchText} =this.state;
+    dispatch({
+      type: 'addMedical/getSym',
+      payload: {
+        type:type,
+        key:searchText,
+        pagesize:10,
+        pageindex:1,
+      },
+      callback:(res)=>{
+        this.setState({
+          diagnoseData:res,
+          diagnoseType:type
+        })
+      }
+    });
+  };
+
+  onSelect = (v) => {
+    console.log(v)
+  };
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -358,15 +235,8 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const data ={
-      list: dataSource,
-      pagination: {
-        total: total|| 0,
-        pageSize:pageSize,
-        current:current
-      },
-    }
-
+    const { diagnoseData, data } =this.state;
+    console.log('@data',data)
     return (
       <PageHeaderWrapper title="四诊数据采集">
         <Spin spinning={this.state.loading} tip="正在提交">
@@ -463,47 +333,6 @@ class DiagnosisForm extends PureComponent {
                 {/* </div> */}
                 {/* )} */}
               </Form.Item>
-              <Form.Item>
-                <Modal
-                  centered
-                  destroyOnClose
-                  width={640}
-                  title="诊断列表"
-                  visible={this.state.modalVisible}
-                  onOk={()=>{this.handleDieaseOk()}}
-                  onCancel={() => this.handleCancel()}
-                >
-                  <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
-                  <StandardTable
-                    rowKey='Id'
-                    selectedRows={selectDiseaseRows}
-                    loading={loading}
-                    data={data}
-                    columns={this.columns}
-                    onSelectRow={this.handleSelectRows}
-                    onChange={this.handleStandardTableChange}
-                  />
-                </Modal>
-                <Modal
-                  centered
-                  destroyOnClose
-                  width={640}
-                  title="关联证型"
-                  visible={modalVisible}
-                  onOk={()=>{this.handleRelateOk()}}
-                  onCancel={() => this.handleCancelRelate()}
-                >
-                  <StandardTable
-                    selectedRows={selectRelateRows}
-                    pagination={{pageSize:8}}
-                    dataSource={relateSyn}
-                    onSelectRow={this.handleSelectRelateRows}
-                    onChange={this.handleStandardTableChange}
-                    columns={this.columns1}
-                    rowKey={item => item.Id}
-                  />
-                </Modal>
-              </Form.Item>
               <Form.Item
                 label="四诊信息"
                 labelCol={{ span: 5 }}
@@ -514,32 +343,47 @@ class DiagnosisForm extends PureComponent {
                  rules: [{ required: true, message: '请输入四诊信息!' }],
                  })(
                    <div style={{ display: 'flex' }}>
-                     <AutoComplete>
-                       <Input />
-                     </AutoComplete>
-                     <Button onClick={() => {this.showModal()}}>更多</Button>
+                     <div>
+                       <AutoComplete
+                         className="global-search"
+                         size="large"
+                         style={{ width: '100%' }}
+                         dataSource={diagnoseData.map(this.renderOption)}
+                         onSelect={this.onSelect}
+                         onSearch={this.onSearch}
+                         placeholder="input here"
+                         optionLabelProp="text"
+                       >
+                         <Input />
+                       </AutoComplete>
+                       <Radio.Group
+                         onChange={value => { this.onTyChange(value.target.value)}}
+                         defaultValue={'see'}
+                       >
+                         <Radio value={'see'}>望</Radio>
+                         <Radio value={'smell'}>闻</Radio>
+                         <Radio value={'ask'}>问</Radio>
+                         <Radio value={'touch'}>切</Radio>
+                         <Radio value={'other'}>其他</Radio>
+                       </Radio.Group>
+                     </div>
+                     <Button onClick={() => {this.handleMore()}}>更多</Button>
+                     {
+                       data == false ? null :  <Tag >{data.Name}</Tag>
+                     }
                    </div>
                  )}
               </Form.Item>
               <Form.Item>
-                {/* {this.renderFourDiagnosis()} */}
                 {this.state.visible ?
-                  <Tabs onChange={this.callback} type="card">
-                    <TabPane tab="望" key="1">
-                      {
-                        dataSource.map(item=>{
-                          console.log('@item',item)
-                          return
-                            <Row style={{ display: 'flex' }}>
-                              <Col span={12}>{item.Name}</Col>
-                              <Col span={12}><Checkbox onChange={this.onChange} /></Col>
-                            </Row>
-                        })
-                      }
+                  <Tabs onChange={this.changeTab} type="card">
+                    <TabPane tab="望" key={'see'}>
+                      {this.renderRow()}
                     </TabPane>
-                    <TabPane tab="闻" key="2">Content of Tab Pane 2</TabPane>
-                    <TabPane tab="问" key="3">Content of Tab Pane 3</TabPane>
-                    <TabPane tab="切" key="4">Content of Tab Pane 3</TabPane>
+                    <TabPane tab="闻" key={'smile'}>Content of Tab Pane 2</TabPane>
+                    <TabPane tab="问" key={'ask'}>Content of Tab Pane 3</TabPane>
+                    <TabPane tab="切" key={'touch'}>Content of Tab Pane 3</TabPane>
+                    <TabPane tab="其他" key={'other'}>Content of Tab Pane 3</TabPane>
                   </Tabs> : null}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>
