@@ -29,7 +29,8 @@ class DiagnosisForm extends PureComponent {
       selectedRows:[],
       visible:false,
       diagnoseData:[],
-      diagnoseType:'see'
+      diagnoseType:'see',
+      searchText:'',
     }
   }
 
@@ -169,17 +170,37 @@ class DiagnosisForm extends PureComponent {
       payload: {
         type:diagnoseType,
         key:v,
-        pagesize:9999,
+        pagesize:100,
         pageindex:1,
       },
       callback:(res)=>{
         this.setState({
-          diagnoseData:res
+          diagnoseData:res,
+          searchText:v,
         })
       }
     });
   };
 
+  onTyChange = (type) => {
+    const {dispatch} =this.props;
+    const {searchText} =this.state;
+    dispatch({
+      type: 'addMedical/getSym',
+      payload: {
+        type:type,
+        key:searchText,
+        pagesize:100,
+        pageindex:1,
+      },
+      callback:(res)=>{
+        this.setState({
+          diagnoseData:res,
+          diagnoseType:type
+        })
+      }
+    });
+  };
 
   onSelect = (v) => {
     console.log(v)
@@ -315,7 +336,7 @@ class DiagnosisForm extends PureComponent {
                  })(
                    <div style={{}}>
                      <Radio.Group
-                       onChange={value => {this.state.diagnoseType = value.target.value}}
+                       onChange={value => { this.onTyChange(value.target.value)}}
                        defaultValue={'see'}
                      >
                        <Radio value={'see'}>望</Radio>
