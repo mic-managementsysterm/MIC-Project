@@ -1,12 +1,13 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs,Radio, message, Icon, Row,Tag, Col, Checkbox
+  Form, Input, Spin, Button, AutoComplete, Tabs, Radio, List, Tag, Row, Col,Upload, Icon, message
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
 import styles from './Diagnosis.less';
-const Option = AutoComplete.Option
+
+const {Option} = AutoComplete
 
 const {TabPane} = Tabs;
 
@@ -19,10 +20,11 @@ const {TabPane} = Tabs;
 }))
 class DiagnosisForm extends PureComponent {
   constructor(props){
-    super(props)
+    super(props);
     this.state={
       loading:false,
-      modalVisible:false,
+      uploading: false,
+      // modalVisible:false,
       selectedRows:[],
       visible:false,
       diagnoseData:[],
@@ -31,6 +33,9 @@ class DiagnosisForm extends PureComponent {
       fourDiagnoseData: [],
       fourDiagnoseType:'see',
       data: [],
+      base64: [],
+      current:1,
+      total:0,
     }
   }
 
@@ -44,8 +49,6 @@ class DiagnosisForm extends PureComponent {
         key:searchKey
       },
     });
-    this.handleSelectRows([])
-    this.handleSelectRelateRows([])
   }
 
   handleSubmit = (e) => {
@@ -63,6 +66,8 @@ class DiagnosisForm extends PureComponent {
         upload.GMS = values.GMS;
         upload.TGJC = values.TGJC;
         upload.Diagnose = this.state.selectedRows;
+        upload.Diagnoses = this.state.data;
+        upload.MedicalImgs = this.state.base10Value;
         this.props.dispatch({
           type: 'addMedical/upload',
           payload:upload,
@@ -81,94 +86,154 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
-  handleDiagnosisAdd=()=>{
-    this.setState({
-      modalVisible:true
-    })
-  }
-
-  handleSelectRows = rows => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'disease/setStates',
-      payload: {
-        selectDiseaseRows:rows
-      },
-    });
-  };
-
-  handleSelectRelateRows=rows=>{
-    const { dispatch ,disease:{selectRelateRows}} = this.props;
-    dispatch({
-      type: 'disease/setStates',
-      payload: {
-        selectRelateRows:rows
-      },
-    });
-  };
-
-  handleClose=(removedTag,int)=>{
-    const { dispatch ,disease:{selectDiseaseRows,selectRelateRows}} = this.props;
-    if (int===1) {
-      const tags = selectDiseaseRows.filter(function(disease, index) {
-        return disease.Id!==removedTag.Id;
-      });
-      this.handleSelectRows(tags)
-    }
-     else {
-      const rows = selectRelateRows.filter(function(relate, index) {
-        return relate.Id!==removedTag.Id;
-      });
-
-      this.handleSelectRelateRows(rows)
-    }
-  }
-
-  callback = (key) =>{
-    console.log(key);
-  }
-
   handleMore = () =>{
+    const {dispatch} =this.props;
     this.setState({
       visible: true
+    });
+    dispatch({
+      type: 'addMedical/getSym',
+      payload: {
+        type:'see',
+        key:'',
+        pagesize:10,
+        pageindex:1,
+      },
+      callback:(res)=>{
+        this.setState({
+          fourDiagnoseData:res.rows,
+          total:res.total
+        })
+      }
+    });
+  };
+
+  changeTab = (type) =>{
+    const {dispatch} =this.props;
+    dispatch({
+      type: 'addMedical/getSym',
+      payload: {
+        type:type,
+        pagesize:10,
+        pageindex:1,
+      },
+      callback:(res)=>{
+        this.setState({
+          fourDiagnoseData:res.rows,
+          fourDiagnoseType:type,
+          total:res.total,
+          current:1,
+        })
+      }
+    });
+  };
+
+  renderRow = () =>{
+    const { fourDiagnoseData,data,current,total,fourDiagnoseType } = this.state;
+    const pageChange = (page) => {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'addMedical/getSym',
+        payload: {
+          type:fourDiagnoseType,
+          key:'',
+          pagesize:10,
+          pageindex:page,
+        },
+        callback:(res)=>{
+          this.setState({
+            fourDiagnoseData:res.rows,
+            current:res.pageindex
+          })
+        }
+      });
+    };
+    const addTag = (item) =>{
+      let da =data.slice();
+      da.push(item);
+      this.setState({data:da})
+    };
+    // @ts-ignore
+    return(
+      <List
+        itemLayout="horizontal"
+        size="small"
+        style={{ width: 600 }}
+        pagination={{
+          onChange: (page) => pageChange(page),
+          pageSize: 10,
+          current:current,
+          total:total
+        }}
+        dataSource={fourDiagnoseData}
+        renderItem={item =>(
+          <List.Item actions={[<Button onClick={()=>addTag(item)}>添加</Button>]}>
+            <div style={{ width: 560}}>{item.Name}</div>
+          </List.Item>
+        )}
+      />
+    )
+  };
+
+  renderTag = (data) =>{
+    return data.map(disease=>{
+      return (<Tag key={disease.Id} closable>{disease.Name}</Tag>
+      )
     })
+  };
+
+  //获取base64
+  getBase64 = (img, callback) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
   }
 
- changeTab = (type) =>{
-   const {dispatch} =this.props;
-   const {searchText} =this.state;
-   dispatch({
-     type: 'addMedical/getSym',
-     payload: {
-       type:type,
-       key:'',
-       pagesize:10,
-       pageindex:1,
-     },
-     callback:(res)=>{
-       this.setState({
-         fourDiagnoseData:res,
-         fourDiagnoseType:type
-       })
-     }
-   });
- }
+  beforeUpload = file => {
+    const isJPG = file.type === 'image/jpeg';
+    const isJPEG = file.type === 'image/jpeg';
+    const isGIF = file.type === 'image/gif';
+    const isPNG = file.type === 'image/png';
+    if (!(isJPG || isJPEG || isGIF || isPNG)) {
+      message.error({
+        title: '只能上传JPG 、JPEG 、GIF、 PNG格式的图片~',
+      });
+      return;
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must smaller than 2MB!');
+    }
+    return isJPG && isLt2M;
+  };
 
+  handleChange = (info) => {
+    const { base64 } = this.state;
+    let base = base64;
+    if (info.file.status === 'uploading') {
+      this.setState({ uploading: true });
+      return;
+    }
+    if (info.file.status === 'done') {
+      if (info.fileList.length > 1) {
+        info.fileList.splice(0, 1);
+      }
+      this.getBase64(info.file.originFileObj, imageUrl =>{
+        base.push(imageUrl),
+          this.setState({
+            base64: base,
+            uploading:false,
+            imageUrl:null
+          })
+      });
+    }
+  }
 
-renderRow = () =>{
-    const { fourDiagnoseData,data } = this.state;
-    let da = data;
-
-    return fourDiagnoseData.map(item=>{
-      da = da.push(item)
-      return <Button onClick={() =>this.setState({data : da})}>{item.Name}</Button>
-  })
-}
-  //auto
+  // auto
   renderOption = (item) => {
     return (
-      <Option key={item.Id} text={item.Name}>
-        <span>{item.Name+`\t`+item.PinYin}</span>
+      <Option key={item.Id} text={item.Name} data={item}>
+        <span>{`${item.Name}\t${item.PinYin}`}</span>
       </Option>
     );
   };
@@ -186,7 +251,7 @@ renderRow = () =>{
       },
       callback:(res)=>{
         this.setState({
-          diagnoseData:res,
+          diagnoseData:res.rows,
           searchText:v,
         })
       }
@@ -206,23 +271,28 @@ renderRow = () =>{
       },
       callback:(res)=>{
         this.setState({
-          diagnoseData:res,
+          diagnoseData:res.rows,
           diagnoseType:type
         })
       }
     });
   };
 
-  onSelect = (v) => {
-    console.log(v)
+  onSelect = (key,option) => {
+    const { data } = this.state;
+    let da =data.slice();
+    da.push(option.props.data);
+    this.setState({data:da})
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
-      disAndSyn:{relateSyn,restSyn,restPagination},
-      disease:{diseaseData,dataSource, selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },
-      loading,
+      // disAndSyn:{relateSyn,restSyn,restPagination},
+      disease:{selectDiseaseRows,selectRelateRows,
+        // diseaseData,dataSource,pageSize,current,total,modalVisible
+      },
+      // loading,
     } = this.props;
     const tailFormItemLayout = {
       wrapperCol: {
@@ -236,8 +306,13 @@ renderRow = () =>{
         },
       },
     };
-    const { diagnoseData, data } =this.state;
-    console.log('@data',data)
+    const { diagnoseData, data,imageUrl } =this.state;
+    const uploadButton = (
+      <div>
+        <Icon type={this.state.uploading ? 'loading' : 'plus'} />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
     return (
       <PageHeaderWrapper title="四诊数据采集">
         <Spin spinning={this.state.loading} tip="正在提交">
@@ -250,13 +325,13 @@ renderRow = () =>{
                 className={styles.form}
               >
                 {getFieldDecorator('ZS', {
-                rules: [{
-                  required: true, message: '请输入主诉!',
-                }],
-              })(
+                  rules: [{
+                    required: true, message: '请输入主诉!',
+                  }],
+                })(
 
-                <Input />
-              )}
+                  <Input />
+                )}
               </Form.Item>
               <Form.Item
                 label="现病史"
@@ -265,12 +340,12 @@ renderRow = () =>{
                 className={styles.form}
               >
                 {getFieldDecorator('XBS', {
-                rules: [{
-                  required: true, message: '请输入现病史！',
-                }],
-              })(
-                <Input />
-              )}
+                  rules: [{
+                    required: true, message: '请输入现病史！',
+                  }],
+                })(
+                  <Input />
+                )}
               </Form.Item>
               <Form.Item
                 label="既往史"
@@ -279,12 +354,12 @@ renderRow = () =>{
                 className={styles.form}
               >
                 {getFieldDecorator('JWS', {
-                rules: [{
-                  required: true, message: '请输入既往史!',
-                }],
-              })(
-                <Input />
-              )}
+                  rules: [{
+                    required: true, message: '请输入既往史!',
+                  }],
+                })(
+                  <Input />
+                )}
               </Form.Item>
               <Form.Item
                 label="过敏史"
@@ -293,10 +368,10 @@ renderRow = () =>{
                 className={styles.form}
               >
                 {getFieldDecorator('GMS', {
-                rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
-              })(
-                <Input />
-              )}
+                  rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
+                })(
+                  <Input />
+                )}
               </Form.Item>
               <Form.Item
                 label="体格检查"
@@ -305,10 +380,10 @@ renderRow = () =>{
                 className={styles.form}
               >
                 {getFieldDecorator('TGJC', {
-                rules: [{ required: true, message: '请输入体格检查!' }],
-              })(
-                <Input />
-              )}
+                  rules: [{ required: true, message: '请输入体格检查!' }],
+                })(
+                  <Input />
+                )}
               </Form.Item>
               <Form.Item
                 label="中医诊断"
@@ -321,16 +396,6 @@ renderRow = () =>{
                 {/* })( */}
                 {/* <div> */}
                 <Button onClick={()=>{this.handleDiagnosisAdd()}}>添加诊断</Button>
-                {
-                selectDiseaseRows.map((disease,index)=>{
-                return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}>{disease.Name}</Tag>
-              })
-              }
-                {
-                selectRelateRows.map((relate,index)=>{
-                return <Tag key={relate.Id} closable onClose={() => this.handleClose(relate,2)}>{relate.Name}</Tag>
-              })
-              }
                 {/* </div> */}
                 {/* )} */}
               </Form.Item>
@@ -341,51 +406,89 @@ renderRow = () =>{
                 className={styles.form}
               >
                 {getFieldDecorator('DiagnoseInfo', {
-                 rules: [{ required: true, message: '请输入四诊信息!' }],
-                 })(
-                   <div style={{ display: 'flex' }}>
-                     <div>
-                       <AutoComplete
-                         className="global-search"
-                         size="large"
-                         style={{ width: '100%' }}
-                         dataSource={diagnoseData.map(this.renderOption)}
-                         onSelect={this.onSelect}
-                         onSearch={this.onSearch}
-                         placeholder="input here"
-                         optionLabelProp="text"
-                       >
-                         <Input />
-                       </AutoComplete>
-                       <Radio.Group
-                         onChange={value => { this.onTyChange(value.target.value)}}
-                         defaultValue={'see'}
-                       >
-                         <Radio value={'see'}>望</Radio>
-                         <Radio value={'smell'}>闻</Radio>
-                         <Radio value={'ask'}>问</Radio>
-                         <Radio value={'touch'}>切</Radio>
-                         <Radio value={'other'}>其他</Radio>
-                       </Radio.Group>
-                     </div>
-                     <Button onClick={() => {this.handleMore()}}>更多</Button>
-                     {
-                       data == false ? null :  <Tag >{data.Name}</Tag>
-                     }
-                   </div>
-                 )}
+                  rules: [{message: '请输入四诊信息!' }],
+                })(
+                  <div>
+                    <div style={{ display: 'flex' }}>
+                      <div>
+                        <AutoComplete
+                          className="global-search"
+                          size="large"
+                          style={{ width: '100%' }}
+                          dataSource={diagnoseData.map(this.renderOption)}
+                          onSelect={this.onSelect}
+                          onSearch={this.onSearch}
+                          placeholder="input here"
+                          optionLabelProp="text"
+                        >
+                          <Input />
+                        </AutoComplete>
+                        <Radio.Group
+                          onChange={value => { this.onTyChange(value.target.value)}}
+                          defaultValue="see"
+                        >
+                          <Radio value="see">望</Radio>
+                          <Radio value="smell">闻</Radio>
+                          <Radio value="ask">问</Radio>
+                          <Radio value="touch">切</Radio>
+                          <Radio value="other">其他</Radio>
+                        </Radio.Group>
+                      </div>
+                      <Button onClick={() => {this.handleMore()}} style={{ marginLeft: 5, marginTop: 4 }}>更多</Button>
+                    </div>
+                    {this.renderTag(data)}
+                  </div>
+                )}
               </Form.Item>
-              <Form.Item>
+              <Form.Item
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+              >
                 {this.state.visible ?
-                  <Tabs onChange={this.changeTab} type="card">
-                    <TabPane tab="望" key={'see'}>
-                      {this.renderRow()}
-                    </TabPane>
-                    <TabPane tab="闻" key={'smile'}>Content of Tab Pane 2</TabPane>
-                    <TabPane tab="问" key={'ask'}>Content of Tab Pane 3</TabPane>
-                    <TabPane tab="切" key={'touch'}>Content of Tab Pane 3</TabPane>
-                    <TabPane tab="其他" key={'other'}>Content of Tab Pane 3</TabPane>
-                  </Tabs> : null}
+                  <Row>
+                    <Col span={12} offset={8}>
+                      <Tabs onChange={this.changeTab} type="card" defaultActiveKey="see" style={{ width: 600, alignItems: 'center' }}>
+                        <TabPane tab="望" key="see">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="闻" key="smell">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="问" key="ask">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="切" key="touch">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="其他" key="other">
+                          {this.renderRow()}
+                        </TabPane>
+                      </Tabs>
+                    </Col>
+                  </Row> : null}
+              </Form.Item>
+              <Form.Item
+                label="四诊照片"
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+                className={styles.form}
+              >
+                {getFieldDecorator('SZZP', {
+                  rules: [{ required: true, message: '请输入体格检查!' }],
+                })(
+                  <Upload
+                    name="avatar"
+                    listType="picture-card"
+                    accept=".jpg,.jpeg,.png"
+                    className="avatar-uploader"
+                    showUploadList={true}
+                    action=""
+                    beforeUpload={this.beforeUpload}
+                    onChange={this.handleChange}
+                  >
+                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
+                  </Upload>
+                )}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>
                 <Button type="primary" htmlType="submit" style={{ marginBottom: 20 }}>提交</Button>
