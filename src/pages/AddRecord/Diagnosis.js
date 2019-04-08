@@ -158,9 +158,10 @@ class DiagnosisForm extends PureComponent {
 renderRow = () =>{
     const { fourDiagnoseData,data } = this.state;
     let da = data;
-  console.log('@fourDiagnoseData',fourDiagnoseData)
+
     return fourDiagnoseData.map(item=>{
-      return <Button onClick={() =>this.setState({data : da.push(item)})}>{item.Name}</Button>
+      da = da.push(item)
+      return <Button onClick={() =>this.setState({data : da})}>{item.Name}</Button>
   })
 }
   //auto
