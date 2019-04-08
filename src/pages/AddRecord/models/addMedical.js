@@ -11,7 +11,7 @@ export default {
     },
     *getSym({ payload ,callback}, { call }) {
       const  response = yield call(getSymByType, payload);
-      if (callback && response.Success) callback(response.Data.rows)
+      if (callback && response.Success) callback(response.Data)
     },
   },
 };

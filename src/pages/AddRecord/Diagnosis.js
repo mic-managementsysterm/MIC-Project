@@ -1,45 +1,45 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs,Radio, message, Icon, Row,Tag
+  Form, Input, Spin, Button, AutoComplete, Tabs, Radio, List, Tag, Col
 } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
+import Row from 'antd/es/grid/row';
 import styles from './Diagnosis.less';
-import Respondent from "../Respondent/Respondent";
+
+const {Option} = AutoComplete
 
 const {TabPane} = Tabs;
-const Option = AutoComplete.Option
 
-@connect(({ addMedical,routerParams, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
+@connect(({ addMedical,routerParams,disease,disAndSyn, loading }) => ({
   addMedical,
-  getDisease,
-  getSyndrome,
   disease,
   disAndSyn,
-  loading: loading.models.addMedical && loading.models.getDisease&&loading.models.getSyndrome&&loading.models.disease&&loading.models.disAndSyn,
+  loading: loading.models.addMedical &&loading.models.disease&&loading.models.disAndSyn,
   routerParams,
 }))
 class DiagnosisForm extends PureComponent {
   constructor(props){
-    super(props)
+    super(props);
     this.state={
       loading:false,
-      modalVisible:false,
+      // modalVisible:false,
       selectedRows:[],
       visible:false,
       diagnoseData:[],
       diagnoseType:'see',
       searchText:'',
+      fourDiagnoseData: [],
+      fourDiagnoseType:'see',
+      data: [],
+      current:1,
+      total:0,
     }
   }
 
   componentDidMount() {
     const { dispatch ,disease:{current,pageSize,searchKey}} = this.props;
-    dispatch({
-      type: 'getDisease/getDisease',
-      payload: "",
-    });
     dispatch({
       type: 'disease/queryDisease',
       payload: {
@@ -67,6 +67,7 @@ class DiagnosisForm extends PureComponent {
         upload.GMS = values.GMS;
         upload.TGJC = values.TGJC;
         upload.Diagnose = this.state.selectedRows;
+        upload.Diagnoses = this.state.data;
         this.props.dispatch({
           type: 'addMedical/upload',
           payload:upload,
@@ -86,18 +87,10 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleDiagnosisAdd=()=>{
-    this.setState({
-      modalVisible:true
-    })
-  }
-
-  handleCancel=()=>{
-    this.setState({
-      modalVisible:false
-    })
-    let rows=[]
-    this.handleSelectRows(rows)
-}
+    // this.setState({
+    //   modalVisible:true
+    // })
+  };
 
   handleSelectRows = rows => {
     const { dispatch } = this.props;
@@ -110,7 +103,7 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleSelectRelateRows=rows=>{
-    const { dispatch ,disease:{selectRelateRows}} = this.props;
+    const { dispatch } = this.props;
     dispatch({
       type: 'disease/setStates',
       payload: {
@@ -120,44 +113,128 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleClose=(removedTag,int)=>{
-    const { dispatch ,disease:{selectDiseaseRows,selectRelateRows}} = this.props;
+    const { disease:{selectDiseaseRows,selectRelateRows}} = this.props;
     if (int===1) {
-      const tags = selectDiseaseRows.filter(function(disease, index) {
+      const tags = selectDiseaseRows.filter(function(disease) {
         return disease.Id!==removedTag.Id;
       });
       this.handleSelectRows(tags)
     }
-     else {
-      const rows = selectRelateRows.filter(function(relate, index) {
+    else {
+      const rows = selectRelateRows.filter(function(relate) {
         return relate.Id!==removedTag.Id;
       });
 
       this.handleSelectRelateRows(rows)
     }
-  }
+  };
 
   callback = (key) =>{
     console.log(key);
-  }
+  };
 
-  showModal = () =>{
+  handleMore = () =>{
+    const {dispatch} =this.props;
     this.setState({
       visible: true
-    })
-  }
-
-  handleOk = () => {
-    this.setState({
-      visible: false,
     });
-  }
+    dispatch({
+      type: 'addMedical/getSym',
+      payload: {
+        type:'see',
+        key:'',
+        pagesize:10,
+        pageindex:1,
+      },
+      callback:(res)=>{
+        this.setState({
+          fourDiagnoseData:res.rows,
+          total:res.total
+        })
+      }
+    });
+  };
+
+  changeTab = (type) =>{
+    const {dispatch} =this.props;
+    dispatch({
+      type: 'addMedical/getSym',
+      payload: {
+        type:type,
+        pagesize:10,
+        pageindex:1,
+      },
+      callback:(res)=>{
+        this.setState({
+          fourDiagnoseData:res.rows,
+          fourDiagnoseType:type,
+          total:res.total,
+          current:1,
+        })
+      }
+    });
+  };
 
 
-  //auto
+  renderRow = () =>{
+    const { fourDiagnoseData,data,current,total,fourDiagnoseType } = this.state;
+    const pageChange = (page) => {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'addMedical/getSym',
+        payload: {
+          type:fourDiagnoseType,
+          key:'',
+          pagesize:10,
+          pageindex:page,
+        },
+        callback:(res)=>{
+          this.setState({
+            fourDiagnoseData:res.rows,
+            current:res.pageindex
+          })
+        }
+      });
+    };
+    const addTag = (item) =>{
+      let da =data.slice();
+      da.push(item);
+      this.setState({data:da})
+    };
+    // @ts-ignore
+    return(
+      <List
+        itemLayout="horizontal"
+        size="small"
+        style={{ width: 600 }}
+        pagination={{
+          onChange: (page) => pageChange(page),
+          pageSize: 10,
+          current:current,
+          total:total
+        }}
+        dataSource={fourDiagnoseData}
+        renderItem={item =>(
+          <List.Item actions={[<Button onClick={()=>addTag(item)}>添加</Button>]}>
+            <div style={{ width: 560}}>{item.Name}</div>
+          </List.Item>
+        )}
+      />
+    )
+  };
+
+  renderTag = (data) =>{
+    return data.map(disease=>{
+      return (<Tag key={disease.Id} closable>{disease.Name}</Tag>
+      )
+    })
+  };
+
+  // auto
   renderOption = (item) => {
     return (
-      <Option key={item.Id} text={item.Name}>
-        <span>{item.Name+`\t`+item.PinYin}</span>
+      <Option key={item.Id} text={item.Name} data={item}>
+        <span>{`${item.Name}\t${item.PinYin}`}</span>
       </Option>
     );
   };
@@ -170,12 +247,12 @@ class DiagnosisForm extends PureComponent {
       payload: {
         type:diagnoseType,
         key:v,
-        pagesize:100,
+        pagesize:10,
         pageindex:1,
       },
       callback:(res)=>{
         this.setState({
-          diagnoseData:res,
+          diagnoseData:res.rows,
           searchText:v,
         })
       }
@@ -190,29 +267,34 @@ class DiagnosisForm extends PureComponent {
       payload: {
         type:type,
         key:searchText,
-        pagesize:100,
+        pagesize:10,
         pageindex:1,
       },
       callback:(res)=>{
         this.setState({
-          diagnoseData:res,
+          diagnoseData:res.rows,
           diagnoseType:type
         })
       }
     });
   };
 
-  onSelect = (v) => {
-    console.log(v)
+  onSelect = (key,option) => {
+    // console.log(key,option);
+    const { data } = this.state;
+    let da =data.slice();
+    da.push(option.props.data);
+    this.setState({data:da})
   };
-
 
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
-      disAndSyn:{relateSyn,restSyn,restPagination},
-      disease:{diseaseData,dataSource, selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },
-      loading,
+      // disAndSyn:{relateSyn,restSyn,restPagination},
+      disease:{selectDiseaseRows,selectRelateRows,
+        // diseaseData,dataSource,pageSize,current,total,modalVisible
+      },
+      // loading,
     } = this.props;
     const tailFormItemLayout = {
       wrapperCol: {
@@ -226,9 +308,7 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const { diagnoseData } =this.state;
-
-
+    const { diagnoseData, data } =this.state;
     return (
       <PageHeaderWrapper title="四诊数据采集">
         <Spin spinning={this.state.loading} tip="正在提交">
@@ -241,13 +321,13 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('ZS', {
-                rules: [{
-                  required: true, message: '请输入主诉!',
-                }],
-              })(
+                  rules: [{
+                    required: true, message: '请输入主诉!',
+                  }],
+                })(
 
                   <Input />
-              )}
+                )}
               </Form.Item>
               <Form.Item
                 label="现病史"
@@ -256,12 +336,12 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('XBS', {
-                rules: [{
-                  required: true, message: '请输入现病史！',
-                }],
-              })(
+                  rules: [{
+                    required: true, message: '请输入现病史！',
+                  }],
+                })(
                   <Input />
-              )}
+                )}
               </Form.Item>
               <Form.Item
                 label="既往史"
@@ -270,12 +350,12 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('JWS', {
-                rules: [{
-                  required: true, message: '请输入既往史!',
-                }],
-              })(
+                  rules: [{
+                    required: true, message: '请输入既往史!',
+                  }],
+                })(
                   <Input />
-              )}
+                )}
               </Form.Item>
               <Form.Item
                 label="过敏史"
@@ -284,10 +364,10 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('GMS', {
-                rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
-              })(
+                  rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
+                })(
                   <Input />
-              )}
+                )}
               </Form.Item>
               <Form.Item
                 label="体格检查"
@@ -296,10 +376,10 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('TGJC', {
-                rules: [{ required: true, message: '请输入体格检查!' }],
-              })(
+                  rules: [{ required: true, message: '请输入体格检查!' }],
+                })(
                   <Input />
-              )}
+                )}
               </Form.Item>
               <Form.Item
                 label="中医诊断"
@@ -313,15 +393,15 @@ class DiagnosisForm extends PureComponent {
                 {/* <div> */}
                 <Button onClick={()=>{this.handleDiagnosisAdd()}}>添加诊断</Button>
                 {
-                selectDiseaseRows.map((disease,index)=>{
-                return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}>{disease.Name}</Tag>
-              })
-              }
+                  selectDiseaseRows.map((disease)=>{
+                  return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}>{disease.Name}</Tag>
+                })
+                }
                 {
-                selectRelateRows.map((relate,index)=>{
-                return <Tag key={relate.Id} closable onClose={() => this.handleClose(relate,2)}>{relate.Name}</Tag>
-              })
-              }
+                  selectRelateRows.map((relate)=>{
+                  return <Tag key={relate.Id} closable onClose={() => this.handleClose(relate,2)}>{relate.Name}</Tag>
+                })
+                }
                 {/* </div> */}
                 {/* )} */}
               </Form.Item>
@@ -332,49 +412,66 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('DiagnoseInfo', {
-                 rules: [{ required: true, message: '请输入四诊信息!' }],
-                 })(
-                   <div style={{}}>
-                     <Radio.Group
-                       onChange={value => { this.onTyChange(value.target.value)}}
-                       defaultValue={'see'}
-                     >
-                       <Radio value={'see'}>望</Radio>
-                       <Radio value={'smell'}>闻</Radio>
-                       <Radio value={'ask'}>问</Radio>
-                       <Radio value={'touch'}>切</Radio>
-                       <Radio value={'other'}>其他</Radio>
-                     </Radio.Group>
-                     <AutoComplete
-                       className="global-search"
-                       size="large"
-                       style={{ width: '100%' }}
-                       dataSource={diagnoseData.map(this.renderOption)}
-                       onSelect={this.onSelect}
-                       onSearch={this.onSearch}
-                       placeholder="input here"
-                       optionLabelProp="text"
-                     >
-                       <Input />
-                     </AutoComplete>
-                     <Button onClick={() => {this.showModal()}}>更多</Button>
-                   </div>
-                 )}
+                  rules: [{ required: true, message: '请输入四诊信息!' }],
+                })(
+                  <div>
+                    <div style={{ display: 'flex' }}>
+                      <div>
+                        <AutoComplete
+                          className="global-search"
+                          size="large"
+                          style={{ width: '100%' }}
+                          dataSource={diagnoseData.map(this.renderOption)}
+                          onSelect={this.onSelect}
+                          onSearch={this.onSearch}
+                          placeholder="input here"
+                          optionLabelProp="text"
+                        >
+                          <Input />
+                        </AutoComplete>
+                        <Radio.Group
+                          onChange={value => { this.onTyChange(value.target.value)}}
+                          defaultValue="see"
+                        >
+                          <Radio value="see">望</Radio>
+                          <Radio value="smell">闻</Radio>
+                          <Radio value="ask">问</Radio>
+                          <Radio value="touch">切</Radio>
+                          <Radio value="other">其他</Radio>
+                        </Radio.Group>
+                      </div>
+                      <Button onClick={() => {this.handleMore()}}>更多</Button>
+                    </div>
+                    {this.renderTag(data)}
+                  </div>
+                )}
               </Form.Item>
-              <Form.Item>
-                <Modal
-                  title="四诊信息"
-                  visible={this.state.visible}
-                  onOk={this.handleOk}
-                  onCancel={this.handleCancel}
-                >
-                  <Tabs onChange={this.callback} type="card">
-                    <TabPane tab="望" key="1">Content of Tab Pane 1</TabPane>
-                    <TabPane tab="闻" key="2">Content of Tab Pane 2</TabPane>
-                    <TabPane tab="问" key="3">Content of Tab Pane 3</TabPane>
-                    <TabPane tab="切" key="4">Content of Tab Pane 3</TabPane>
-                  </Tabs>
-                </Modal>
+              <Form.Item
+                labelCol={{ span: 5 }}
+                wrapperCol={{ span: 15 }}
+              >
+                {this.state.visible ?
+                  <Row>
+                    <Col span={12} offset={8}>
+                      <Tabs onChange={this.changeTab} type="card" defaultActiveKey="see" style={{ width: 600, alignItems: 'center' }}>
+                        <TabPane tab="望" key="see">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="闻" key="smell">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="问" key="ask">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="切" key="touch">
+                          {this.renderRow()}
+                        </TabPane>
+                        <TabPane tab="其他" key="other">
+                          {this.renderRow()}
+                        </TabPane>
+                      </Tabs>
+                    </Col>
+                  </Row> : null}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>
                 <Button type="primary" htmlType="submit" style={{ marginBottom: 20 }}>提交</Button>
