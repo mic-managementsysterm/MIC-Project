@@ -456,17 +456,32 @@ class DiagnosisForm extends PureComponent {
   };
 
   select=(value,option)=>{
-    const { disease:{DSNoData} } = this.props;
+    const { disease:{DSNoData}, dispatch} = this.props;
     if (DSNoData.length===0){
       this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+      dispatch({
+        type: 'disease/setStates',
+        payload: {
+          value:''
+        },
+      });
     } else {
+      let flag = false;
       DSNoData.map((d)=>{
         if (d.Id === option.props.text) {
-          message.error('请勿重复选择')
-        }else {
-          this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+          message.error('请勿重复选择');
+          flag = true;
         }
-      })
+      });
+      if(!flag){
+        this.handleSelectRows([{Name:value,Id:option.props.text}],0);
+        dispatch({
+          type: 'disease/setStates',
+          payload: {
+            value:''
+          },
+        });
+      }
     }
   };
 
@@ -477,6 +492,7 @@ class DiagnosisForm extends PureComponent {
           type: 'disease/setStates',
           payload: {
             searchKey:key,
+            value:value,
           },callback:()=>{
              dispatch({
                type: 'disease/queryDisAndSyn',
