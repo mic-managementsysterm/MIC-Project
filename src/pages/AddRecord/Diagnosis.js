@@ -51,6 +51,26 @@ class DiagnosisForm extends PureComponent {
     });
   }
 
+  format = () => {
+    const {data,base64} =this.state;
+    let medicalSymtoms = [];
+    let medicalImages = [];
+    data.map((value,index)=>{
+      medicalSymtoms.push({
+        Order:index,
+        SymptomId:value.Id,
+        SymptomName:value.Name,
+        SymptomLevel:1,
+      })
+    });
+    base64.map((value)=>{
+      medicalImages.push({
+        Img:value
+      })
+    });
+    return {medicalSymtoms,medicalImages}
+  };
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.setState({
@@ -59,15 +79,16 @@ class DiagnosisForm extends PureComponent {
     let upload = {};
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        let formatParams = this.format();
         upload.RespondentId = this.props.routerParams.Respondent.Id;
         upload.ZS = values.ZS;
         upload.XBS = values.XBS;
         upload.JWS = values.JWS;
         upload.GMS = values.GMS;
         upload.TGJC = values.TGJC;
-        upload.Diagnose = this.state.selectedRows;
-        upload.Diagnoses = this.state.data;
-        upload.MedicalImgs = this.state.base10Value;
+        // upload.Diagnose = this.state.selectedRows;
+        upload.Symptoms = formatParams.medicalImages;
+        upload.MedicalImgs = formatParams.medicalImages;
         this.props.dispatch({
           type: 'addMedical/upload',
           payload:upload,
@@ -87,6 +108,7 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleMore = () =>{
+    const { fourDiagnoseData } = this.state
     const {dispatch} =this.props;
     this.setState({
       visible: true
@@ -153,7 +175,6 @@ class DiagnosisForm extends PureComponent {
       da.push(item);
       this.setState({data:da})
     };
-    // @ts-ignore
     return(
       <List
         itemLayout="horizontal"
@@ -395,7 +416,7 @@ class DiagnosisForm extends PureComponent {
                 {/* rules: [{ required: true, message: '请输入中医诊断!' }], */}
                 {/* })( */}
                 {/* <div> */}
-                <Button onClick={()=>{this.handleDiagnosisAdd()}}>添加诊断</Button>
+                <Button>添加诊断</Button>
                 {/* </div> */}
                 {/* )} */}
               </Form.Item>

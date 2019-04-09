@@ -62,7 +62,7 @@ class FourDagnostic extends Component {
                 : null}
             </Description>
             <Description term="四诊照片" className={styles.term}>
-              {/* { diagnosisData.MedicalImgs == false ? null : <img src={`http://210.41.215.16:5010${diagnosisData.MedicalImgs[0].Url}`} className={styles.img} />} */}
+               { diagnosisData.MedicalImgs && diagnosisData.MedicalImgs[0] && <img src={`http://localhost:5010${diagnosisData.MedicalImgs[0].Img}`} className={styles.img} />}
             </Description>
           </DescriptionDetail>
         </Card>
