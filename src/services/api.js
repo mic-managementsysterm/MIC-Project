@@ -46,6 +46,10 @@ export async function changePwd(params) {
 export async function queryDisease(params) {
   return request(`/Api/disease/get/find?${stringify(params)}`);
 }
+//疾病或 症状
+export async function queryDisAndSyn(params) {
+  return request(`/Api/disease/get/findInDisAndSyn?${stringify(params)}`);
+}
 
 export async function addDisease(params) {
   return request(`/Api/disease/change/add`,{
