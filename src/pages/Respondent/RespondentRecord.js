@@ -63,7 +63,7 @@ class RespondentRecord extends PureComponent {
       list: { records },
       loading,
     } = this.props;
-    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.routerParams.Respondent;
+    const { Name, Gender, Phone, Born,Address,Hobby } = this.props.routerParams.Respondent;
     return (
       <PageHeaderWrapper title="患者详情">
         <Card>
@@ -73,7 +73,7 @@ class RespondentRecord extends PureComponent {
           <Description term="联系电话">{Phone}</Description>
           <Description term="出生日期">{Born}</Description>
           <Description term="家庭地址">{Address}</Description>
-          <Description term="创建时间">{CreatedAt}</Description>
+          <Description term="兴趣爱好">{Hobby}</Description>
         </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
         <div className={styles.cardList}>
