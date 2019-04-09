@@ -1,15 +1,18 @@
-import { queryDisease, addDisease, removeDisease, updateDisease} from '@/services/api';
+import { queryDisease, addDisease, removeDisease, updateDisease,queryDisAndSyn} from '@/services/api';
 
 export default {
   namespace: 'disease',
 
   state: {
     dataSource:[],
+    DSdata:[],
+    DSNoData:[],
+    selectedId:null,
     current:1,
     pageSize:10,
     total:0,
     searchKey:'',
-
+    value:'',
     diseaseData:[],
     modalVisible: false,
     relateModalVisible: false,
@@ -26,7 +29,7 @@ export default {
   },
 
   effects: {
-    *queryDisease({ payload }, { call, put }) {
+    *queryDisease({ payload,callback }, { call, put }) {
       const response = yield call(queryDisease, payload);
       if(response.Success){
         yield put({
@@ -39,6 +42,23 @@ export default {
             searchKey:payload.key
           },
         });
+        if (callback) callback();
+      }
+    },
+    *queryDisAndSyn({ payload,callback }, { call, put }) {
+      const response = yield call(queryDisAndSyn, payload);
+      if(response.Success){
+        yield put({
+          type: 'set',
+          payload: {
+            DSdata:response.Data.rows,
+            current:response.Data.pageindex,
+            pageSize:response.Data.pagesize,
+            total:response.Data.total,
+            searchKey:payload.key
+          },
+        });
+        if (callback) callback();
       }
     },
     *addDisease({ payload, callback }, { call }) {
