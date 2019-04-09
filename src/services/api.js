@@ -281,6 +281,10 @@ export async function uploadMedical(params) {
   });
 }
 
+export async function getSymByType(params) {
+  return request(`/Api/symptom/get/findWithType?${stringify(params)}`);
+}
+
 export async function deleteMedical(params) {
   return request(`/Api/medicalrecord/delete/delete`,{
     method: 'POST',
