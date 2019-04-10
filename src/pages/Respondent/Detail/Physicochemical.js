@@ -25,7 +25,7 @@ class Physicochemical  extends Component {
   render() {
     const { detail = {}, loading } = this.props;
     const { physicochemicalData = {} } = detail;
-    const { Name, Gender, Phone, Born,Address,CreatedAt } = this.props.routerParams.Respondent;
+    const { Name, Gender, Phone, Born,Address,Hobby } = this.props.routerParams.Respondent;
     return (
       <PageHeaderWrapper title="记录详情页" loading={loading}>
         <Card bordered={false}>
@@ -35,7 +35,7 @@ class Physicochemical  extends Component {
             <Description term="联系电话">{Phone}</Description>
             <Description term="出生日期">{Born}</Description>
             <Description term="家庭地址">{Address}</Description>
-            <Description term="创建时间">{CreatedAt}</Description>
+            <Description term="兴趣爱好">{Hobby}</Description>
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
           <h1>{physicochemicalData&&physicochemicalData.GaugeRecord ? physicochemicalData.GaugeRecord.GaugeName : null}检查详情</h1>
