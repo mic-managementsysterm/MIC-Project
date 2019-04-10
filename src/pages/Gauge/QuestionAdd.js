@@ -175,7 +175,6 @@ class questionAdd extends React.Component {
     });
   }
 
-
   handleQuestionChange(e, questionIndex,int) {
     let { questions } = this.state;
     if (int===1) {
@@ -216,8 +215,6 @@ class questionAdd extends React.Component {
       questions: questions
     });
   }
-
-
 
   handleDatePick(date, dateString) {
     const {questions}=this.state
@@ -304,7 +301,6 @@ class questionAdd extends React.Component {
     );
   }
 
-
   getQuestions() {
     let questions = this.state.questions;
     const { TextArea } = Input;
@@ -381,7 +377,6 @@ class questionAdd extends React.Component {
     })
   }
 
-
   getQuestionOperator(questionIndex, array) {
     return (
       <div>
@@ -405,7 +400,6 @@ class questionAdd extends React.Component {
 
   getFooter() {
     const disabledDate = (current) => current && current.valueOf() < Date.now();
-
     return (
       <div style={{ padding: 20 }}>
         <div style={{ float: 'left' }}>
@@ -420,6 +414,7 @@ class questionAdd extends React.Component {
       </div>
     );
   }
+
   onChangeTotalInt=(value)=>{
     const {questions}=this.state
     questions.TotalScore=value;
@@ -427,6 +422,7 @@ class questionAdd extends React.Component {
       questions:questions
     })
   }
+
   onChangePassInt=(value)=>{
     const {questions}=this.state
     questions.PassScore=value;
@@ -434,6 +430,7 @@ class questionAdd extends React.Component {
       questions:questions
     })
   }
+
   render() {
     const {question:{showLoading}}=this.props
     return (

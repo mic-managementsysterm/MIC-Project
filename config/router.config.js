@@ -63,6 +63,31 @@ export default [
           },
         ],
       },
+      //理化单管理
+      {
+        path: '/phy',
+        icon: 'form',
+        name: 'phy',
+        routes: [
+          {
+            path: '/phy/phy-list',
+            name: 'phy',
+            component: './Phy/Phy',
+          },
+          {
+            path: '/phy/phy-list/phyAdd-list',
+            hideInMenu:true,
+            name: 'phyAdd',
+            component: './Phy/PhyAdd',
+          },
+          {
+            path: '/phy/phy-list/phyEdit-list',
+            hideInMenu:true,
+            name: 'phyEdit',
+            component: './Phy/PhyEdit',
+          },
+        ],
+      },
       //受访者管理
       {
         path: '/respondent',

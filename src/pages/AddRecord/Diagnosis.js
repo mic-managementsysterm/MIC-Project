@@ -223,9 +223,9 @@ class DiagnosisForm extends PureComponent {
 
   beforeUpload = file => {
     const isJPG = file.type === 'image/jpeg';
-    if (!isJPG) {
+    if (!(isJPG || isJPEG || isGIF || isPNG)) {
       message.error({
-        title: '只能上传JPG格式的图片~',
+        title: '只能上传JPG 、JPEG 、GIF、 PNG格式的图片~',
       });
       return;
     }
@@ -249,6 +249,7 @@ class DiagnosisForm extends PureComponent {
       }
       this.getBase64(info.file.originFileObj, imageUrl =>{
         base.push(imageUrl);
+        console.log("base",base)
         this.setState({
           base64: base,
           uploading:false,
@@ -675,7 +676,7 @@ class DiagnosisForm extends PureComponent {
                           dataSource={diagnoseData.map(this.renderOption)}
                           onSelect={this.onSelect}
                           onSearch={this.onSearch}
-                          placeholder="请输入疾病中文名、者证型中文名、疾病首字母或证型首字母"
+                          placeholder="请输入疾病中文名、证型中文名、疾病首字母或证型首字母"
                           optionLabelProp="text"
                         >
                           <Input />

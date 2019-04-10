@@ -89,7 +89,7 @@ componentWillMount(){
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
               <Link to={'/gauge/question-list/questionAdd-list'}>
-                <Button className={styles.btn2} style={{marginBottom:5,}} >添加</Button>
+                <Button className={styles.btn2} style={{marginBottom:5}} >添加</Button>
               </Link>
               </div>
                 <Table rowKey='Id' style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={questions}> </Table>
