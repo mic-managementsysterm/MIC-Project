@@ -73,7 +73,7 @@ componentWillMount(){
             (   <div className={styles.operation}>
           <Link to={{
             pathname:'/gauge/question-list/questionEdit-list',
-            state:{Id:record.Id}
+            state:{Id:record.Id,info:1}
           }}>
           <Button className={styles.btn}>编辑</Button>
           </Link>
@@ -87,7 +87,7 @@ componentWillMount(){
           <PageHeaderWrapper title="量表管理" loading={loading}>
             <div >
               <div style={{display:'flex',flexDirection:'row-reverse'}}>
-              <Link to={'/gauge/question-list/questionAdd-list'}>
+              <Link to={{pathname:'/gauge/question-list/questionEdit-list',state:{info:0}}}>
                 <Button className={styles.btn2} style={{marginBottom:5,}} >添加</Button>
               </Link>
               </div>
