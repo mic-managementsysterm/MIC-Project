@@ -745,7 +745,7 @@ class DiagnosisForm extends PureComponent {
                     showUploadList
                     action=""
                     beforeUpload={this.beforeUpload}
-                    onChange= {this.handleChange}
+                    onChange={this.handleChange}
                   >
                     {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
                   </Upload>
