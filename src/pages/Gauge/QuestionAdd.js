@@ -1,8 +1,8 @@
 import React from 'react';
-import {Spin , DatePicker, Button, Input, Icon,InputNumber,Upload ,Row,message } from 'antd';
+import {Spin , DatePicker, Button, Input, Checkbox, Icon,InputNumber,Upload ,Row,message } from 'antd';
+import { UploadChangeParam } from 'antd/lib/upload/interface';
 import router from 'umi/router';
 import { connect } from 'dva';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 const list=[]
 const fileList=[]
 
@@ -23,9 +23,7 @@ class questionAdd extends React.Component {
     this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
     this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
-    this.handleDatePick = this.handleDatePick.bind(this);
     this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
-    this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
     this.beforeUpload=this.beforeUpload.bind(this);
     this.checkImageWH=this.checkImageWH.bind(this)
     this.state = {
@@ -34,32 +32,26 @@ class questionAdd extends React.Component {
       questions:{
         Id:         null,
         Name:       '这里是标题',
-        TotalScore: null,
-        PassScore:  null,
+        TotalScore: 1,
+        PassScore:  1,
         Topics:     [
           {
             Id:              null,
             QuestionnaireId: null,
-            Title:           null,
+            Title:           '类型一（加分/不加分）',
             Image :          null,
             Order:           null,
             GroupName:       null,
             TotalScore:      null,
-            Type:            null,
+            Type:            0,
             // CreatedAt:       null /* 2018-07-23 10:04:30 */
           }
         ],
         // CreatedAt:  null,
       }
       ,
-      date:null,
-      title:'这里是标题',
+      defaultGroupName:null,
       fileList:[],
-      props : {
-        action: '//jsonplaceholder.typicode.com/posts/',
-        listType: 'picture',
-        defaultFileList: [...fileList],
-      },
       indexCurrent:null,
       loading1:false,
       loading2:false,
@@ -101,9 +93,13 @@ class questionAdd extends React.Component {
       Order:null,
       GroupName:'',
       TotalScore:null,
-      Title: '类型一',
-      CreatedAt:'',
+      Title: '类型一（加分/不加分）',
     };
+    if (this.state.defaultGroupName){
+      newQuestion.GroupName=this.state.defaultGroupName
+    }else {
+
+    }
     this.state.questions.Topics.push(newQuestion)
     this.setState( {
       questions: this.state.questions,
@@ -165,9 +161,13 @@ class questionAdd extends React.Component {
       GroupName:'',
       Type: 1,
       TotalScore:null,
-      Title: '类型二',
-      CreatedAt:'',
+      Title: '类型二（按步加分）',
     };
+    if (this.state.defaultGroupName){
+      newQuestion.GroupName=this.state.defaultGroupName
+    }else {
+
+    }
     this.state.questions.Topics.push(newQuestion)
     this.setState({
       questions: this.state.questions,
@@ -186,6 +186,7 @@ class questionAdd extends React.Component {
     }else {
       questions.Topics[questionIndex].GroupName = e.target.value;
       this.setState({
+        defaultGroupName:e.target.value,
         questions: questions
       });
     }
@@ -218,16 +219,8 @@ class questionAdd extends React.Component {
   }
 
 
-
-  handleDatePick(date, dateString) {
-    const {questions}=this.state
-    questions.CreatedAt=dateString
-    this.setState({
-      questions:questions
-    })
-  }
-
   handleSaveQuestionnaire(body) {
+
     this.setState({
       showLoading:true
     })
@@ -236,40 +229,24 @@ class questionAdd extends React.Component {
     dispatch({
         type:'question/changeQuestion',
         payload: {body},callback:()=>{
-          this.setState({
-            showLoading:false
-          })
-          router.push('/gauge/question-list')
+        const {question:{res}}=this.props
+          if (res.Success) {
+            this.setState({
+              showLoading:false
+            })
+            router.push('/gauge/question-list')
+            message.success('保存成功')
+          }else{
+            this.setState({
+              showLoading:false
+            })
+            message.error(res.Message)
+          }
         }
       }
     )
   }
 
-  handleReleaseQuestionnaire() {
-    let me = this;
-
-    if (this.state.questions.length === 0) {
-      message.warning({
-        title: '请添加至少一个问题'
-      });
-    } else if (this.state.date === '') {
-      message.warning({
-        title: '请选择截止日期'
-      });
-    } else {
-      message.confirm({
-        title: '确定发布问卷吗？',
-        content: '截止日期为 ' + this.state.date,
-        onOk() {
-          const index = me.state.index;
-          list[index] = Object.assign({}, {...me.state, stage: '发布中'});
-          localStorage.list = JSON.stringify(list);
-          window.location.reload();
-          me.props.history.push('/');
-        }
-      });
-    }
-  }
 
   onChangeInt=(value,quesIndex)=>{
     let { questions } = this.state;
@@ -340,10 +317,12 @@ class questionAdd extends React.Component {
       if (question.Type === 0||1) {
         return (
           <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
+            <div >
+            <span>题目类型</span>
+            <Input value={question.GroupName} style={{ borderStyle: 'none', width: '90%', marginLeft: 3,marginBottom: 10}} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
+            </div>
             <span>Q{questionIndex + 1}</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
-            <span>题目类型</span>
-            <Input value={question.GroupName} style={{ borderStyle: 'none', width: '50%', marginLeft: 3,marginTop:10 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
             <Row style={{float:'right'}}>
               <span >总分：</span>
               <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
@@ -408,11 +387,11 @@ class questionAdd extends React.Component {
 
     return (
       <div style={{ padding: 20 }}>
-        <div style={{ float: 'left' }}>
-          <span>问卷截止日期：</span>
-          <DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />
-          <span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>
-        </div>
+        {/*<div style={{ float: 'left' }}>*/}
+          {/*<span>问卷截止日期：</span>*/}
+          {/*<DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />*/}
+          {/*<span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>*/}
+        {/*</div>*/}
         <div style={{ float: 'right' }}>
           <Button onClick={()=>this.handleSaveQuestionnaire(this.state.questions)}>保存问卷</Button>
           {/*<Button type="primary" style={{ marginLeft: 16 }} onClick={this.handleReleaseQuestionnaire}>发布问卷</Button>*/}
@@ -437,7 +416,6 @@ class questionAdd extends React.Component {
   render() {
     const {question:{showLoading}}=this.props
     return (
-      <PageHeaderWrapper title="新增问卷" >
       <Spin spinning={this.state.showLoading} tip={'正在保存'}>
         <div>
           {this.getTitle()}
@@ -459,7 +437,6 @@ class questionAdd extends React.Component {
           {this.getFooter()}
         </div>
       </Spin>
-      </PageHeaderWrapper>
     );
   }
 }
