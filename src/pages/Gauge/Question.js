@@ -77,13 +77,12 @@ componentWillMount(){
           }}>
           <Button className={styles.btn}>编辑</Button>
           </Link>
-          <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>
+          <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.Id)}>
           <Button>删除</Button>
           </Popconfirm>
           </div>
           ) : null)
-        }
-        ]
+        }]
         return(
           <PageHeaderWrapper title="量表管理" loading={loading}>
             <div >

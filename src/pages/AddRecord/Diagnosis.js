@@ -347,11 +347,13 @@ class DiagnosisForm extends PureComponent {
     if (int===0) {
       const row=rows.map(i=>{return{...i}})
       const row2=rows.map(i=>{return{...i}});
+      const row3=selectDiseaseRows.concat(row).map(i=>{return{...i}});
+      const row4=DSNoData.concat(row2).map(i=>{return{...i}});
       dispatch({
         type: 'disease/setStates',
         payload:{
-          selectDiseaseRows:selectDiseaseRows.length===0?row:selectDiseaseRows.concat(row),
-          DSNoData:DSNoData.length===0?row2:DSNoData.concat(row2)
+          selectDiseaseRows:selectDiseaseRows.length===0?row:row3,
+          DSNoData:DSNoData.length===0?row2:row4
         },
       });
       console.log('@loop3',DSNoData)
