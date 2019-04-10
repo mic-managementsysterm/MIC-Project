@@ -354,6 +354,7 @@ class DiagnosisForm extends PureComponent {
           DSNoData:DSNoData.length===0?row2:DSNoData.concat(row2)
         },
       });
+      console.log('@loop3',DSNoData)
     }else {
       dispatch({
         type: 'disease/setStates',
@@ -363,6 +364,7 @@ class DiagnosisForm extends PureComponent {
         },
       });
     }
+    console.log('@loop4',DSNoData)
   };
 
   handleSelectRelateRows=rows=>{
@@ -460,7 +462,7 @@ class DiagnosisForm extends PureComponent {
   }
 
   select=(value,option)=>{
-    const { dispatch, form,disease:{pageSize,DSdata,searchKey,DSNoData} } = this.props;
+    const { dispatch, form,disease:{pageSize,DSdata,searchKey,DSNoData,selectDiseaseRows} } = this.props;
     const key=value
     if (DSNoData.length===0){
       this.handleSelectRows([{Name:value,Id:option.props.text}],0)
@@ -468,7 +470,10 @@ class DiagnosisForm extends PureComponent {
       DSNoData.map((d,index)=>{
         if (d.Id==option.props.text) {
           message.error('请勿重复选择')
+          console.log('@loop',index)
         }else {
+          console.log('@loop1',index)
+          const row=[{Name:value,Id:option.props.text}]
           this.handleSelectRows([{Name:value,Id:option.props.text}],0)
         }
       })
