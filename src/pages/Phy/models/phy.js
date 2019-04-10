@@ -1,10 +1,30 @@
-import { getAllGauge, deletePhy } from '@/services/api';
+import { getAllGauge, getPhy,changePhy, deletePhy } from '@/services/api';
 
 export default {
   namespace: 'phy',
 
   state: {
     phys: [],
+    phy:{
+      Id:         null,
+      Name:       null,
+      Topics:     [
+        {
+          Id:         null,
+          GaugeId:    null,
+          GroupName:  null,
+          GroupOrder: null,
+          Title:      null,
+          Order:      null,
+          Type:       null,
+          CreatedAt:       null
+        }
+      ],
+      CreatedAt:  null,
+    },
+    Id:'',
+    res:null,
+    showLoading:true,
   },
   effects: {
     *getAllPhy({ payload }, { call, put }) {
@@ -17,6 +37,20 @@ export default {
       });
       if (callback) callback()
     },
+    *getPhy({ payload, callback }, { call, put }) {
+      const response = yield call(getPhy, payload);
+      yield put({
+        type: 'show',
+        payload: {
+          phy: response.Data
+        }
+      });
+      if (callback) callback()
+    },
+    *changePhy({payload,callback},{call,put}){
+      yield call(changePhy,payload);
+      if (callback) callback()
+    },
     *deletePhy({payload,callback},{call,put}){
       yield call(deletePhy,payload)
       if (callback) callback()
@@ -27,6 +61,12 @@ export default {
       return {
         ...state,
         ...action.payload,
+      };
+    },
+    change(state, payload) {
+      return {
+        ...state,
+        status:payload.status,
       };
     },
   }

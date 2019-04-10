@@ -365,6 +365,20 @@ export async function getAllGauge() {
   return request( `/Api/gaugetable/get/lib`);
 }
 
+export async function getPhy(Id) {
+  return request(`/Api/gaugetable/get/getById?${stringify(Id)}`)
+}
+
+export async function changePhy(params) {
+  return request(`/Api/gaugetable/change/add`, {
+    method: 'POST',
+    body: { ...params.body },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  });
+}
+
 export async function deletePhy(params) {
   return request(`/Api/gaugetable/delete/byId`,{
     method: 'POST',
