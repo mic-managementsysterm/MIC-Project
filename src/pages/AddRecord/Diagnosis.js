@@ -225,12 +225,9 @@ class DiagnosisForm extends PureComponent {
 
   beforeUpload = file => {
     const isJPG = file.type === 'image/jpeg';
-    const isJPEG = file.type === 'image/jpeg';
-    const isGIF = file.type === 'image/gif';
-    const isPNG = file.type === 'image/png';
-    if (!(isJPG || isJPEG || isGIF || isPNG)) {
+    if (!isJPG) {
       message.error({
-        title: '只能上传JPG 、JPEG 、GIF、 PNG格式的图片~',
+        title: '只能上传JPG格式的图片~',
       });
       return;
     }
@@ -249,7 +246,7 @@ class DiagnosisForm extends PureComponent {
       return;
     }
     if (info.file.status === 'done') {
-      if (info.fileList.length > 1) {
+      if (info.fileList.length > 3) {
         info.fileList.splice(0, 1);
       }
       this.getBase64(info.file.originFileObj, imageUrl =>{
@@ -407,7 +404,6 @@ class DiagnosisForm extends PureComponent {
    let rows=[]
    this.handleSelectRelateRows(rows)
   };
-
 
   handleRelateOk=()=>{
     const { dispatch ,disease:{selectRelateRows,selectDiseaseRows,selectedId,DSNoData}} = this.props;
@@ -683,7 +679,7 @@ class DiagnosisForm extends PureComponent {
                           dataSource={diagnoseData.map(this.renderOption)}
                           onSelect={this.onSelect}
                           onSearch={this.onSearch}
-                          placeholder="input here"
+                          placeholder="请输入疾病中文名、者证型中文名、疾病首字母或证型首字母"
                           optionLabelProp="text"
                         >
                           <Input />
@@ -739,7 +735,7 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('SZZP', {
-                  rules: [{ required: true, message: '请输入体格检查!' }],
+                  rules: [{ required: true, message: '请选择四诊照片!' }],
                 })(
                   <Upload
                     name="avatar"
@@ -749,7 +745,7 @@ class DiagnosisForm extends PureComponent {
                     showUploadList
                     action=""
                     beforeUpload={this.beforeUpload}
-                    onChange={this.handleChange}
+                    onChange= {this.handleChange}
                   >
                     {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
                   </Upload>
