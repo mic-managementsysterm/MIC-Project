@@ -6,10 +6,9 @@ import { connect } from 'dva';
 const { TabPane }=Tabs;
 const { Option }=Select;
 
-
-
-@connect(({question,loading})=>({
-  question,
+@connect(({phy,routerParams, loading})=>({
+  phy,
+  routerParams,
   loading:loading.models.loading
 }))
 class questionAdd extends React.Component {
@@ -19,7 +18,6 @@ class questionAdd extends React.Component {
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleTitleBlur = this.handleTitleBlur.bind(this);
     this.getTitle = this.getTitle.bind(this);
-    this.handleAddArea = this.handleAddArea.bind(this);
 
     this.handleAddTopic = this.handleAddTopic.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
@@ -36,7 +34,6 @@ class questionAdd extends React.Component {
     this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
     this.state = {
       titleEditable:false,
-      addAreaVisible:false,
       showLoading:false,
       record:{
         Id:         null,
@@ -52,7 +49,7 @@ class questionAdd extends React.Component {
         ],
       },
       tabObj:{
-        "group1":[{
+        "检查项目类别":[{
           Title :          null,
           Order:           null,
           GroupName:       null,
@@ -60,14 +57,14 @@ class questionAdd extends React.Component {
           Type:            1,
         }]
       },
-      tabNameArr:["group1"],
-      currentTab:"group1",
+      tabNameArr:["检查项目类别"],
+      currentTab:"检查项目类别",
       currentTabNewName:"",
     };
   }
 
   componentWillMount(){
-    const {Id} = this.props.location.state;
+    let Id = this.props.routerParams.phyId;
     if(Id){
       this.getQuestion(Id)
     }
@@ -76,7 +73,7 @@ class questionAdd extends React.Component {
   getQuestion=(Id)=>{
     const {dispatch} = this.props
     dispatch({
-      type:'question/getQuestion',
+      type:'phy/getPhy',
       payload:{
         Id
       },
@@ -101,38 +98,28 @@ class questionAdd extends React.Component {
     })
   };
 
-  // / 绘制部分
-  getAddArea() {
-    return (
-      this.state.addAreaVisible ? (
-        <div style={{ padding: 30, textAlign: 'center', border: '1px solid #eee' }}>
-          <Button icon="check-circle-o" size="large" onClick={this.handleAddTopic}>添加问题</Button>
-        </div>
-      ) : ''
-    );
-  }
-
   getQuestions(questions) {
-
     return questions.map((question, questionIndex) => {
       return (
-        <div style={{ padding: 30 }} key={questionIndex.toString()}>
+        <div style={{ padding: 20 }} key={questionIndex.toString()}>
           <div>
-            <span>项目内容</span>
+            <span>检查内容</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '50%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex)} />
           </div>
-          <span>项目类型</span>
-          <Select
-            style={{ width: 200 }}
-            defaultValue={question.Type || 1}
-            onChange={value => this.handleTypeChange(value,questionIndex)}
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-          >
-            <Option value={1}>1</Option>
-            <Option value={2}>2</Option>
-            <Option value={3}>3</Option>
-            <Option value={4}>4</Option>
-          </Select>
+          <div style={{ marginTop: 10}}>
+            <span>检查结果类型</span>
+            <Select
+              style={{ width: 200 }}
+              defaultValue={question.Type || 1}
+              onChange={value => this.handleTypeChange(value,questionIndex)}
+              filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            >
+              <Option value={1}>1</Option>
+              <Option value={2}>2</Option>
+              <Option value={3}>3</Option>
+              <Option value={4}>4</Option>
+            </Select>
+          </div>
           {this.getQuestionOperator(questionIndex,question)}
         </div>
       );
@@ -169,9 +156,7 @@ class questionAdd extends React.Component {
       </div>
     );
   }
-  // / 绘制部分
 
-  // / 问卷标题
   getTitle() {
     return (
       this.state.titleEditable ? (
@@ -209,16 +194,6 @@ class questionAdd extends React.Component {
     })
   }
 
-  handleAddArea() {
-    let { addAreaVisible } = this.state;
-    this.setState({
-      addAreaVisible: !addAreaVisible
-    })
-  }
-  // / 问卷标题
-
-
-  // / 问卷内容
   handleAddTopic() {
     const newTopic = {
       Title :          null,
@@ -230,7 +205,6 @@ class questionAdd extends React.Component {
     let {tabObj,currentTab} = this.state;
     tabObj[currentTab].push({...newTopic});
     this.setState( {
-      addAreaVisible: false,
       tabObj
     });
   }
@@ -276,15 +250,20 @@ class questionAdd extends React.Component {
       tabObj
     });
   }
-  // / 问卷内容
 
   handleSaveQuestionnaire() {
     let {record,tabObj,tabNameArr} = this.state;
+    const { dispatch } = this.props;
     let upload ={};
     let Topics = [];
     upload.Name = record.Name;
+    upload.Id = this.props.routerParams.phyId ? this.props.routerParams.phyId : null;
     tabNameArr.map((tabName,tabIndex) => {
       tabObj[tabName].map((topic,topicIndex) => {
+        if(!topic.Title){
+          message.warning(`${tabName}Q${topicIndex+1}没有输入标题`)
+          return
+        }
         Topics.push({
           Title:topic.Title,
           Order:topicIndex + 1,
@@ -294,7 +273,12 @@ class questionAdd extends React.Component {
         })
       })
     });
-    console.log("uploadProps",upload)
+    upload.Topics = Topics;
+    dispatch({
+      type: 'phy/changePhy',
+      payload: {body:upload},
+    })
+    console.log('@upload',upload)
   }
 
   // / tab部分
@@ -307,11 +291,11 @@ class questionAdd extends React.Component {
   tabNameChange(){
     let {currentTabNewName,tabObj,tabNameArr,currentTab} = this.state;
     if(currentTabNewName === ""){
-      message.warning("请输入组名！");
+      message.warning("请输入项目类别名称！");
       return
     }
     if(tabNameArr.indexOf(currentTabNewName) !== -1){
-      message.warning("已存此名字的组！");
+      message.warning("已存此名字的项目类别！");
       return
     }
     let tmpTopics =[];
@@ -335,14 +319,13 @@ class questionAdd extends React.Component {
       tabObj:tmpTabObj,
       tabNameArr:tmpTabNameArr,
       currentTab:currentTabNewName,
-      currentTabNewName:"",
     })
   };
 
   deleteTab(){
     let {tabObj,tabNameArr,currentTab} = this.state;
     if(tabNameArr.length === 1){
-      message.warning("至少保留一个组！");
+      message.warning("至少保留一个项目类别！");
       return
     }
     let tmpTabNameArr = [];
@@ -372,11 +355,11 @@ class questionAdd extends React.Component {
   addTab() {
     let {currentTabNewName,tabObj,tabNameArr} = this.state;
     if(currentTabNewName === ""){
-      message.warning("请输入组名！");
+      message.warning("请输入项目类别名称！");
       return
     }
     if(tabNameArr.indexOf(currentTabNewName) !== -1){
-      message.warning("已存此名字的组！");
+      message.warning("已存此名字的项目类别！");
       return
     }
     tabObj[currentTabNewName] = [{
@@ -389,7 +372,6 @@ class questionAdd extends React.Component {
     tabNameArr.push(currentTabNewName);
 
     this.setState({
-      addAreaVisible: false,
       tabObj,
       tabNameArr,
       currentTab:currentTabNewName
@@ -412,26 +394,24 @@ class questionAdd extends React.Component {
       </Tabs>
     )
   };
-  // / tab部分
 
   render() {
     return (
       <Spin spinning={this.state.showLoading} tip="正在保存">
         <div>
           {this.getTitle()}
-          <div>
-            <Input onChange={e => {this.state.currentTabNewName = e.target.value;return null}} />
-            <Button onClick={() => this.tabNameChange()}>更改组名</Button>
-            <Button onClick={() => this.deleteTab()}>删除此组</Button>
-            <Button onClick={() => this.addTab()}>新增组类</Button>
+          <div style={{ display: 'flex', padding: 20 }}>
+            <Input style={{ width: '50%' }}  placeholder='请输入项目类别名称' onChange={e => {this.state.currentTabNewName = e.target.value;return null}} />
+            <Button style={{ marginLeft: 10 }} onClick={() => this.tabNameChange()}>更改项目类别名称</Button>
+            <Button style={{ marginLeft: 10 }} onClick={() => this.deleteTab()}>删除此项目类别名称</Button>
+            <Button style={{ marginLeft: 10 }} onClick={() => this.addTab()}>新增项目类别</Button>
           </div>
-          <div style={{ padding: 20, borderTop: '2px solid #ccc', borderBottom: '2px solid #ccc' }}>
+          <div style={{ padding: 20, borderBottom: '2px solid #ccc' }}>
             <div style={{ marginBottom: 20 }}>
               {this.renderTabs()}
             </div>
-            {this.getAddArea()}
-            <div className="addQuestion" style={{ wdith: '100%', height: '100%', padding: 30, background: '#eee', textAlign: 'center'}} onClick={this.handleAddArea}>
-              添加问题
+            <div className="addQuestion" style={{ wdith: '100%', height: '100%', padding: 30, background: '#eee', textAlign: 'center'}} onClick={this.handleAddTopic}>
+              添加检查内容
             </div>
           </div>
           {this.getFooter()}

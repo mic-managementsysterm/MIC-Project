@@ -6,11 +6,9 @@ import {
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
-
 import styles from './Diagnosis.less';
-
-const { TabPane } = Tabs;
-const { Option } = AutoComplete;
+const TabPane = Tabs.TabPane;
+const Option = AutoComplete.Option;
 
 @connect(({ addMedical,routerParams, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
   addMedical,
@@ -22,23 +20,10 @@ const { Option } = AutoComplete;
   routerParams,
 }))
 class DiagnosisForm extends PureComponent {
-  columns1= [
-    {
-      title: '证型名称',
-      dataIndex: 'Name',
-      align: 'center',
-    },{
-      title: '证型拼音',
-      dataIndex: 'PinYin',
-      align: 'center',
-    },
-  ];
-
   constructor(props){
     super(props)
     this.state={
       loading:false,
-      uploading: false,
       visible:false,
       diagnoseData:[],
       diagnoseType:'see',
@@ -49,13 +34,27 @@ class DiagnosisForm extends PureComponent {
       base64: [],
       current:1,
       total:0,
+      previewVisible: false,
+      previewImage: '',
+      fileList: [],
     }
   }
 
-
+  columns1= [
+    {
+      title: '证型名称',
+      dataIndex: 'Name',
+      align: 'center',
+    },{
+      title: '证型拼音',
+      dataIndex: 'PinYin',
+      align: 'center',
+    },
+    ];
 
   componentDidMount() {
-    this.handleSelectRows([]);
+    const { dispatch ,disease:{current,pageSize,searchKey}} = this.props;
+    this.handleSelectRows([])
     this.handleSelectRelateRows([])
   }
 
@@ -86,11 +85,12 @@ class DiagnosisForm extends PureComponent {
     });
     let upload = {};
     const {disease:{DSNoData}}=this.props
-    let data=[];
-    DSNoData.map((item)=>{
+    let data=[]
+    let d=[]
+    DSNoData.map((item,index)=>{
       const row={DiagnoseName:item.Name||item.DiagnoseName,DiagnoseId:item.Id||item.DiagnoseId,ParentId:item.ParentId||''}
       data= data.concat(row)
-    });
+    })
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         let formatParams = this.format();
@@ -216,49 +216,26 @@ class DiagnosisForm extends PureComponent {
     })
   };
 
-  // 获取base64
-  getBase64 = (img, callback) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
-  };
+  handleCancel = () => this.setState({ previewVisible: false })
 
-  beforeUpload = file => {
-    const isJPG = file.type === 'image/jpeg';
-    if (!isJPG) {
-      message.error({
-        title: '只能上传JPG格式的图片~',
-      });
-      return;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
-    }
-    return isJPG && isLt2M
-  };
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.thumbUrl,
+      previewVisible: true,
+    });
+  }
 
-  handleChange = (info) => {
+  handleChange = ({ fileList }) => {
     const { base64 } = this.state;
-    let base = base64;
-    if (info.file.status === 'uploading') {
-      this.setState({ uploading: true });
-      return;
-    }
-    if (info.file.status === 'done') {
-      if (info.fileList.length > 3) {
-        info.fileList.splice(0, 1);
-      }
-      this.getBase64(info.file.originFileObj, imageUrl =>{
-        base.push(imageUrl);
-        this.setState({
-          base64: base,
-          uploading:false,
-          imageUrl:null
-        })
-      });
-    }
-  };
+    let base = base64.slice();
+    fileList.map(item =>{
+      base.push(item.thumbUrl)
+    })
+    this.setState({ fileList: fileList, base64: base })}
+
+  // onRemove = ({fileList}) =>{
+  //   const { fileList } = this.state;
+  // }
 
   // auto
   renderOption = (item) => {
@@ -318,10 +295,17 @@ class DiagnosisForm extends PureComponent {
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch,disease:{formValues,searchKey} } = this.props;
+    const filters = Object.keys(filtersArg).reduce((obj, key) => {
+      const newObj = { ...obj };
+      newObj[key] = getValue(filtersArg[key]);
+      return newObj;
+    }, {});
+
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
       ...formValues,
+      ...filters,
     };
     if (sorter.field) {
       params.sorter = `${sorter.field}_${sorter.order}`;
@@ -337,9 +321,9 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleSelectRows = (rows,int) => {
-    const { dispatch,disease:{selectDiseaseRows,DSNoData} } = this.props;
+    const { dispatch,disease:{DSdata,selectDiseaseRows,DSNoData} } = this.props;
     if (int===0) {
-      const row=rows.map(i=>{return{...i}});
+      const row=rows.map(i=>{return{...i}})
       const row2=rows.map(i=>{return{...i}});
       dispatch({
         type: 'disease/setStates',
@@ -360,7 +344,7 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleSelectRelateRows=rows=>{
-    const { dispatch } = this.props;
+    const { dispatch ,disease:{selectRelateRows}} = this.props;
     dispatch({
       type: 'disease/setStates',
       payload: {
@@ -370,7 +354,7 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleModalVisible = (record) => {
-  const { dispatch } = this.props;
+  const { dispatch,disease:{selectedId} } = this.props;
    dispatch({
     type: 'disease/setStates',
     payload: {
@@ -391,7 +375,7 @@ class DiagnosisForm extends PureComponent {
 
   };
 
-  handleCancelRelate = () => {
+ handleCancelRelate = () => {
    const {dispatch}=this.props
     dispatch({
       type: 'disease/setStates',
@@ -407,12 +391,12 @@ class DiagnosisForm extends PureComponent {
 
   handleRelateOk=()=>{
     const { dispatch ,disease:{selectRelateRows,selectDiseaseRows,selectedId,DSNoData}} = this.props;
-    selectDiseaseRows.slice().map((item)=>{
-      selectRelateRows.slice().map((d)=>{
+    selectDiseaseRows.slice().map((item,index)=>{
+      selectRelateRows.slice().map((d,index)=>{
         if (item.Id===selectedId) {
-          item.Name=item.Name+'('+d.Name+')';
-          const row=[{ParentId:selectedId,DiagnoseId:d.Id,DiagnoseName:d.Name}];
-          const rows=row.slice();
+          item.Name=item.Name+'('+d.Name+')'
+          const row=[{ParentId:selectedId,DiagnoseId:d.Id,DiagnoseName:d.Name}]
+          const rows=row.slice()
           dispatch({
             type: 'disease/setStates',
             payload: {
@@ -423,7 +407,7 @@ class DiagnosisForm extends PureComponent {
           });
         }
       })
-    });
+    })
     dispatch({
       type: 'disease/setStates',
       payload: {
@@ -432,63 +416,49 @@ class DiagnosisForm extends PureComponent {
       },
     });
     this.handleSelectRelateRows([])
-  };
+}
 
   handleClose=(removedTag,int)=>{
-    const { disease:{selectDiseaseRows,selectRelateRows}} = this.props;
+    const { dispatch ,disease:{selectDiseaseRows,selectRelateRows}} = this.props;
     if (int===1) {
-      const tags = selectDiseaseRows.filter(function(disease) {
+      const tags = selectDiseaseRows.filter(function(disease, index) {
         return disease.Id!==removedTag.Id;
       });
       this.handleSelectRows(tags,1)
     }
      else {
-      const rows = selectRelateRows.filter(function(relate) {
+      const rows = selectRelateRows.filter(function(relate, index) {
         return relate.Id!==removedTag.Id;
       });
 
       this.handleSelectRelateRows(rows,1)
     }
-  };
+  }
 
   select=(value,option)=>{
-    const { disease:{DSNoData}, dispatch} = this.props;
+    const { dispatch, form,disease:{pageSize,DSdata,searchKey,DSNoData,selectDiseaseRows} } = this.props;
+    const key=value
     if (DSNoData.length===0){
       this.handleSelectRows([{Name:value,Id:option.props.text}],0)
-      dispatch({
-        type: 'disease/setStates',
-        payload: {
-          value:''
-        },
-      });
     } else {
-      let flag = false;
-      DSNoData.map((d)=>{
-        if (d.Id === option.props.text) {
-          message.error('请勿重复选择');
-          flag = true;
+      DSNoData.map((d,index)=>{
+        if (d.Id==option.props.text) {
+          message.error('请勿重复选择')
+        }else {
+          const row=[{Name:value,Id:option.props.text}]
+          this.handleSelectRows([{Name:value,Id:option.props.text}],0)
         }
-      });
-      if(!flag){
-        this.handleSelectRows([{Name:value,Id:option.props.text}],0);
-        dispatch({
-          type: 'disease/setStates',
-          payload: {
-            value:''
-          },
-        });
-      }
+      })
     }
-  };
+  }
 
   handleSearch=(value)=>{
-      const { dispatch } = this.props;
-       const key=value;
+      const { dispatch, form,disease:{pageSize} } = this.props;
+       const key=value
          dispatch({
           type: 'disease/setStates',
           payload: {
             searchKey:key,
-            value:value,
           },callback:()=>{
              dispatch({
                type: 'disease/queryDisAndSyn',
@@ -500,21 +470,22 @@ class DiagnosisForm extends PureComponent {
              });
            },
         });
-  };
+}
 
   renderOptionItem=(item)=>{
     return (
-      <Option key={item.Name} text={item.Id}>
+      <Option key={item.Name} text={item.Id} >
         {item.Name}
       </Option>
     );
-  };
+  }
 
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
-      disAndSyn:{relateSyn},
-      disease:{value,DSdata, selectDiseaseRows,selectRelateRows,modalVisible },
+      disAndSyn:{relateSyn,restSyn,restPagination},
+      disease:{diseaseData,value,DSdata,DSNoData, selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },
+      loading,
     } = this.props;
     const tailFormItemLayout = {
       wrapperCol: {
@@ -528,13 +499,21 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const { diagnoseData, data,imageUrl } =this.state;
+    const { diagnoseData, data,imageUrl } =this.state;const { previewVisible, previewImage, fileList } = this.state;
     const uploadButton = (
       <div>
-        <Icon type={this.state.uploading ? 'loading' : 'plus'} />
+        <Icon type="plus" />
         <div className="ant-upload-text">Upload</div>
       </div>
     );
+    const data1 ={
+      list: DSdata,
+      pagination: {
+        total: total|| 0,
+        pageSize:pageSize,
+        current:current
+      },
+    }
     return (
       <PageHeaderWrapper title="四诊数据采集">
         <Spin spinning={this.state.loading} tip="正在提交">
@@ -618,24 +597,18 @@ class DiagnosisForm extends PureComponent {
                   value={value}
                   placeholder="请输入中医诊断"
                   onSelect={this.select}
-                  onSearch={(key)=>this.handleSearch(key)}
+                  onSearch={(value)=>this.handleSearch(value)}
                   optionLabelProp="text"
                 >
                   <Input />
                 </AutoComplete>
                 {
-                  selectDiseaseRows.map((disease)=>{
-                    return (
-                      <Tag
-                        key={disease.Id}
-                        closable
-                        onClose={() => this.handleClose(disease,1)}
-                      >
-                        <span onClick={()=>{this.handleModalVisible(disease.Id)}}>
-                          {disease.Name}
-                        </span>
-                      </Tag>
-                    )
+                  selectDiseaseRows.map((disease,index)=>{
+                    return <Tag key={disease.Id}
+                                closable
+                                onClose={() => this.handleClose(disease,1)}>
+                      <span onClick = {()=>{this.handleModalVisible(disease.Id)}}>{disease.Name}</span>
+                    </Tag>
                   })
                 }
               </Form.Item>
@@ -679,13 +652,13 @@ class DiagnosisForm extends PureComponent {
                           dataSource={diagnoseData.map(this.renderOption)}
                           onSelect={this.onSelect}
                           onSearch={this.onSearch}
-                          placeholder="请输入疾病中文名、者证型中文名、疾病首字母或证型首字母"
+                          placeholder="请输入疾病中文名、证型中文名、疾病首字母或证型首字母"
                           optionLabelProp="text"
                         >
                           <Input />
                         </AutoComplete>
                         <Radio.Group
-                          onChange={event => { this.onTyChange(event.target.value)}}
+                          onChange={value => { this.onTyChange(value.target.value)}}
                           defaultValue="see"
                         >
                           <Radio value="see">望</Radio>
@@ -737,18 +710,20 @@ class DiagnosisForm extends PureComponent {
                 {getFieldDecorator('SZZP', {
                   rules: [{ required: true, message: '请选择四诊照片!' }],
                 })(
-                  <Upload
-                    name="avatar"
-                    listType="picture-card"
-                    accept=".jpg,.jpeg,.png"
-                    className="avatar-uploader"
-                    showUploadList
-                    action=""
-                    beforeUpload={this.beforeUpload}
-                    onChange={this.handleChange}
-                  >
-                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
-                  </Upload>
+                  <div>
+                    <Upload
+                      action=""
+                      listType="picture-card"
+                      fileList={fileList}
+                      onPreview={this.handlePreview}
+                      onChange={this.handleChange}
+                    >
+                      {fileList.length >= 2 ? null : uploadButton}
+                    </Upload>
+                    <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                      <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                    </Modal>
+                  </div>
                 )}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>

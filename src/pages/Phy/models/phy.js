@@ -2,7 +2,6 @@ import { getAllGauge, getPhy,changePhy, deletePhy } from '@/services/api';
 
 export default {
   namespace: 'phy',
-
   state: {
     phys: [],
     phy:{
@@ -45,7 +44,7 @@ export default {
           phy: response.Data
         }
       });
-      if (callback) callback()
+      if (callback) callback(response.Data)
     },
     *changePhy({payload,callback},{call,put}){
       yield call(changePhy,payload);
