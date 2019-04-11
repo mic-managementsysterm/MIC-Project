@@ -1,17 +1,16 @@
 import React from 'react';
-import {Spin , Button, Input, Icon,InputNumber,Upload ,Row,message } from 'antd';
+import {Spin , DatePicker, Button, Input, Checkbox, Icon,InputNumber,Upload ,Row,message } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload/interface';
 import router from 'umi/router';
 import { connect } from 'dva';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-const list=[];
-const fileList=[];
+const list=[]
+const fileList=[]
 
 @connect(({question,loading})=>({
   question,
   loading:loading.models.loading
 }))
-class QuestionEdit extends React.Component {
+class questionAdd extends React.Component {
   constructor(props) {
     super(props);
     this.handleTitleClick = this.handleTitleClick.bind(this);
@@ -24,11 +23,7 @@ class QuestionEdit extends React.Component {
     this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
     this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
-    this.handleDatePick = this.handleDatePick.bind(this);
     this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
-    this.handleReleaseQuestionnaire = this.handleReleaseQuestionnaire.bind(this);
-    this.handleIndex=this.handleIndex.bind(this);
-    this.handleChange=this.handleChange.bind(this);
     this.beforeUpload=this.beforeUpload.bind(this);
     this.checkImageWH=this.checkImageWH.bind(this)
     this.state = {
@@ -36,50 +31,38 @@ class QuestionEdit extends React.Component {
       addAreaVisible:false,
       questions:{
         Id:         null,
-        Name:       null,
-        TotalScore: null,
-        PassScore:  null,
+        Name:       '这里是标题',
+        TotalScore: 1,
+        PassScore:  1,
         Topics:     [
           {
             Id:              null,
             QuestionnaireId: null,
-            Title:           null,
+            Title:           '类型一（加分/不加分）',
             Image :          null,
             Order:           null,
             GroupName:       null,
             TotalScore:      null,
-            Type:            null,
-            CreatedAt:       null /* 2018-07-23 10:04:30 */
+            Type:            0,
+            // CreatedAt:       null /* 2018-07-23 10:04:30 */
           }
         ],
-        CreatedAt:  null,
+        // CreatedAt:  null,
       }
       ,
-      date:null,
-      title:'这里是标题',
+      defaultGroupName:null,
       fileList:[],
-      props : {
-        action: '//jsonplaceholder.typicode.com/posts/',
-        listType: 'picture',
-        defaultFileList: [...fileList],
-      },
       indexCurrent:null,
       loading1:false,
       loading2:false,
       showLoading:false,
     };
   }
-
-  handleTitleClick() {
-    this.setState({
-      titleEditable: true
-    })
-  }
   componentWillMount(){
     const Id=this.props.location.state.Id
     this.getQuestion(Id)
-
   }
+
   getQuestion=(Id)=>{
     const {dispatch}=this.props
     dispatch({
@@ -92,6 +75,12 @@ class QuestionEdit extends React.Component {
           questions:question
         })
       }
+    })
+  }
+
+  handleTitleClick() {
+    this.setState({
+      titleEditable: true
     })
   }
 
@@ -123,9 +112,13 @@ class QuestionEdit extends React.Component {
       Order:null,
       GroupName:'',
       TotalScore:null,
-      Title: '类型一',
-      CreatedAt:'',
+      Title: '类型一（加分/不加分）',
     };
+    if (this.state.defaultGroupName){
+      newQuestion.GroupName=this.state.defaultGroupName
+    }else {
+
+    }
     this.state.questions.Topics.push(newQuestion)
     this.setState( {
       questions: this.state.questions,
@@ -177,34 +170,7 @@ class QuestionEdit extends React.Component {
       filereader.readAsDataURL(file);
     });
   }
-  handleChange = (info) => {
-    const {indexCurrent}=this.state
-    if (info.file.status === 'uploading') {
-      this.setState({ loading: true });
-      return;
-    }
-    if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      if (info.fileList.length>1){
-        info.fileList.splice(0,1);
-      }
-      this.getBase64(info.file.originFileObj, imageUrl =>{
-        const base64Img=imageUrl
-          // this.state.questions.Topics[this.state.indexCurrent].Image=null,
-          // this.setState({
-          //   questions:this.state.questions,
-          //   // loading:false,
-          //   // imageUrl:null
-          // })
-          this.state.questions.Topics[indexCurrent].Image=imageUrl,
-          this.setState({
-            questions:this.state.questions,
-            loading:false,
-            imageUrl:null
-          })
-      });
-    }
-  }
+
   handleAddCheckbox() {
     const newQuestion = {
       Id:'',
@@ -214,9 +180,13 @@ class QuestionEdit extends React.Component {
       GroupName:'',
       Type: 1,
       TotalScore:null,
-      Title: '类型二',
-      CreatedAt:'',
+      Title: '类型二（按步加分）',
     };
+    if (this.state.defaultGroupName){
+      newQuestion.GroupName=this.state.defaultGroupName
+    }else {
+
+    }
     this.state.questions.Topics.push(newQuestion)
     this.setState({
       questions: this.state.questions,
@@ -235,6 +205,7 @@ class QuestionEdit extends React.Component {
     }else {
       questions.Topics[questionIndex].GroupName = e.target.value;
       this.setState({
+        defaultGroupName:e.target.value,
         questions: questions
       });
     }
@@ -252,9 +223,6 @@ class QuestionEdit extends React.Component {
   handleCopyQuestion(questionIndex) {
     let { questions } = this.state;
     let copy = Object.assign({}, questions.Topics[questionIndex]);
-    // if (questions.Topics[questionIndex].Type !== 1) {
-    //   // copy.options = copy.options.slice(0);
-    // }
     questions.Topics.splice(questionIndex + 1, 0, copy);
     this.setState({
       questions: questions
@@ -270,15 +238,8 @@ class QuestionEdit extends React.Component {
   }
 
 
-  handleDatePick(date, dateString) {
-    const {questions}=this.state
-    questions.CreatedAt=dateString
-    this.setState({
-      questions:questions
-    })
-  }
-
   handleSaveQuestionnaire(body) {
+
     this.setState({
       showLoading:true
     })
@@ -287,40 +248,24 @@ class QuestionEdit extends React.Component {
     dispatch({
         type:'question/changeQuestion',
         payload: {body},callback:()=>{
-          this.setState({
-            showLoading:false
-          })
-          router.push('/gauge/question-list')
+          const {question:{res}}=this.props
+          if (res.Success) {
+            this.setState({
+              showLoading:false
+            })
+            router.push('/gauge/question-list')
+            message.success('保存成功')
+          }else{
+            this.setState({
+              showLoading:false
+            })
+            message.error(res.Message)
+          }
         }
       }
     )
   }
 
-  handleReleaseQuestionnaire() {
-    let me = this;
-
-    if (this.state.questions.length === 0) {
-      message.warning({
-        title: '请添加至少一个问题'
-      });
-    } else if (this.state.date === '') {
-      message.warning({
-        title: '请选择截止日期'
-      });
-    } else {
-      message.confirm({
-        title: '确定发布问卷吗？',
-        content: '截止日期为 ' + this.state.date,
-        onOk() {
-          const index = me.state.index;
-          list[index] = Object.assign({}, {...me.state, stage: '发布中'});
-          localStorage.list = JSON.stringify(list);
-          window.location.reload();
-          me.props.history.push('/');
-        }
-      });
-    }
-  }
 
   onChangeInt=(value,quesIndex)=>{
     let { questions } = this.state;
@@ -354,19 +299,14 @@ class QuestionEdit extends React.Component {
       ) : ''
     );
   }
-  handleIndex=(index)=>{
-    this.setState({
-      indexCurrent:index,
-      loading:true
-    })
-  }
+
 
   getQuestions() {
     let questions = this.state.questions;
     const { TextArea } = Input;
     return questions.Topics.map((question, questionIndex, array) => {
       const uploadButton = (
-        <div onClick={()=>this.handleIndex(questionIndex)}>
+        <div >
           <Icon type={this.state.loading ? 'loading' : 'plus'} />
           <div className="ant-upload-text">Upload</div>
         </div>
@@ -384,7 +324,7 @@ class QuestionEdit extends React.Component {
           }
           this.getBase64(info.file.originFileObj, imageUrl =>{
             const base64Img=imageUrl
-              this.state.questions.Topics[questionIndex].Image=imageUrl,
+            this.state.questions.Topics[questionIndex].Image=imageUrl,
               this.setState({
                 questions:this.state.questions,
                 loading:false,
@@ -396,10 +336,12 @@ class QuestionEdit extends React.Component {
       if (question.Type === 0||1) {
         return (
           <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
+            <div >
+              <span>题目类型</span>
+              <Input value={question.GroupName} style={{ borderStyle: 'none', width: '90%', marginLeft: 3,marginBottom: 10}} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
+            </div>
             <span>Q{questionIndex + 1}</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
-            <span>题目类型</span>
-            <Input value={question.GroupName} style={{ borderStyle: 'none', width: '50%', marginLeft: 3,marginTop:10 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
             <Row style={{float:'right'}}>
               <span >总分：</span>
               <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
@@ -493,7 +435,6 @@ class QuestionEdit extends React.Component {
   render() {
     const {question:{showLoading}}=this.props
     return (
-      <PageHeaderWrapper title="问卷编辑">
       <Spin spinning={this.state.showLoading} tip={'正在保存'}>
         <div>
           {this.getTitle()}
@@ -502,9 +443,6 @@ class QuestionEdit extends React.Component {
             <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.TotalScore}  onChange={(value)=>this.onChangeTotalInt(value)}/>
             <span >及格分数：</span>
             <InputNumber style={{marginTop:5}} min={1} max={50} value={this.state.questions.PassScore}  onChange={(value)=>this.onChangePassInt(value)}/>
-          </div>
-          <div>
-
           </div>
           <div style={{ padding: 20, borderTop: '2px solid #ccc', borderBottom: '2px solid #ccc' }}>
             <div style={{ marginBottom: 20 }}>
@@ -518,9 +456,8 @@ class QuestionEdit extends React.Component {
           {this.getFooter()}
         </div>
       </Spin>
-      </PageHeaderWrapper>
     );
   }
 }
 
-export default QuestionEdit;
+export default questionAdd;

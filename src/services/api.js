@@ -245,10 +245,6 @@ export async function queryFakeList(params) {
   return request(`/Api/visit/get/GetRespondentRecord?${stringify(params)}`);
 }
 
-export async function getAllGauge() {
-  return request( `/Api/gaugetable/get/lib`);
-}
-
 export async function getCognitionDetail(params) {
   return request(`/Api/questionnairerecord/get/getById?${stringify(params)}`);
 }
@@ -355,6 +351,36 @@ export async function queryQues(params) {
 
 export async function addOrUpdateQues(params) {
   return request(`/Api/questionnairerecord/change/addOrUpdate`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+
+export async function getAllGauge() {
+  return request( `/Api/gaugetable/get/lib`);
+}
+
+export async function getPhy(Id) {
+  return request(`/Api/gaugetable/get/getById?${stringify(Id)}`)
+}
+
+export async function changePhy(params) {
+  return request(`/Api/gaugetable/change/add`, {
+    method: 'POST',
+    body: { ...params.body },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  });
+}
+
+export async function deletePhy(params) {
+  return request(`/Api/gaugetable/delete/byId`,{
     method: 'POST',
     body: {
       ...params,
