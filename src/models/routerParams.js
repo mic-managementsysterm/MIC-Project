@@ -7,6 +7,7 @@ export default {
     Respondent:{},
     RecordId:'',
     RecordAddId:'',
+    phyId: '',
   },
 
   effects: {
@@ -24,7 +25,6 @@ export default {
           session && (obj[k] = JSON.parse(session))
         }
       }
-      console.log('obj',obj)
       yield put({
         type: 'set',
         payload: obj,
@@ -37,7 +37,7 @@ export default {
       const {payload} = action;
       for(let key in payload){
         if(payload.hasOwnProperty(key)){
-          payload[key] && sessionStorage.setItem(key,JSON.stringify(payload[key]))
+          payload[key] !== undefined && sessionStorage.setItem(key,JSON.stringify(payload[key]))
         }
       }
       return {
@@ -59,7 +59,6 @@ export default {
       };
     },
   },
-
 
   subscriptions: {
     restore({ dispatch,_ }) {

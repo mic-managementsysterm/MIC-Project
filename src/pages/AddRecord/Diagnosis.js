@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, Table, message, Col, Row,Tag,Icon,Radio,Upload
+  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, message, Col, Row,Tag,Icon,Radio,Upload
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -24,7 +24,6 @@ class DiagnosisForm extends PureComponent {
     super(props)
     this.state={
       loading:false,
-      uploading: false,
       visible:false,
       diagnoseData:[],
       diagnoseType:'see',
@@ -35,6 +34,9 @@ class DiagnosisForm extends PureComponent {
       base64: [],
       current:1,
       total:0,
+      previewVisible: false,
+      previewImage: '',
+      fileList: [],
     }
   }
 
@@ -214,50 +216,26 @@ class DiagnosisForm extends PureComponent {
     })
   };
 
-  // 获取base64
-  getBase64 = (img, callback) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
+  handleCancel = () => this.setState({ previewVisible: false })
+
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.thumbUrl,
+      previewVisible: true,
+    });
   }
 
-  beforeUpload = file => {
-    const isJPG = file.type === 'image/jpeg';
-    if (!(isJPG || isJPEG || isGIF || isPNG)) {
-      message.error({
-        title: '只能上传JPG 、JPEG 、GIF、 PNG格式的图片~',
-      });
-      return;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
-    }
-    return isJPG && isLt2M;
-  };
-
-  handleChange = (info) => {
+  handleChange = ({ fileList }) => {
     const { base64 } = this.state;
-    let base = base64;
-    if (info.file.status === 'uploading') {
-      this.setState({ uploading: true });
-      return;
-    }
-    if (info.file.status === 'done') {
-      if (info.fileList.length > 3) {
-        info.fileList.splice(0, 1);
-      }
-      this.getBase64(info.file.originFileObj, imageUrl =>{
-        base.push(imageUrl);
-        console.log("base",base)
-        this.setState({
-          base64: base,
-          uploading:false,
-          imageUrl:null
-        })
-      });
-    }
-  }
+    let base = base64.slice();
+    fileList.map(item =>{
+      base.push(item.thumbUrl)
+    })
+    this.setState({ fileList: fileList, base64: base })}
+
+  // onRemove = ({fileList}) =>{
+  //   const { fileList } = this.state;
+  // }
 
   // auto
   renderOption = (item) => {
@@ -342,7 +320,6 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
-
   handleSelectRows = (rows,int) => {
     const { dispatch,disease:{DSdata,selectDiseaseRows,DSNoData} } = this.props;
     if (int===0) {
@@ -355,7 +332,6 @@ class DiagnosisForm extends PureComponent {
           DSNoData:DSNoData.length===0?row2:DSNoData.concat(row2)
         },
       });
-      console.log('@loop3',DSNoData)
     }else {
       dispatch({
         type: 'disease/setStates',
@@ -365,7 +341,6 @@ class DiagnosisForm extends PureComponent {
         },
       });
     }
-    console.log('@loop4',DSNoData)
   };
 
   handleSelectRelateRows=rows=>{
@@ -377,7 +352,6 @@ class DiagnosisForm extends PureComponent {
       },
     });
   };
-
 
   handleModalVisible = (record) => {
   const { dispatch,disease:{selectedId} } = this.props;
@@ -421,7 +395,6 @@ class DiagnosisForm extends PureComponent {
       selectRelateRows.slice().map((d,index)=>{
         if (item.Id===selectedId) {
           item.Name=item.Name+'('+d.Name+')'
-          console.log('@d',d)
           const row=[{ParentId:selectedId,DiagnoseId:d.Id,DiagnoseName:d.Name}]
           const rows=row.slice()
           dispatch({
@@ -471,9 +444,7 @@ class DiagnosisForm extends PureComponent {
       DSNoData.map((d,index)=>{
         if (d.Id==option.props.text) {
           message.error('请勿重复选择')
-          console.log('@loop',index)
         }else {
-          console.log('@loop1',index)
           const row=[{Name:value,Id:option.props.text}]
           this.handleSelectRows([{Name:value,Id:option.props.text}],0)
         }
@@ -528,7 +499,13 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const { diagnoseData, data,imageUrl } =this.state;
+    const { diagnoseData, data,imageUrl } =this.state;const { previewVisible, previewImage, fileList } = this.state;
+    const uploadButton = (
+      <div>
+        <Icon type="plus" />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
     const data1 ={
       list: DSdata,
       pagination: {
@@ -537,12 +514,6 @@ class DiagnosisForm extends PureComponent {
         current:current
       },
     }
-    const uploadButton = (
-      <div>
-        <Icon type={this.state.uploading ? 'loading' : 'plus'} />
-        <div className="ant-upload-text">Upload</div>
-      </div>
-    );
     return (
       <PageHeaderWrapper title="四诊数据采集">
         <Spin spinning={this.state.loading} tip="正在提交">
@@ -739,18 +710,20 @@ class DiagnosisForm extends PureComponent {
                 {getFieldDecorator('SZZP', {
                   rules: [{ required: true, message: '请选择四诊照片!' }],
                 })(
-                  <Upload
-                    name="avatar"
-                    listType="picture-card"
-                    accept=".jpg,.jpeg,.png"
-                    className="avatar-uploader"
-                    showUploadList
-                    action=""
-                    beforeUpload={this.beforeUpload}
-                    onChange= {this.handleChange}
-                  >
-                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
-                  </Upload>
+                  <div>
+                    <Upload
+                      action=""
+                      listType="picture-card"
+                      fileList={fileList}
+                      onPreview={this.handlePreview}
+                      onChange={this.handleChange}
+                    >
+                      {fileList.length >= 2 ? null : uploadButton}
+                    </Upload>
+                    <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                      <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                    </Modal>
+                  </div>
                 )}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>

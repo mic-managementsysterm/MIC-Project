@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table,Button, Popconfirm} from 'antd';
-import Link from 'umi/link';
+import Router from 'umi/router';
 import { connect } from 'dva';
 import moment from 'moment';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -29,6 +29,15 @@ class Phy extends Component{
       }})
   }
 
+  handleRoute = (Id) =>{
+    const { dispatch } = this.props;
+    dispatch({
+      type:'routerParams/setStates',
+      payload: {phyId: Id}
+    })
+    Router.push('/phy/phy-list/phyEdit-list')
+}
+
   render() {
     const {phy:{phys},loading}=this.props;
     phys ? phys.map(phy=>{
@@ -54,12 +63,7 @@ class Phy extends Component{
         render:(text,record)=>(
           phys.length>=1?
             (   <div className={styles.operation}>
-                <Link to={{
-                  pathname:'/phy/phy-list/phyEdit-list',
-                  state:{Id:record.Id}
-                }}>
-                  <Button className={styles.btn}>编辑</Button>
-                </Link>
+                  <Button className={styles.btn} onClick={() =>this.handleRoute(record.Id)}>编辑</Button>
                 <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>
                   <Button>删除</Button>
                 </Popconfirm>
@@ -70,9 +74,7 @@ class Phy extends Component{
     return(
       <PageHeaderWrapper title="理化单管理">
         <div style={{display:'flex',flexDirection:'row-reverse'}}>
-          <Link to={'/phy/phy-list/phyAdd-list'}>
-            <Button className={styles.btn2} style={{marginBottom:5}} >添加</Button>
-          </Link>
+          <Button style={{marginBottom:5}} onClick={() =>this.handleRoute('')}>新增</Button>
         </div>
         <Table rowKey='Id' style={{backgroundColor:'#ffffff'}} align={'center'} columns={columns} dataSource={phys}> </Table>
       </PageHeaderWrapper>
