@@ -337,20 +337,20 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleSelectRows = (rows,int) => {
-    const { dispatch } = this.props;
+    const { dispatch,disease:{selectDiseaseRows,DSNoData} } = this.props;
     if (int===0) {
       const row=rows.map(i=>{return{...i}});
       const row2=rows.map(i=>{return{...i}});
       dispatch({
-        type: 'disease/set',
+        type: 'disease/setStates',
         payload:{
-          selectDiseaseRows:this.props.disease.selectDiseaseRows.length===0?row:this.props.disease.selectDiseaseRows.concat(row),
-          DSNoData:this.props.disease.DSNoData.length===0?row2:this.props.disease.DSNoData.concat(row2)
+          selectDiseaseRows:selectDiseaseRows.length===0?row:selectDiseaseRows.concat(row),
+          DSNoData:DSNoData.length===0?row2:DSNoData.concat(row2)
         },
       });
     }else {
       dispatch({
-        type: 'disease/set',
+        type: 'disease/setStates',
         payload: {
           selectDiseaseRows:rows.slice(),
           DSNoData:rows.slice(),
@@ -452,17 +452,32 @@ class DiagnosisForm extends PureComponent {
   };
 
   select=(value,option)=>{
-    const { disease:{DSNoData} } = this.props;
+    const { disease:{DSNoData}, dispatch} = this.props;
     if (DSNoData.length===0){
       this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+      dispatch({
+        type: 'disease/setStates',
+        payload: {
+          value:''
+        },
+      });
     } else {
-      DSNoData.map(async(d)=>{
+      let flag = false;
+      DSNoData.map((d)=>{
         if (d.Id === option.props.text) {
-          message.error('请勿重复选择')
-        }else {
-          await this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+          message.error('请勿重复选择');
+          flag = true;
         }
-      })
+      });
+      if(!flag){
+        this.handleSelectRows([{Name:value,Id:option.props.text}],0);
+        dispatch({
+          type: 'disease/setStates',
+          payload: {
+            value:''
+          },
+        });
+      }
     }
   };
 
