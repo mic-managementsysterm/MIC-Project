@@ -1,9 +1,10 @@
 import React from 'react';
-import {Spin, Button, Input, Select, Icon,InputNumber,Tabs ,Row,message } from 'antd';
-import { UploadChangeParam } from 'antd/lib/upload/interface';
-import router from 'umi/router';
+import {Spin, Button, Input, Select, Tabs , message } from 'antd';
+// import router from 'umi/router';
 import { connect } from 'dva';
+
 const { TabPane }=Tabs;
+const { Option }=Select;
 
 
 
@@ -22,6 +23,7 @@ class questionAdd extends React.Component {
 
     this.handleAddTopic = this.handleAddTopic.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
+    this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
     this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
@@ -35,11 +37,6 @@ class questionAdd extends React.Component {
     this.state = {
       titleEditable:false,
       addAreaVisible:false,
-      defaultGroupName:null,
-      fileList:[],
-      indexCurrent:null,
-      loading1:false,
-      loading2:false,
       showLoading:false,
       record:{
         Id:         null,
@@ -68,13 +65,16 @@ class questionAdd extends React.Component {
       currentTabNewName:"",
     };
   }
+
   componentWillMount(){
-    const Id=this.props.location.state.Id;
-    Id && this.getQuestion(Id)
+    const {Id} = this.props.location.state;
+    if(Id){
+      this.getQuestion(Id)
+    }
   }
 
   getQuestion=(Id)=>{
-    const {dispatch}=this.props
+    const {dispatch} = this.props
     dispatch({
       type:'question/getQuestion',
       payload:{
@@ -101,125 +101,7 @@ class questionAdd extends React.Component {
     })
   };
 
-  /// 问卷标题
-  getTitle() {
-    return (
-      this.state.titleEditable ? (
-        <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 3, textAlign: 'center' }} onClick={this.handleTitleClick}>
-          <Input style={{ fontSize: 18, fontWeight: 'bold', padding: 30, textAlign: 'center' }} value={this.state.record.Name} onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} />
-        </div>
-      ) : (
-        <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 20, textAlign: 'center' }} onClick={this.handleTitleClick}>
-          <h2><strong>{this.state.record.Name}</strong></h2>
-        </div>
-      )
-    );
-  }
-
-  handleTitleClick() {
-    this.setState({
-      titleEditable: true
-    })
-  }
-
-  handleTitleChange(e) {
-    let newRecord = {
-      ...this.state.record,
-      Name:e.target.value
-    };
-    this.setState({
-      record:newRecord
-    })
-  }
-
-  handleTitleBlur() {
-    this.setState({
-      titleEditable: false
-    })
-  }
-
-  handleAddArea() {
-    this.setState({
-      addAreaVisible: !this.state.addAreaVisible
-    })
-  }
-  /// 问卷标题
-
-
-  /// 问卷内容
-  handleAddTopic() {
-    const newTopic = {
-      Title :          null,
-      Order:           null,
-      GroupName:       null,
-      GroupOrder:       null,
-      Type:            1,
-    };
-    let {tabObj,currentTab} = this.state;
-    tabObj[currentTab].push({...newTopic});
-    this.setState( {
-      addAreaVisible: false,
-      tabObj
-    });
-  }
-
-  handleQuestionChange(e, questionIndex) {
-    let { tabObj,currentTab } = this.state;
-    tabObj[currentTab][questionIndex].Title = e.target.value;
-    this.setState({
-      tabObj
-    });
-  }
-
-  handleShiftQuestion(questionIndex, num) {
-    let { tabObj,currentTab } = this.state;
-    let shiftQuestion = tabObj[currentTab].splice(questionIndex, 1)[0];
-    tabObj[currentTab].splice(questionIndex + num, 0, shiftQuestion);
-    this.setState({
-      tabObj
-    })
-  }
-
-  handleCopyQuestion(questionIndex) {
-    let { tabObj,currentTab } = this.state;
-    let copy = Object.assign({}, tabObj[currentTab][questionIndex]);
-    tabObj[currentTab].splice(questionIndex + 1, 0, copy);
-    this.setState({
-      tabObj
-    });
-  }
-
-  handleRemoveQuestion(questionIndex) {
-    let { tabObj,currentTab } = this.state;
-    tabObj[currentTab].splice(questionIndex, 1);
-    this.setState({
-      tabObj
-    });
-  }
-  /// 问卷内容
-
-
-  handleSaveQuestionnaire() {
-    let {record,tabObj,tabNameArr} = this.state;
-    let upload ={};
-    let Topics = [];
-    upload.Name = record.Name;
-    tabNameArr.map((tabName,tabIndex) => {
-      tabObj[tabName].map((topic,topicIndex) => {
-        Topics.push({
-          Title:topic.Title,
-          Order:topicIndex + 1,
-          GroupName:tabName,
-          GroupOrder:tabIndex + 1,
-          Type:topic.Type,
-        })
-      })
-    });
-    console.log("uploadProps",upload)
-  }
-
-
-  /// 绘制部分
+  // / 绘制部分
   getAddArea() {
     return (
       this.state.addAreaVisible ? (
@@ -233,11 +115,8 @@ class questionAdd extends React.Component {
   getQuestions(questions) {
 
     return questions.map((question, questionIndex) => {
-      const handleChange = (value) => {
-        questions[questionIndex].Type = value - 0
-      };
       return (
-        <div style={{ padding: 30 }} key={questionIndex}>
+        <div style={{ padding: 30 }} key={questionIndex.toString()}>
           <div>
             <span>项目内容</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '50%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex)} />
@@ -246,7 +125,7 @@ class questionAdd extends React.Component {
           <Select
             style={{ width: 200 }}
             defaultValue={question.Type || 1}
-            onChange={handleChange}
+            onChange={value => this.handleTypeChange(value,questionIndex)}
             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
           >
             <Option value={1}>1</Option>
@@ -290,9 +169,135 @@ class questionAdd extends React.Component {
       </div>
     );
   }
-  /// 绘制部分
+  // / 绘制部分
 
-  /// tab部分
+  // / 问卷标题
+  getTitle() {
+    return (
+      this.state.titleEditable ? (
+        <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 3, textAlign: 'center' }} onClick={this.handleTitleClick}>
+          <Input style={{ fontSize: 18, fontWeight: 'bold', padding: 30, textAlign: 'center' }} value={this.state.record.Name} onChange={this.handleTitleChange} onBlur={this.handleTitleBlur} />
+        </div>
+      ) : (
+        <div className="editTitle" style={{ margin: '0 20px 20px 20px', padding: 20, textAlign: 'center' }} onClick={this.handleTitleClick}>
+          <h2><strong>{this.state.record.Name}</strong></h2>
+        </div>
+      )
+    );
+  }
+
+  handleTitleClick() {
+    this.setState({
+      titleEditable: true
+    })
+  }
+
+  handleTitleChange(e) {
+    let {record} = this.state;
+    let newRecord = {
+      ...record,
+      Name:e.target.value
+    };
+    this.setState({
+      record:newRecord
+    })
+  }
+
+  handleTitleBlur() {
+    this.setState({
+      titleEditable: false
+    })
+  }
+
+  handleAddArea() {
+    let { addAreaVisible } = this.state;
+    this.setState({
+      addAreaVisible: !addAreaVisible
+    })
+  }
+  // / 问卷标题
+
+
+  // / 问卷内容
+  handleAddTopic() {
+    const newTopic = {
+      Title :          null,
+      Order:           null,
+      GroupName:       null,
+      GroupOrder:       null,
+      Type:            1,
+    };
+    let {tabObj,currentTab} = this.state;
+    tabObj[currentTab].push({...newTopic});
+    this.setState( {
+      addAreaVisible: false,
+      tabObj
+    });
+  }
+
+  handleQuestionChange(e, questionIndex) {
+    let { tabObj,currentTab } = this.state;
+    tabObj[currentTab][questionIndex].Title = e.target.value;
+    this.setState({
+      tabObj
+    });
+  }
+
+  handleTypeChange(value, questionIndex) {
+    let { tabObj,currentTab } = this.state;
+    tabObj[currentTab][questionIndex].Type = value - 0;
+    this.setState({
+      tabObj
+    });
+  }
+
+  handleShiftQuestion(questionIndex, num) {
+    let { tabObj,currentTab } = this.state;
+    let shiftQuestion = tabObj[currentTab].splice(questionIndex, 1)[0];
+    tabObj[currentTab].splice(questionIndex + num, 0, shiftQuestion);
+    this.setState({
+      tabObj
+    })
+  }
+
+  handleCopyQuestion(questionIndex) {
+    let { tabObj,currentTab } = this.state;
+    let copy = Object.assign({}, tabObj[currentTab][questionIndex]);
+    tabObj[currentTab].splice(questionIndex + 1, 0, copy);
+    this.setState({
+      tabObj
+    });
+  }
+
+  handleRemoveQuestion(questionIndex) {
+    let { tabObj,currentTab } = this.state;
+    tabObj[currentTab].splice(questionIndex, 1);
+    this.setState({
+      tabObj
+    });
+  }
+  // / 问卷内容
+
+  handleSaveQuestionnaire() {
+    let {record,tabObj,tabNameArr} = this.state;
+    let upload ={};
+    let Topics = [];
+    upload.Name = record.Name;
+    tabNameArr.map((tabName,tabIndex) => {
+      tabObj[tabName].map((topic,topicIndex) => {
+        Topics.push({
+          Title:topic.Title,
+          Order:topicIndex + 1,
+          GroupName:tabName,
+          GroupOrder:tabIndex + 1,
+          Type:topic.Type,
+        })
+      })
+    });
+    console.log("uploadProps",upload)
+  }
+
+  // / tab部分
   changeTab(tabName){
     this.setState({
       currentTab:tabName
@@ -352,7 +357,9 @@ class questionAdd extends React.Component {
         tmpCurrentIndex = index
       }
     });
-    tmpCurrentIndex >= tmpTabNameArr.length && (tmpCurrentIndex -= 1);
+    if(tmpCurrentIndex >= tmpTabNameArr.length){
+      tmpCurrentIndex -= 1
+    }
 
     this.setState({
       tabObj:tmpTabObj,
@@ -394,7 +401,7 @@ class questionAdd extends React.Component {
     let tabComponents= [];
     tabNameArr.map(tabName =>{
       tabComponents.push(
-        <TabPane tab={tabName} key={tabName} >
+        <TabPane tab={tabName} key={tabName}>
           {this.getQuestions(tabObj[tabName])}
         </TabPane>
       )
@@ -405,15 +412,15 @@ class questionAdd extends React.Component {
       </Tabs>
     )
   };
-  /// tab部分
+  // / tab部分
 
   render() {
     return (
-      <Spin spinning={this.state.showLoading} tip={'正在保存'}>
+      <Spin spinning={this.state.showLoading} tip="正在保存">
         <div>
           {this.getTitle()}
           <div>
-            <Input onChange={e => this.state.currentTabNewName = e.target.value} />
+            <Input onChange={e => {this.state.currentTabNewName = e.target.value;return null}} />
             <Button onClick={() => this.tabNameChange()}>更改组名</Button>
             <Button onClick={() => this.deleteTab()}>删除此组</Button>
             <Button onClick={() => this.addTab()}>新增组类</Button>
