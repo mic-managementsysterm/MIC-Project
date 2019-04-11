@@ -64,7 +64,7 @@ class Phy extends Component{
           phys.length>=1?
             (   <div className={styles.operation}>
                   <Button className={styles.btn} onClick={() =>this.handleRoute(record.Id)}>编辑</Button>
-                <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.key)}>
+                <Popconfirm  title="确定删除?"  okText="确认" cancelText="取消" onConfirm={() => this.handleDelete(record.Id)}>
                   <Button>删除</Button>
                 </Popconfirm>
               </div>

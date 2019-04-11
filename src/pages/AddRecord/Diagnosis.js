@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, message, Col, Row,Tag,Icon,Radio,Upload
+  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, Table, message, Col, Row,Tag,Icon,Radio,Upload
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -24,6 +24,7 @@ class DiagnosisForm extends PureComponent {
     super(props)
     this.state={
       loading:false,
+      uploading: false,
       visible:false,
       diagnoseData:[],
       diagnoseType:'see',
@@ -32,11 +33,9 @@ class DiagnosisForm extends PureComponent {
       fourDiagnoseType:'see',
       data: [],
       base64: [],
+      fileList: [],
       current:1,
       total:0,
-      previewVisible: false,
-      previewImage: '',
-      fileList: [],
     }
   }
 
@@ -216,26 +215,52 @@ class DiagnosisForm extends PureComponent {
     })
   };
 
-  handleCancel = () => this.setState({ previewVisible: false })
-
-  handlePreview = (file) => {
-    this.setState({
-      previewImage: file.thumbUrl,
-      previewVisible: true,
-    });
+  // 获取base64
+  getBase64 = (img, callback) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
   }
 
-  handleChange = ({ fileList }) => {
-    const { base64 } = this.state;
-    let base = base64.slice();
-    fileList.map(item =>{
-      base.push(item.thumbUrl)
-    })
-    this.setState({ fileList: fileList, base64: base })}
+  beforeUpload = file => {
+    const isJPG = file.type === 'image/jpeg';
+    if (!isJPG) {
+      message.error({
+        title: '只能上传JPG格式的图片',
+      });
+      return;
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('图片大小不超过2MB!');
+    }
+    return isJPG && isLt2M;
+  };
 
-  // onRemove = ({fileList}) =>{
-  //   const { fileList } = this.state;
-  // }
+  handleChange = (info) => {
+    const { base64 } = this.state;
+    let base = base64;
+    if (info.file.status === 'uploading') {
+      this.setState({ uploading: true });
+      return;
+    }
+    if (info.file.status === 'done') {
+      // if (info.fileList.length > 3) {
+      //   info.fileList.splice(0, 1);
+      // }
+      this.setState({
+        fileList: info.fileList,
+      })
+      this.getBase64(info.file.originFileObj, imageUrl =>{
+        base.push(imageUrl);
+        this.setState({
+          base64: base,
+          uploading:false,
+          imageUrl:null
+        })
+      });
+    }
+  }
 
   // auto
   renderOption = (item) => {
@@ -320,6 +345,7 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
+
   handleSelectRows = (rows,int) => {
     const { dispatch,disease:{DSdata,selectDiseaseRows,DSNoData} } = this.props;
     if (int===0) {
@@ -352,6 +378,7 @@ class DiagnosisForm extends PureComponent {
       },
     });
   };
+
 
   handleModalVisible = (record) => {
   const { dispatch,disease:{selectedId} } = this.props;
@@ -499,13 +526,7 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const { diagnoseData, data,imageUrl } =this.state;const { previewVisible, previewImage, fileList } = this.state;
-    const uploadButton = (
-      <div>
-        <Icon type="plus" />
-        <div className="ant-upload-text">Upload</div>
-      </div>
-    );
+    const { diagnoseData, data,imageUrl,fileList } =this.state;
     const data1 ={
       list: DSdata,
       pagination: {
@@ -514,6 +535,12 @@ class DiagnosisForm extends PureComponent {
         current:current
       },
     }
+    const uploadButton = (
+      <div>
+        <Icon type={this.state.uploading ? 'loading' : 'plus'} />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
     return (
       <PageHeaderWrapper title="四诊数据采集">
         <Spin spinning={this.state.loading} tip="正在提交">
@@ -710,20 +737,18 @@ class DiagnosisForm extends PureComponent {
                 {getFieldDecorator('SZZP', {
                   rules: [{ required: true, message: '请选择四诊照片!' }],
                 })(
-                  <div>
-                    <Upload
-                      action=""
-                      listType="picture-card"
-                      fileList={fileList}
-                      onPreview={this.handlePreview}
-                      onChange={this.handleChange}
-                    >
-                      {fileList.length >= 2 ? null : uploadButton}
-                    </Upload>
-                    <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                      <img alt="example" style={{ width: '100%' }} src={previewImage} />
-                    </Modal>
-                  </div>
+                  <Upload
+                    name="avatar"
+                    listType="picture-card"
+                    accept=".jpeg"
+                    className="avatar-uploader"
+                    showUploadList
+                    action=""
+                    beforeUpload={this.beforeUpload}
+                    onChange= {this.handleChange}
+                  >
+                    {fileList.length >= 2 ? null: uploadButton}
+                  </Upload>
                 )}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>

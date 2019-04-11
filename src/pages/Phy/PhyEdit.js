@@ -1,7 +1,7 @@
 import React from 'react';
 import {Spin, Button, Input, Select, Tabs , message } from 'antd';
-// import router from 'umi/router';
 import { connect } from 'dva';
+import router from 'umi/router';
 
 const { TabPane }=Tabs;
 const { Option }=Select;
@@ -92,7 +92,7 @@ class questionAdd extends React.Component {
           record:res,
           tabObj,
           tabNameArr,
-          currentTab:tabNameArr[0]
+          currentTab:tabNameArr[0],
         })
       }
     })
@@ -114,10 +114,10 @@ class questionAdd extends React.Component {
               onChange={value => this.handleTypeChange(value,questionIndex)}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
-              <Option value={1}>1</Option>
-              <Option value={2}>2</Option>
-              <Option value={3}>3</Option>
-              <Option value={4}>4</Option>
+              <Option value={1}>正常/异常</Option>
+              <Option value={2}>填写心率</Option>
+              <Option value={3}>选择心电图结果</Option>
+              <Option value={4}>填写检测结果</Option>
             </Select>
           </div>
           {this.getQuestionOperator(questionIndex,question)}
@@ -253,9 +253,12 @@ class questionAdd extends React.Component {
 
   handleSaveQuestionnaire() {
     let {record,tabObj,tabNameArr} = this.state;
-    const { dispatch } = this.props;
     let upload ={};
     let Topics = [];
+    const { dispatch } = this.props;
+    this.setState({
+      showLoading: true
+    })
     upload.Name = record.Name;
     upload.Id = this.props.routerParams.phyId ? this.props.routerParams.phyId : null;
     tabNameArr.map((tabName,tabIndex) => {
@@ -277,8 +280,19 @@ class questionAdd extends React.Component {
     dispatch({
       type: 'phy/changePhy',
       payload: {body:upload},
+      callback:(res)=>{
+        if (res.Success) {
+          this.setState({
+            showLoading:false
+          })
+          router.go(-1);
+        }else {
+          this.setState({
+            showLoading: false
+          })
+        }
+      },
     })
-    console.log('@upload',upload)
   }
 
   // / tab部分
