@@ -87,17 +87,14 @@ constructor(props) {
     );
   }
 
+
   getPhys = () => {
     const {phys} = this.state;
     const handleChange = (value) => {
-      console.log('@value',value)
-      console.log(`selected ${value}`);
     };
     const handleBlur =()=> {
-      console.log('blur');
     };
     const handleFocus =() => {
-      console.log('focus');
     }
     return (phys.Topics.map((phy, phyIndex) => {
       if (phy.Type === 1 || 2 || 3 || 4) {

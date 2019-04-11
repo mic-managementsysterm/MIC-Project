@@ -70,6 +70,7 @@ class questionAdd extends React.Component {
     }
   }
 
+
   getQuestion=(Id)=>{
     const {dispatch} = this.props
     dispatch({
