@@ -117,9 +117,10 @@ class SecurityView extends Component {
     return (
       <Fragment>
         <Modal
+          centered
           destroyOnClose
           width={640}
-          title="新增患者"
+          title="修改密码"
           visible={visible}
           onOk={() => this.okHandle()}
           onCancel={() => this.handleCancel()}

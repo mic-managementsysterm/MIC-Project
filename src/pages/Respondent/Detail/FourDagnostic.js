@@ -60,7 +60,7 @@ class FourDagnostic extends Component {
                <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
                  {diagnosisData&&diagnosisData.Diagnoses
                    ? diagnosisData.Diagnoses.map((item, index) => {
-                     return <span key={index}>{item.DiagnoseName}、</span>;
+                     return <span key={index}>{item.DiagnoseName}&nbsp;&nbsp;&nbsp;&nbsp;</span>;
                    })
                    : null}
                </Row>
@@ -69,7 +69,7 @@ class FourDagnostic extends Component {
               <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
                 {diagnosisData&&diagnosisData.Symptoms
                   ? diagnosisData.Symptoms.map((item, index) => {
-                    return <span key={index}>{item.SymptomName}、</span>;
+                    return <span key={index}>{item.SymptomName}&nbsp;&nbsp;&nbsp;&nbsp;</span>;
                   })
                   : null}
               </Row>
