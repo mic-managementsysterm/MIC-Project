@@ -60,22 +60,24 @@ class FourDagnostic extends Component {
                <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
                  {diagnosisData&&diagnosisData.Diagnoses
                    ? diagnosisData.Diagnoses.map((item, index) => {
-                     return <span key={index}>{item.DiagnoseName}、</span>;
+                     return <span key={index}>{item.DiagnoseName}&nbsp;&nbsp;&nbsp;&nbsp;</span>;
                    })
                    : null}
                </Row>
             </Description>
             <Description term="四诊信息" className={styles.term}>
               <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
-                {diagnosisData.Symptoms
+                {diagnosisData&&diagnosisData.Symptoms
                   ? diagnosisData.Symptoms.map((item, index) => {
-                    return <span key={index}>{item.SymptomName}、</span>;
+                    return <span key={index}>{item.SymptomName}&nbsp;&nbsp;&nbsp;&nbsp;</span>;
                   })
                   : null}
               </Row>
             </Description>
             <Description term="四诊照片" className={styles.term}>
-               { diagnosisData.MedicalImgs && diagnosisData.MedicalImgs[0] && <img src={`http://10.126.6.112:5010${diagnosisData.MedicalImgs[0].Img}`} className={styles.img} />}
+              {diagnosisData.MedicalImgs && diagnosisData.MedicalImgs ? diagnosisData.MedicalImgs.map(img => <img
+                src={`http://localhost:5010${img.Img}`} className={styles.img}/>) : null
+              }
             </Description>
           </DescriptionDetail>
         </Card>

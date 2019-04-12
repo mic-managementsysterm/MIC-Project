@@ -26,7 +26,9 @@ class GaugeDetail extends Component{
                     <li>{item.Score}</li>
                   </ul>
                 </Col>
-                {item.Images && item.Images[0] && <img src={`http://localhost:5010${item.Images[0].Url}`} className={styles.img} />}
+                {item.Images && item.Images ? item.Images.map(img => <img
+                  src={`http://localhost:5010${img.Url}`} className={styles.img}/>) : null
+                }
               </Row>
             </div>
           )

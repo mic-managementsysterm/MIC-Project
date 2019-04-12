@@ -47,8 +47,8 @@ export default {
       if (callback) callback(response.Data)
     },
     *changePhy({payload,callback},{call,put}){
-      yield call(changePhy,payload);
-      if (callback) callback()
+      const response = yield call(changePhy,payload);
+      if (callback) callback(response)
     },
     *deletePhy({payload,callback},{call,put}){
       yield call(deletePhy,payload)

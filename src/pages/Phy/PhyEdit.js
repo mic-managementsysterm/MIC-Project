@@ -1,7 +1,7 @@
 import React from 'react';
 import {Spin, Button, Input, Select, Tabs , message } from 'antd';
-// import router from 'umi/router';
 import { connect } from 'dva';
+import router from 'umi/router';
 
 const { TabPane }=Tabs;
 const { Option }=Select;
@@ -93,7 +93,7 @@ class questionAdd extends React.Component {
           record:res,
           tabObj,
           tabNameArr,
-          currentTab:tabNameArr[0]
+          currentTab:tabNameArr[0],
         })
       }
     })
@@ -104,21 +104,21 @@ class questionAdd extends React.Component {
       return (
         <div style={{ padding: 20 }} key={questionIndex.toString()}>
           <div>
-            <span>检查内容</span>
+            <span style={{ marginRight: 10 }}>检查内容</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '50%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex)} />
           </div>
           <div style={{ marginTop: 10}}>
-            <span>检查结果类型</span>
+            <span style={{ marginRight: 10 }}>检查结果类型</span>
             <Select
               style={{ width: 200 }}
               defaultValue={question.Type || 1}
               onChange={value => this.handleTypeChange(value,questionIndex)}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
-              <Option value={1}>1</Option>
-              <Option value={2}>2</Option>
-              <Option value={3}>3</Option>
-              <Option value={4}>4</Option>
+              <Option value={1}>正常/异常</Option>
+              <Option value={2}>填写心率</Option>
+              <Option value={3}>选择心电图结果</Option>
+              <Option value={4}>填写检测结果</Option>
             </Select>
           </div>
           {this.getQuestionOperator(questionIndex,question)}
@@ -254,9 +254,12 @@ class questionAdd extends React.Component {
 
   handleSaveQuestionnaire() {
     let {record,tabObj,tabNameArr} = this.state;
-    const { dispatch } = this.props;
     let upload ={};
     let Topics = [];
+    const { dispatch } = this.props;
+    this.setState({
+      showLoading: true
+    })
     upload.Name = record.Name;
     upload.Id = this.props.routerParams.phyId ? this.props.routerParams.phyId : null;
     tabNameArr.map((tabName,tabIndex) => {
@@ -278,8 +281,19 @@ class questionAdd extends React.Component {
     dispatch({
       type: 'phy/changePhy',
       payload: {body:upload},
+      callback:(res)=>{
+        if (res.Success) {
+          this.setState({
+            showLoading:false
+          })
+          router.go(-1);
+        }else {
+          this.setState({
+            showLoading: false
+          })
+        }
+      },
     })
-    console.log('@upload',upload)
   }
 
   // / tab部分
@@ -292,11 +306,11 @@ class questionAdd extends React.Component {
   tabNameChange(){
     let {currentTabNewName,tabObj,tabNameArr,currentTab} = this.state;
     if(currentTabNewName === ""){
-      message.warning("请输入项目类别名称！");
+      message.warning("请输入检查项目类别！");
       return
     }
     if(tabNameArr.indexOf(currentTabNewName) !== -1){
-      message.warning("已存此名字的项目类别！");
+      message.warning("已存此名字的检查项目类别！");
       return
     }
     let tmpTopics =[];
@@ -326,7 +340,7 @@ class questionAdd extends React.Component {
   deleteTab(){
     let {tabObj,tabNameArr,currentTab} = this.state;
     if(tabNameArr.length === 1){
-      message.warning("至少保留一个项目类别！");
+      message.warning("至少保留一个检查项目类别！");
       return
     }
     let tmpTabNameArr = [];
@@ -356,11 +370,11 @@ class questionAdd extends React.Component {
   addTab() {
     let {currentTabNewName,tabObj,tabNameArr} = this.state;
     if(currentTabNewName === ""){
-      message.warning("请输入项目类别名称！");
+      message.warning("请输入检查项目类别！");
       return
     }
     if(tabNameArr.indexOf(currentTabNewName) !== -1){
-      message.warning("已存此名字的项目类别！");
+      message.warning("已存此名字的检查项目类别！");
       return
     }
     tabObj[currentTabNewName] = [{
@@ -402,10 +416,10 @@ class questionAdd extends React.Component {
         <div>
           {this.getTitle()}
           <div style={{ display: 'flex', padding: 20 }}>
-            <Input style={{ width: '50%' }}  placeholder='请输入项目类别名称' onChange={e => {this.state.currentTabNewName = e.target.value;return null}} />
-            <Button style={{ marginLeft: 10 }} onClick={() => this.tabNameChange()}>更改项目类别名称</Button>
-            <Button style={{ marginLeft: 10 }} onClick={() => this.deleteTab()}>删除此项目类别名称</Button>
-            <Button style={{ marginLeft: 10 }} onClick={() => this.addTab()}>新增项目类别</Button>
+            <Input style={{ width: '50%' }}  placeholder='请输入检查项目类别' onChange={e => {this.state.currentTabNewName = e.target.value;return null}} />
+            <Button style={{ marginLeft: 10 }} onClick={() => this.tabNameChange()}>更改检查项目类别</Button>
+            <Button style={{ marginLeft: 10 }} onClick={() => this.deleteTab()}>删除此检查项目类别</Button>
+            <Button style={{ marginLeft: 10 }} onClick={() => this.addTab()}>新增检查项目类别</Button>
           </div>
           <div style={{ padding: 20, borderBottom: '2px solid #ccc' }}>
             <div style={{ marginBottom: 20 }}>

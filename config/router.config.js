@@ -41,19 +41,13 @@ export default [
       //量表管理
       {
         path: '/gauge',
-        icon: 'form',
+        icon: 'profile',
         name: 'gauge',
         routes: [
           {
             path: '/gauge/question-list',
             name: 'question',
             component: './Gauge/Question',
-          },
-          {
-            path: '/gauge/question-list/questionAdd-list',
-            hideInMenu:true,
-            name: 'questionAdd',
-            component: './Gauge/QuestionAdd',
           },
           {
             path: '/gauge/question-list/questionEdit-list',
@@ -78,7 +72,7 @@ export default [
             path: '/phy/phy-list/phyAdd-list',
             hideInMenu:true,
             name: 'phyAdd',
-            component: './Phy/PhyAdd',
+            component: './Phy/PhyEdit',
           },
           {
             path: '/phy/phy-list/phyEdit-list',
