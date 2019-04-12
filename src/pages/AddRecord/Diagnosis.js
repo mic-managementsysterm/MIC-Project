@@ -33,6 +33,7 @@ class DiagnosisForm extends PureComponent {
       fourDiagnoseType:'see',
       data: [],
       base64: [],
+      fileList: [],
       current:1,
       total:0,
     }
@@ -223,15 +224,15 @@ class DiagnosisForm extends PureComponent {
 
   beforeUpload = file => {
     const isJPG = file.type === 'image/jpeg';
-    if (!(isJPG || isJPEG || isGIF || isPNG)) {
+    if (!isJPG) {
       message.error({
-        title: '只能上传JPG 、JPEG 、GIF、 PNG格式的图片~',
+        title: '只能上传JPG格式的图片',
       });
       return;
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
+      message.error('图片大小不超过2MB!');
     }
     return isJPG && isLt2M;
   };
@@ -244,12 +245,14 @@ class DiagnosisForm extends PureComponent {
       return;
     }
     if (info.file.status === 'done') {
-      if (info.fileList.length > 3) {
-        info.fileList.splice(0, 1);
-      }
+      // if (info.fileList.length > 3) {
+      //   info.fileList.splice(0, 1);
+      // }
+      this.setState({
+        fileList: info.fileList,
+      })
       this.getBase64(info.file.originFileObj, imageUrl =>{
         base.push(imageUrl);
-        console.log("base",base)
         this.setState({
           base64: base,
           uploading:false,
@@ -353,11 +356,10 @@ class DiagnosisForm extends PureComponent {
       dispatch({
         type: 'disease/setStates',
         payload:{
-          selectDiseaseRows:selectDiseaseRows.length===0?row:row3,
-          DSNoData:DSNoData.length===0?row2:row4
+          selectDiseaseRows:selectDiseaseRows.length===0?row:selectDiseaseRows.concat(row),
+          DSNoData:DSNoData.length===0?row2:DSNoData.concat(row2)
         },
       });
-      console.log('@loop3',DSNoData)
     }else {
       dispatch({
         type: 'disease/setStates',
@@ -367,7 +369,6 @@ class DiagnosisForm extends PureComponent {
         },
       });
     }
-    console.log('@loop4',DSNoData)
   };
 
   handleSelectRelateRows=rows=>{
@@ -423,7 +424,6 @@ class DiagnosisForm extends PureComponent {
       selectRelateRows.slice().map((d,index)=>{
         if (item.Id===selectedId) {
           item.Name=item.Name+'('+d.Name+')'
-          console.log('@d',d)
           const row=[{ParentId:selectedId,DiagnoseId:d.Id,DiagnoseName:d.Name}]
           const rows=row.slice()
           dispatch({
@@ -466,16 +466,16 @@ class DiagnosisForm extends PureComponent {
 
   select=(value,option)=>{
     const { dispatch, form,disease:{pageSize,DSdata,searchKey,DSNoData,selectDiseaseRows} } = this.props;
-    const key=option.props.text
+    const key=value
     if (DSNoData.length===0){
-      this.handleSelectRows([{Name:option.props.text,Id:value}],0)
+      this.handleSelectRows([{Name:value,Id:option.props.text}],0)
     } else {
       DSNoData.map((d,index)=>{
-        if (d.Id==value) {
+        if (d.Id==option.props.text) {
           message.error('请勿重复选择')
         }else {
-          const row=[{Name:option.props.text,Id:value}]
-          this.handleSelectRows([{Name:option.props.text,Id:value}],0)
+          const row=[{Name:value,Id:option.props.text}]
+          this.handleSelectRows([{Name:value,Id:option.props.text}],0)
         }
       })
     }
@@ -503,7 +503,7 @@ class DiagnosisForm extends PureComponent {
 
   renderOptionItem=(item)=>{
     return (
-      <Option key={item.Id} text={item.Name} >
+      <Option key={item.Name} text={item.Id} >
         {item.Name}
       </Option>
     );
@@ -528,7 +528,7 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const { diagnoseData, data,imageUrl } =this.state;
+    const { diagnoseData, data,imageUrl,fileList } =this.state;
     const data1 ={
       list: DSdata,
       pagination: {
@@ -742,14 +742,14 @@ class DiagnosisForm extends PureComponent {
                   <Upload
                     name="avatar"
                     listType="picture-card"
-                    accept=".jpg,.jpeg,.png"
+                    accept=".jpeg"
                     className="avatar-uploader"
                     showUploadList
                     action=""
                     beforeUpload={this.beforeUpload}
                     onChange= {this.handleChange}
                   >
-                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
+                    {fileList.length >= 2 ? null: uploadButton}
                   </Upload>
                 )}
               </Form.Item>

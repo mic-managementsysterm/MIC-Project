@@ -67,7 +67,7 @@ class FourDagnostic extends Component {
             </Description>
             <Description term="四诊信息" className={styles.term}>
               <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
-                {diagnosisData.Symptoms
+                {diagnosisData&&diagnosisData.Symptoms
                   ? diagnosisData.Symptoms.map((item, index) => {
                     return <span key={index}>{item.SymptomName}、</span>;
                   })
@@ -75,7 +75,9 @@ class FourDagnostic extends Component {
               </Row>
             </Description>
             <Description term="四诊照片" className={styles.term}>
-               { diagnosisData.MedicalImgs && diagnosisData.MedicalImgs[0] && <img src={`http://localhost:5010${diagnosisData.MedicalImgs[0].Img}`} className={styles.img} />}
+              {diagnosisData.MedicalImgs && diagnosisData.MedicalImgs ? diagnosisData.MedicalImgs.map(img => <img
+                src={`http://localhost:5010${img.Img}`} className={styles.img}/>) : null
+              }
             </Description>
           </DescriptionDetail>
         </Card>

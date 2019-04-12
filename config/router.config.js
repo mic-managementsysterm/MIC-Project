@@ -41,7 +41,7 @@ export default [
       //量表管理
       {
         path: '/gauge',
-        icon: 'form',
+        icon: 'profile',
         name: 'gauge',
         routes: [
           {
