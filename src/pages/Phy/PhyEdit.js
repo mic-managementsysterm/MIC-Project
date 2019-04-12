@@ -104,11 +104,11 @@ class questionAdd extends React.Component {
       return (
         <div style={{ padding: 20 }} key={questionIndex.toString()}>
           <div>
-            <span>检查内容</span>
+            <span style={{ marginRight: 10 }}>检查内容</span>
             <Input value={question.Title} style={{ borderStyle: 'none', width: '50%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex)} />
           </div>
           <div style={{ marginTop: 10}}>
-            <span>检查结果类型</span>
+            <span style={{ marginRight: 10 }}>检查结果类型</span>
             <Select
               style={{ width: 200 }}
               defaultValue={question.Type || 1}
@@ -306,11 +306,11 @@ class questionAdd extends React.Component {
   tabNameChange(){
     let {currentTabNewName,tabObj,tabNameArr,currentTab} = this.state;
     if(currentTabNewName === ""){
-      message.warning("请输入项目类别名称！");
+      message.warning("请输入检查项目类别！");
       return
     }
     if(tabNameArr.indexOf(currentTabNewName) !== -1){
-      message.warning("已存此名字的项目类别！");
+      message.warning("已存此名字的检查项目类别！");
       return
     }
     let tmpTopics =[];
@@ -340,7 +340,7 @@ class questionAdd extends React.Component {
   deleteTab(){
     let {tabObj,tabNameArr,currentTab} = this.state;
     if(tabNameArr.length === 1){
-      message.warning("至少保留一个项目类别！");
+      message.warning("至少保留一个检查项目类别！");
       return
     }
     let tmpTabNameArr = [];
@@ -370,11 +370,11 @@ class questionAdd extends React.Component {
   addTab() {
     let {currentTabNewName,tabObj,tabNameArr} = this.state;
     if(currentTabNewName === ""){
-      message.warning("请输入项目类别名称！");
+      message.warning("请输入检查项目类别！");
       return
     }
     if(tabNameArr.indexOf(currentTabNewName) !== -1){
-      message.warning("已存此名字的项目类别！");
+      message.warning("已存此名字的检查项目类别！");
       return
     }
     tabObj[currentTabNewName] = [{
@@ -416,10 +416,10 @@ class questionAdd extends React.Component {
         <div>
           {this.getTitle()}
           <div style={{ display: 'flex', padding: 20 }}>
-            <Input style={{ width: '50%' }}  placeholder='请输入项目类别名称' onChange={e => {this.state.currentTabNewName = e.target.value;return null}} />
-            <Button style={{ marginLeft: 10 }} onClick={() => this.tabNameChange()}>更改项目类别名称</Button>
-            <Button style={{ marginLeft: 10 }} onClick={() => this.deleteTab()}>删除此项目类别名称</Button>
-            <Button style={{ marginLeft: 10 }} onClick={() => this.addTab()}>新增项目类别</Button>
+            <Input style={{ width: '50%' }}  placeholder='请输入检查项目类别' onChange={e => {this.state.currentTabNewName = e.target.value;return null}} />
+            <Button style={{ marginLeft: 10 }} onClick={() => this.tabNameChange()}>更改检查项目类别</Button>
+            <Button style={{ marginLeft: 10 }} onClick={() => this.deleteTab()}>删除此检查项目类别</Button>
+            <Button style={{ marginLeft: 10 }} onClick={() => this.addTab()}>新增检查项目类别</Button>
           </div>
           <div style={{ padding: 20, borderBottom: '2px solid #ccc' }}>
             <div style={{ marginBottom: 20 }}>

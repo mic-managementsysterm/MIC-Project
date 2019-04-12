@@ -34,6 +34,8 @@ class DiagnosisForm extends PureComponent {
       data: [],
       base64: [],
       fileList: [],
+      previewVisible: false,
+      previewImage: '',
       current:1,
       total:0,
     }
@@ -245,9 +247,6 @@ class DiagnosisForm extends PureComponent {
       return;
     }
     if (info.file.status === 'done') {
-      // if (info.fileList.length > 3) {
-      //   info.fileList.splice(0, 1);
-      // }
       this.setState({
         fileList: info.fileList,
       })
@@ -260,6 +259,15 @@ class DiagnosisForm extends PureComponent {
         })
       });
     }
+  }
+
+  handleCancel = () => this.setState({ previewVisible: false })
+
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.thumbUrl,
+      previewVisible: true,
+    });
   }
 
   // auto
@@ -463,49 +471,68 @@ class DiagnosisForm extends PureComponent {
   }
 
   select=(value,option)=>{
-    const { dispatch, form,disease:{pageSize,DSdata,searchKey,DSNoData,selectDiseaseRows} } = this.props;
-    const key=value
+    const { disease:{DSNoData}, dispatch} = this.props;
     if (DSNoData.length===0){
-      this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+      this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id}],0)
+      dispatch({
+        type: 'disease/setStates',
+        payload: {
+          value:''
+        },
+      });
     } else {
-      DSNoData.map((d,index)=>{
-        if (d.Id==option.props.text) {
-          message.error('请勿重复选择')
-        }else {
-          const row=[{Name:value,Id:option.props.text}]
-          this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+      let flag = false;
+      DSNoData.map((d)=>{
+        if (d.Id === option.props.text) {
+          message.error('请勿重复选择');
+          flag = true;
         }
-      })
-    }
-  }
-
-  handleSearch=(value)=>{
-      const { dispatch, form,disease:{pageSize} } = this.props;
-       const key=value
-         dispatch({
+      });
+      if(!flag){
+        this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id}],0);
+        dispatch({
           type: 'disease/setStates',
           payload: {
-            searchKey:key,
-          },callback:()=>{
-             dispatch({
-               type: 'disease/queryDisAndSyn',
-               payload: {
-                 key,
-                 pagesize:10,
-                 pageindex:1,
-               },
-             });
-           },
+            value:''
+          },
         });
-}
+      }
+    }
+  };
+
+
+
+  handleSearch=(value)=>{
+    const { dispatch } = this.props;
+    const key=value;
+    dispatch({
+      type: 'disease/setStates',
+      payload: {
+        searchKey:key,
+        value:value,
+      },callback:()=>{
+        dispatch({
+          type: 'disease/queryDisAndSyn',
+          payload: {
+            key,
+            pagesize:10,
+            pageindex:1,
+          },
+        });
+      },
+    });
+  };
+
 
   renderOptionItem=(item)=>{
     return (
-      <Option key={item.Name} text={item.Id} >
+      <Option key={item.Id} text={item.Name} data={item}>
         {item.Name}
       </Option>
     );
-  }
+  };
+
+
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -526,7 +553,7 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const { diagnoseData, data,imageUrl,fileList } =this.state;
+    const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
     const data1 ={
       list: DSdata,
       pagination: {
@@ -737,18 +764,23 @@ class DiagnosisForm extends PureComponent {
                 {getFieldDecorator('SZZP', {
                   rules: [{ required: true, message: '请选择四诊照片!' }],
                 })(
-                  <Upload
-                    name="avatar"
-                    listType="picture-card"
-                    accept=".jpeg"
-                    className="avatar-uploader"
-                    showUploadList
-                    action=""
-                    beforeUpload={this.beforeUpload}
-                    onChange= {this.handleChange}
-                  >
-                    {fileList.length >= 2 ? null: uploadButton}
-                  </Upload>
+                 <div>
+                   <Upload
+                     name="avatar"
+                     listType="picture-card"
+                     className="avatar-uploader"
+                     showUploadList
+                     action=""
+                     beforeUpload={this.beforeUpload}
+                     onChange= {this.handleChange}
+                     onPreview={this.handlePreview}
+                   >
+                     {fileList.length >= 2 ? null: uploadButton}
+                   </Upload>
+                   <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                     <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                   </Modal>
+                 </div>
                 )}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>
