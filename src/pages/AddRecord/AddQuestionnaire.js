@@ -78,13 +78,13 @@ class AddRecord extends Component {
     Topics[index].insertImg = img;
   };
 
-  renderSelect = (itemin, total) => {
+  renderSelect = (itemin,index, total) => {
     const { dispatch } = this.props;
     let handleChange = event => {
       dispatch({
         type: 'addQues/setInfos',
         payload: {
-          index: itemin.Order - 1,
+          index: index,
           type: 'Score',
           value: event.target.value,
         },
@@ -138,11 +138,11 @@ class AddRecord extends Component {
         let reader = new FileReader();
         reader.readAsDataURL(info.file.originFileObj);
         reader.onload = event => {
-          Topics[item.Order - 1].insertImg = event.target.result;
+          Topics[index].insertImg = event.target.result;
           dispatch({
             type: 'addQues/setInfos',
             payload: {
-              index: item.Order - 1,
+              index: index,
               type: 'Images',
               value: { Url: event.target.result },
             },
@@ -151,11 +151,11 @@ class AddRecord extends Component {
       }
     };
     const onRemove = () => {
-      Topics[item.Order - 1].insertImg = '';
+      Topics[index].insertImg = '';
       dispatch({
         type: 'addQues/setInfos',
         payload: {
-          index: item.Order - 1,
+          index: index,
           type: 'Images',
           value: '',
         },
@@ -181,7 +181,7 @@ class AddRecord extends Component {
         <div className={styles.topic}>
           <Row>{renderGroupName()}</Row>
           <Row className={styles.title}>
-            <span>{`Q${item.Order}${'  '}${item.Title}`}</span>
+            <span>{`Q${index + 1}${'  '}${item.Title}`}</span>
           </Row>
           <Row>
             {item.Image ? (
@@ -202,7 +202,7 @@ class AddRecord extends Component {
             ) : null}
           </Row>
           <Row>
-            {this.renderSelect(item, item.TotalScore)}
+            {this.renderSelect(item, index, item.TotalScore)}
             <Upload
               name="topicImg"
               multiple={false}
