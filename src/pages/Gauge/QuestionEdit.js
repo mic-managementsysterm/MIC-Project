@@ -242,12 +242,14 @@ class questionAdd extends React.Component {
 
 
   handleSaveQuestionnaire(body) {
-
     this.setState({
       showLoading:true
     })
     const {question:{question},dispatch}=this.props
     // question=body
+    body.Topics.map((item,index)=>{
+      item.Order=index+1
+    })
     dispatch({
         type:'question/changeQuestion',
         payload: {body},callback:()=>{
@@ -344,7 +346,7 @@ class questionAdd extends React.Component {
               <Input value={question.GroupName} style={{ borderStyle: 'none', width: '90%', marginLeft: 3,marginBottom: 10}} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
             </div>
             <span>Q{questionIndex + 1}</span>
-            <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
+            <Input value={question.Title} style={{ borderStyle: 'none', width: '90%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
             <Row style={{float:'right'}}>
               <span >总分：</span>
               <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>

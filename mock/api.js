@@ -1,6 +1,6 @@
 import mockjs from 'mockjs';
 
-const titles = ['四诊数据采集', '生理数据采集', '认知筛查量表', 'MMSE量表', 'MoCA量表'];
+const titles = ['四诊数据采集', '理化数据采集', '认知筛查量表', 'MMSE量表', 'MoCA量表'];
 const avatars = [
   'https://gw.alipayobjects.com/zos/rmsportal/WdGqmHpayyMjiEhcKoVE.png', // Alipay
   'https://gw.alipayobjects.com/zos/rmsportal/zOsKZmFRdUtvpqCImOVY.png', // Angular
