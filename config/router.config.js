@@ -72,7 +72,7 @@ export default [
             path: '/phy/phy-list/phyAdd-list',
             hideInMenu:true,
             name: 'phyAdd',
-            component: './Phy/PhyAdd',
+            component: './Phy/PhyEdit',
           },
           {
             path: '/phy/phy-list/phyEdit-list',
