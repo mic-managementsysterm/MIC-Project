@@ -59,8 +59,11 @@ class questionAdd extends React.Component {
     };
   }
   componentWillMount(){
-    const Id=this.props.location.state.Id
-    this.getQuestion(Id)
+    const int=this.props.location.state.info
+    if (int===1){
+      const Id=this.props.location.state.Id
+      this.getQuestion(Id)
+    }
   }
 
   getQuestion=(Id)=>{

@@ -50,12 +50,6 @@ export default [
             component: './Gauge/Question',
           },
           {
-            path: '/gauge/question-list/questionAdd-list',
-            hideInMenu:true,
-            name: 'questionAdd',
-            component: './Gauge/QuestionAdd',
-          },
-          {
             path: '/gauge/question-list/questionEdit-list',
             hideInMenu:true,
             name: 'questionEdit',
