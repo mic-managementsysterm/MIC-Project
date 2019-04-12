@@ -198,8 +198,8 @@ class ManaForm extends PureComponent{
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拼音">
           {form.getFieldDecorator('PinYin', {
-            rules: [{ required: true, message: '请输入症状拼音缩写！'}],
-          })(<Input placeholder="请输入症状拼音缩写" />)}
+            rules: [{ required: true, message: '请输入症状首字母！'}],
+          })(<Input placeholder="请输入症状首字母" />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
           <RadioGroup
@@ -439,7 +439,7 @@ class Symptom extends PureComponent {
       },
     };
     return (
-      <PageHeaderWrapper title="疾病关联">
+      <PageHeaderWrapper title="症状管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>

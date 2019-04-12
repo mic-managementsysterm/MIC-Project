@@ -571,7 +571,7 @@ class Syndrome extends PureComponent {
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
-              <Input placeholder="请输入证型名或拼音缩写" style={{ width: 400,marginRight:20 }} />
+              <Input placeholder="请输入证型名或证型首字母" style={{ width: 400,marginRight:20 }} />
             )}
             <Button type="primary" htmlType="submit">
                 查询

@@ -233,7 +233,7 @@ class Physiology extends PureComponent {
       },
     };
     return(
-      <PageHeaderWrapper title="生理数据采集" loading={loading}>
+      <PageHeaderWrapper title="理化数据采集" loading={loading}>
         <Spin spinning={this.state.loading} tip={'正在提交'}>
         <div className={styles.content}>
           <Form hideRequiredMark style={{ marginTop: 8 }}>
