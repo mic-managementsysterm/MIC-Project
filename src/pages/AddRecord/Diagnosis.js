@@ -466,18 +466,16 @@ class DiagnosisForm extends PureComponent {
 
   select=(value,option)=>{
     const { dispatch, form,disease:{pageSize,DSdata,searchKey,DSNoData,selectDiseaseRows} } = this.props;
-    const key=value
+    const key=option.props.text
     if (DSNoData.length===0){
-      this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+      this.handleSelectRows([{Name:option.props.text,Id:value}],0)
     } else {
       DSNoData.map((d,index)=>{
-        if (d.Id==option.props.text) {
+        if (d.Id==value) {
           message.error('请勿重复选择')
-          console.log('@loop',index)
         }else {
-          console.log('@loop1',index)
-          const row=[{Name:value,Id:option.props.text}]
-          this.handleSelectRows([{Name:value,Id:option.props.text}],0)
+          const row=[{Name:option.props.text,Id:value}]
+          this.handleSelectRows([{Name:option.props.text,Id:value}],0)
         }
       })
     }
@@ -505,7 +503,7 @@ class DiagnosisForm extends PureComponent {
 
   renderOptionItem=(item)=>{
     return (
-      <Option key={item.Name} text={item.Id} >
+      <Option key={item.Id} text={item.Name} >
         {item.Name}
       </Option>
     );

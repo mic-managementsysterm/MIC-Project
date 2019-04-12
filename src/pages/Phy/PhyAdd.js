@@ -22,11 +22,11 @@ constructor(props) {
           Id:         null,
           GaugeId:    null,
           GroupName:  null,
-          GroupOrder: null,
+          GroupOrder: 1,
           Title:      null,
           Order:      null,
           Type:       null
-        }
+        },
       ],
       CreatedAt:  null,
     }
@@ -91,6 +91,46 @@ constructor(props) {
     })
   }
 
+  getQuestionOperator(questionIndex, array) {
+    return (
+      <div>
+        {/*<p style={{ float: 'right' }}>*/}
+          {/*{questionIndex === 0 ? (*/}
+            {/*null*/}
+          {/*) : (*/}
+            {/*<span className="questionOperate" style={{ marginLeft: 8 }} onClick={() => this.handleShiftQuestion(questionIndex, -1)}>上移</span>*/}
+          {/*)}*/}
+          {/*{questionIndex === array.length - 1 ? (*/}
+            {/*null*/}
+          {/*) : (*/}
+            {/*<span className="questionOperate" style={{ marginLeft: 8 }} onClick={() => this.handleShiftQuestion(questionIndex, 1)}>下移</span>*/}
+          {/*)}*/}
+          {/*<span className="questionOperate" style={{ marginLeft: 8 }} onClick={() => this.handleCopyQuestion(questionIndex)}>复用</span>*/}
+          {/*<span className="questionOperate" style={{ marginLeft: 8 }} onClick={() => this.handleRemoveQuestion(questionIndex)}>删除</span>*/}
+        {/*</p>*/}
+        11111111111111111
+      </div>
+    );
+  }
+
+  addPsyGroup=()=>{
+    const {phys} = this.state;
+    const newRow={
+          Id:         null,
+          GaugeId:    null,
+          GroupName:  null,
+          GroupOrder: 1,
+          Title:      null,
+          Order:      null,
+          Type:       null
+        }
+      phys.Topics.push(newRow)
+        this.setState({
+          phys:phys
+        })
+
+  }
+
   savePhy = (body) => {
   const { dispatch } = this.props;
     this.setState({
@@ -125,6 +165,20 @@ constructor(props) {
   getPhys = () => {
     const {phys} = this.state;
     return (phys.Topics.map((phy, phyIndex) => {
+      phys.Topics.map((order,index)=>{
+        if (phy.GroupOrder===order.GroupOrder) {
+          <div style={{ padding: 30 }} key={phyIndex}>
+            <Input value={phy.Title} style={{ borderStyle: 'none', width: '50%', marginLeft: 3 }} onChange={(e) => this.handlePhyChange(e, phyIndex,1)} />
+            <span>项目名称</span>
+            <Input value={phy.GroupName} style={{ borderStyle: 'none', width: '50%', marginLeft: 3,marginTop:10 }} onChange={(e) => this.handlePhyChange(e, phyIndex,2)}></Input>
+            <span>项目类型</span>
+            <Button style={{ textAlign: 'center'}} onClick={this.handleAddPhy}>
+              添加问题
+            </Button>
+            {this.getQuestionOperator(phyIndex,phy.Topics)}
+          </div>
+        }
+      })
       if (phy.Type === 1 || 2 || 3 || 4) {
         return (
           <div style={{ padding: 30 }} key={phyIndex}>
@@ -132,6 +186,9 @@ constructor(props) {
             <span>项目名称</span>
             <Input value={phy.GroupName} style={{ borderStyle: 'none', width: '50%', marginLeft: 3,marginTop:10 }} onChange={(e) => this.handlePhyChange(e, phyIndex,2)}></Input>
             <span>项目类型</span>
+            <Button style={{ textAlign: 'center'}} onClick={this.handleAddPhy}>
+              添加问题
+            </Button>
             </div>
         );
       }
@@ -148,8 +205,8 @@ constructor(props) {
           {this.getTitle()}
           {this.getPhys()}
           {this.getAddArea()}
-          <div style={{ wdith: '100%', height: '100%', padding: 30, background: '#eee', textAlign: 'center'}} onClick={this.handleAddPhy}>
-            添加问题
+          <div style={{ wdith: '100%', height: '100%', padding: 30, background: '#eee', textAlign: 'center'}} onClick={this.addPsyGroup}>
+            添加类型
           </div>
           <Button onClick={()=>this.savePhy(this.state.phys)}>保存理化单</Button>
         </Spin>
