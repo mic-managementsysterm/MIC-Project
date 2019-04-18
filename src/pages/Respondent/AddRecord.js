@@ -80,10 +80,11 @@ import router from 'umi/router';
                 (
                   <List.Item key={item.key}>
                     <Card
+                      onClick={()=>this.addRecord(item)}
                       hoverable
                       className={styles.card}
                       title={item.Name}
-                      extra={<Button onClick={()=>this.addRecord(item)}>新增</Button>}
+                      extra={<Button >新增</Button>}
                     >
                       点击新增添加新记录。
                     </Card>

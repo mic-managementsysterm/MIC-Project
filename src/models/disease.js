@@ -1,4 +1,4 @@
-import { queryDisease, addDisease, removeDisease, updateDisease,queryDisAndSyn} from '@/services/api';
+import { queryDisease, addDisease, removeDisease, updateDisease,queryDisAndSyn,querySymType,addSymType} from '@/services/api';
 
 export default {
   namespace: 'disease',
@@ -6,6 +6,7 @@ export default {
   state: {
     dataSource:[],
     DSdata:[],
+    typeData:[],
     DSNoData:[],
     selectedId:null,
     current:1,
@@ -13,6 +14,7 @@ export default {
     total:0,
     searchKey:'',
     value:'',
+    defaultValue:[],
     diseaseData:[],
     modalVisible: false,
     relateModalVisible: false,
@@ -25,17 +27,23 @@ export default {
       PinYin:"",
       Prevalent:false,
     },
+    Type:{
+      Id	:"",
+      TypeName:	"",
+      ParentId:	"",
+      ChildrenTypes:	[]
+    },
     formValues: {},
   },
 
   effects: {
-    *queryDisease({ payload,callback }, { call, put }) {
-      const response = yield call(queryDisease, payload);
+    *querySymType({ payload,callback }, { call, put }) {
+      const response = yield call(querySymType, payload);
       if(response.Success){
         yield put({
           type: 'set',
           payload: {
-            dataSource:response.Data.rows,
+            typeData:response.Data,
             current:response.Data.pageindex,
             pageSize:response.Data.pagesize,
             total:response.Data.total,
@@ -61,6 +69,22 @@ export default {
         if (callback) callback();
       }
     },
+    *queryDisease({ payload,callback }, { call, put }) {
+      const response = yield call(queryDisease, payload);
+      if(response.Success){
+        yield put({
+          type: 'set',
+          payload: {
+            dataSource:response.Data.rows,
+            current:response.Data.pageindex,
+            pageSize:response.Data.pagesize,
+            total:response.Data.total,
+            searchKey:payload.key
+          },
+        });
+        if (callback) callback();
+      }
+    },
     *addDisease({ payload, callback }, { call }) {
       yield call(addDisease, payload);
       if (callback) callback();
@@ -73,6 +97,12 @@ export default {
       yield call(updateDisease, payload);
       if (callback) callback();
     },
+
+    *addSymType({ payload, callback }, { call }) {
+      yield call(addSymType, payload);
+      if (callback) callback();
+    },
+
     *setStates({ payload, callback }, { put }) {
       yield put({
         type: 'set',

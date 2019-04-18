@@ -10,140 +10,217 @@ import {
   Modal,
   message,
   Table,
+  Radio, Cascader,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
-import styles from './Syndrome.less';
+import styles from './Disease.less';
+import Syndrome from "./Syndrome";
+import Symptom from './Symptom';
 
 const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
 const {Search} = Input;
 FormItem.className = styles["ant-form-item"];
-
-const ClearSyndrome = {
-  Id: "",
-  Name: "",
-  PinYin:"",
+let arr=[];
+let newArr=[]
+let arr1=[]
+const ClearDisease = {
+  Id	:"",
+  TypeName:	"",
+  ParentId:	"",
+  ChildrenTypes:	[]
 };
-const setInfo={};
+const setInfo = {};
 
 const getValue = obj =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
 
+@connect(({ disease,loading }) => ({
+  disease,
+  loading: loading.models.disease,
+}))
+@Form.create()
+class ManaForm extends PureComponent {
+  constructor(props){
+    super(props);
+    this.state={
+      defaultValue:[]
+    }
+  }
 
-const ManaForm = Form.create()(props => {
-  const { syndrome:{Syndrome, modalVisible,pageSize,current,searchKey}, form,dispatch} = props;
-  const okHandle = () => {
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      Syndrome.Name = fieldsValue.Name;
-      Syndrome.PinYin = fieldsValue.PinYin;
-      if(Syndrome.Id === ""){
-        dispatch({
-          type: 'syndrome/addSyndrome',
-          payload: {
-            Name:Syndrome.Name,
-            PinYin:Syndrome.PinYin,
-          },
-          callback:()=>{
-            dispatch({
-              type: 'syndrome/querySyndrome',
-              payload: {
-                key:'',
-                pagesize:pageSize,
-                pageindex:1,
-              },
-            });
-          }
-        });
+  onChange = (value,selectedOptions) => {
+    let {disease:{Type},dispatch} =this.props;
+    Type.ParentId = value[value.length-1];
+    console.log('@value',value,selectedOptions)
+    // Type.SymptomTypeName = value[1];
+  }
+
+  getFather=()=>{
+    const {disease:{typeData}}=this.props
+   return this.getParent(typeData,Type.ParentId)
+  }
+
+
+
+ getParent=(data2, id)=> {
+    for (let i=0;i<data2.length;i++){
+      if (data2[i].Id==id){
+        arr.push(data2[i].Id)
+         newArr=arr.filter((x, index,self)=>self.indexOf(x)===index)
+        break
       }else {
-        dispatch({
-          type: 'syndrome/updateSyndrome',
-          payload: {
-            ...Syndrome
-          },
-          callback:()=>{
-            dispatch({
-              type: 'syndrome/querySyndrome',
-              payload: {
-                key:searchKey,
-                pagesize:pageSize,
-                pageindex:current,
-              },
-            });
-          }
-        });
+        if (data2[i].ChildrenTypes.length!==0){
+          arr.push(data2[i].Id)
+            this.getParent(data2[i].ChildrenTypes,id);
+        } else {
+          arr=[]
+        }
       }
+    }
+   return newArr;
+
+  }
+
+  render(){
+
+    const { disease:{Type,typeData,modalVisible,pageSize,current,searchKey}, form,dispatch} = this.props;
+    setInfo.setBaseInfo = () => {
+      Object.keys(form.getFieldsValue()).forEach(key => {
+        const obj = {};
+        console.log('@11',Type)
+        obj[key] = Type[key] || null;
+        form.setFieldsValue(obj)
+        dispatch({
+          type:'disease/setState',
+          payload:{
+            Type:Type
+          }
+        })
+      });
+    };
+
+    const okHandle = () => {
+      arr=[]
+      newArr=[]
+      arr1=[]
+      form.validateFields((err, fieldsValue) => {
+        if (err) return;
+        Type.TypeName = fieldsValue.TypeName;
+        console.log('@id',Type)
+        if(Type.Id === ""){
+          dispatch({
+            type: 'disease/addSymType',
+            payload: {
+              Type
+            },
+            callback:()=>{
+              dispatch({
+                type: 'disease/querySymType',
+                payload: {
+                  pagesize:pageSize,
+                  pageindex:1,
+                  key:''
+                },
+              });
+            }
+          });
+        }else {
+          console.log('@add',Type)
+          dispatch({
+            type: 'disease/addSymType',
+            payload: {
+              ...Type
+            },
+            callback:()=>{
+              dispatch({
+                type: 'disease/querySymType',
+                payload: {
+                  pagesize:pageSize,
+                  pageindex:current,
+                  key:searchKey
+                },
+              });
+            }
+          });
+        }
+        dispatch({
+          type: 'disease/setStates',
+          payload: {
+            modalVisible:false,
+            Type:ClearDisease,
+          },
+        });
+        form.resetFields();
+      });
+    };
+
+    const handleCancel = () => {
+      arr=[]
+      newArr=[]
+      arr1=[]
       dispatch({
-        type: 'syndrome/setStates',
+        type: 'disease/setStates',
         payload: {
           modalVisible:false,
-          Syndrome:ClearSyndrome,
+          Type:ClearDisease,
         },
       });
-      form.resetFields();
-    });
-  };
-
-  const handleCancel = () => {
-    dispatch({
-      type: 'syndrome/setStates',
-      payload: {
-        modalVisible:false,
-        Syndrome:ClearSyndrome,
-      },
-    });
-  };
-
-  setInfo.setBaseInfo = () => {
-    Object.keys(form.getFieldsValue()).forEach(key => {
-      const obj = {};
-      obj[key] = Syndrome[key] || null;
-      form.setFieldsValue(obj);
-    });
-  };
-
-  return (
-    <Modal
-      centered
-      destroyOnClose
-      width={640}
-      title="病症类型管理"
-      visible={modalVisible}
-      onOk={okHandle}
-      onCancel={() => handleCancel()}
-    >
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型名">
-        {form.getFieldDecorator('Name', {
-          rules: [{ required: true, message: '请输入病症类型名！', min: 1 }],
-        })(<Input placeholder="请输入病症类型名" />)}
-      </FormItem>
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型拼音">
-        {form.getFieldDecorator('PinYin', {
-          rules: [{ message: '请输入病症类型拼音缩写！'}],
-        })(<Input placeholder="请输入病症类型拼音拼音缩写" />)}
-      </FormItem>
-    </Modal>
-  );
-});
+    };
 
 
-@connect(({ synAndSym,syndrome, loading }) => ({
-  synAndSym,
-  loading: loading.models.synAndSym,
-  relateModalVisible: syndrome.relateModalVisible,
+    const fieldNames={ label: 'TypeName', value: 'Id', children: 'ChildrenTypes' }
+    const defaultValue=this.getParent(typeData,Type.ParentId)
+    const data=typeData
+    return (
+      <Modal
+        centered
+        destroyOnClose
+        width={640}
+        title="类型管理"
+        visible={modalVisible}
+        onOk={okHandle}
+        onCancel={() => handleCancel()}
+      >
+
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型名">
+          {form.getFieldDecorator('TypeName', {
+            rules: [{ required: true, message: '请输入类型名！', min: 1 }],
+          })(<Input placeholder="请输入疾病名" />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病症类型">
+          <Cascader
+            options={typeData}
+            fieldNames={fieldNames}
+            onChange={this.onChange}
+            changeOnSelect
+            defaultValue={Type.ParentId?arr1=defaultValue : null}
+          />
+        </FormItem>
+      </Modal>
+    );
+  }
+}
+
+
+
+@connect(({ disAndSyn,disease, loading }) => ({
+  disAndSyn,
+  loading: loading.models.disAndSyn,
+  relateModalVisible: disease.relateModalVisible,
 }))
 @Form.create()
 class RelateForm extends PureComponent {
   columns1= [
     {
-      title: '病症类型名称',
+      title: '证型名称',
       dataIndex: 'Name',
       align: 'center',
     },{
-      title: '病症类型拼音',
+      title: '证型拼音',
       dataIndex: 'PinYin',
       align: 'center',
     },{
@@ -153,18 +230,18 @@ class RelateForm extends PureComponent {
       align: 'center',
       render: (text,record)=>(
         record ?
-          <Button onClick={()=>this.deleteSym(record)}>删除</Button>
+          <Button onClick={()=>this.deleteSyn(record)}>删除</Button>
           :null
       ),
     }];
 
   columns2=[
     {
-      title: '病症类型名称',
+      title: '证型名称',
       dataIndex: 'Name',
       align: 'center',
     }, {
-      title: '病症类型拼音',
+      title: '证型拼音',
       dataIndex: 'PinYin',
       align: 'center',
     },{
@@ -174,7 +251,7 @@ class RelateForm extends PureComponent {
       align: 'center',
       render: (text,record)=>(
         record ?
-          <Button onClick={()=>this.addSym(record)} disabled={record.disabled}>添加</Button>
+          <Button onClick={()=>this.addSyn(record)} disabled={record.disabled}>添加</Button>
           :null
       ),
     }];
@@ -184,10 +261,10 @@ class RelateForm extends PureComponent {
     wrapperCol: { span: 13 },
   };
 
-  addSym = ( record ) => {
-    let { synAndSym:{relateSym, restSym},dispatch } = this.props;
-    let relate = relateSym.slice();
-    let rest = restSym.slice();
+  addSyn = ( record ) => {
+    let { disAndSyn:{relateSyn, restSyn},dispatch } = this.props;
+    let relate = relateSyn.slice();
+    let rest = restSyn.slice();
     let repeat =false;
     relate.map(data =>{
       if (data.Id ===record.Id){
@@ -204,36 +281,36 @@ class RelateForm extends PureComponent {
       item.Id ===record.Id && (item.disabled = true)
     });
     dispatch({
-      type: 'synAndSym/setStates',
+      type: 'disAndSyn/setStates',
       payload: {
-        restSym:rest,
-        relateSym:relate,
+        restSyn:rest,
+        relateSyn:relate,
       },
     });
   };
 
-  deleteSym = ( record ) => {
-    let {synAndSym:{relateSym, restSym},dispatch} = this.props;
-    let relate = relateSym.slice();
-    let rest = restSym.slice();
+  deleteSyn = ( record ) => {
+    let {disAndSyn:{relateSyn, restSyn},dispatch} = this.props;
+    let relate = relateSyn.slice();
+    let rest = restSyn.slice();
 
     rest.map( item=>{
       item.Id === record.Id && (item.disabled =false)
     } );
     relate = relate.filter(item => item.Id !== record.Id);
     dispatch({
-      type: 'synAndSym/setStates',
+      type: 'disAndSyn/setStates',
       payload: {
-        restSym:rest,
-        relateSym:relate,
+        restSyn:rest,
+        relateSyn:relate,
       },
     });
   };
 
   searchSyndrome = (value) => {
-    const { dispatch } = this.props;
+    const { dispatch }  = this.props;
     dispatch({
-      type: 'synAndSym/querySym',
+      type: 'disAndSyn/querySyn',
       payload: {
         key:value,
         pagesize:8,
@@ -243,16 +320,16 @@ class RelateForm extends PureComponent {
   };
 
   handleRelate = () => {
-    const {  synAndSym:{syndromeId,relateSym},dispatch } = this.props;
-    let symIds = [];
-    relateSym.map(item => {
-      symIds.push(item.Id)
+    const {  disAndSyn:{diseaseId,relateSyn,defaultValue},dispatch } = this.props;
+    let synIds = [];
+    relateSyn.map(item => {
+      synIds.push(item.Id)
     });
     dispatch({
-      type: 'synAndSym/updateRelate',
+      type: 'disAndSyn/updateRelate',
       payload: {
-        SyndromeId:syndromeId,
-        SymptomIds:symIds,
+        DiseaseId:diseaseId,
+        SyndromeIds:synIds,
       },
     });
     this.handleCancel()
@@ -261,15 +338,15 @@ class RelateForm extends PureComponent {
   handleCancel = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'synAndSym/setStates',
+      type: 'disAndSyn/setStates',
       payload: {
-        syndromeId:"",
-        relateSym:[],
-        restSym:[]
+        diseaseId:"",
+        relateSyn:[],
+        restSyn:[]
       },
     });
     dispatch({
-      type: 'syndrome/setStates',
+      type: 'disease/setStates',
       payload: {
         relateModalVisible:false,
       },
@@ -277,7 +354,7 @@ class RelateForm extends PureComponent {
   };
 
   onRestChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,synAndSym:{restKey} } = this.props;
+    const { dispatch,disAndSyn:{restKey} } = this.props;
 
     const params = {
       currentPage: pagination.current,
@@ -285,7 +362,7 @@ class RelateForm extends PureComponent {
     };
 
     dispatch({
-      type: 'synAndSym/querySym',
+      type: 'disAndSyn/querySyn',
       payload: {
         pagesize:params.pageSize,
         pageindex:params.currentPage,
@@ -295,12 +372,12 @@ class RelateForm extends PureComponent {
   };
 
   render() {
-    const { relateModalVisible, synAndSym:{relateSym,restSym,restPagination} } = this.props;
+    const { relateModalVisible, disAndSyn:{relateSyn,restSyn,restPagination} } = this.props;
     return (
       <Modal
         centered
         width={1200}
-        title='病症类型管理'
+        title='关联证型'
         okText='完成'
         cancelText='取消'
         visible={relateModalVisible}
@@ -315,23 +392,24 @@ class RelateForm extends PureComponent {
             <div className={styles["syndrome-title"]}>已关联证型</div>
             <Table
               pagination={{pageSize:8}}
-              dataSource={relateSym}
+              dataSource={relateSyn}
               columns={this.columns1}
               rowKey={item => item.Id}
+
             />
           </Col>
           <Col span={12} className={styles.breadcrumbTitle}>
             <div className={styles["syndrome-title"]}>
               <span>未关联证型</span>
               <Search
-                placeholder="根据疾病名称或疾病首字母搜索证型"
+                placeholder="根据类型名称搜索类型"
                 onSearch={value => this.searchSyndrome(value)}
                 style={{ width: 300, marginLeft: 180 }}
               />
             </div>
             <Table
               pagination={restPagination}
-              dataSource={restSym}
+              dataSource={restSyn}
               columns={this.columns2}
               rowKey={item => item.Id}
               onChange={(p,f,s)=>this.onRestChange(p,f,s)}
@@ -346,33 +424,28 @@ class RelateForm extends PureComponent {
 
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ syndrome,synAndSym, loading }) => ({
-  syndrome,
-  synAndSym,
-  loading: loading.models.syndrome,
+@connect(({ disease,disAndSyn, loading }) => ({
+  disease,
+  disAndSyn,
+  loading: loading.models.disease,
 }))
 @Form.create()
-class Syndrome extends PureComponent {
+class Symtype extends PureComponent {
   columns = [
     {
-      title: '病症类型名称',
-      dataIndex: 'Name',
+      title: '类型名称',
+      dataIndex: 'TypeName',
       width: '40%',
-    },
-    {
-      title: '拼音',
-      dataIndex: 'PinYin',
-      width: '30%',
     },
     {
       title: '操作',
       width: '30%',
       render: (text, record) => {
-        const {syndrome:{dataSource}} = this.props;
-        return dataSource && dataSource.length >= 1
+        const {disease:{typeData}} = this.props;
+        return typeData && typeData.length >= 1
           ? (
             <div key={record.Id}>
-              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>证型关联</Button>
+              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>疾病关联</Button>
               <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>编辑</Button>
             </div>
           ) : null
@@ -381,19 +454,20 @@ class Syndrome extends PureComponent {
   ];
 
   componentDidMount(){
-    const { dispatch,syndrome:{current,pageSize,searchKey} } = this.props;
+    const { dispatch,disease:{typeData,current,pageSize,searchKey} } = this.props;
     dispatch({
-      type: 'syndrome/querySyndrome',
+      type: 'disease/querySymType',
       payload: {
         pagesize:pageSize,
         pageindex:current,
         key:searchKey
       },
     });
+    console.log('@typeData',typeData)
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,syndrome:{formValues,searchKey} } = this.props;
+    const { dispatch,disease:{formValues,searchKey} } = this.props;
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
@@ -410,7 +484,7 @@ class Syndrome extends PureComponent {
       params.sorter = `${sorter.field}_${sorter.order}`;
     }
     dispatch({
-      type: 'syndrome/querySyndrome',
+      type: 'disease/queryDisease',
       payload: {
         pagesize:params.pageSize,
         pageindex:params.currentPage,
@@ -420,10 +494,10 @@ class Syndrome extends PureComponent {
   };
 
   handleFormReset = () => {
-    const { form, dispatch,syndrome:{pageSize} } = this.props;
+    const { form, dispatch,disease:{pageSize} } = this.props;
     form.resetFields();
     dispatch({
-      type: 'syndrome/setStates',
+      type: 'disease/setStates',
       payload: {
         formValues:{},
         current:1,
@@ -432,7 +506,7 @@ class Syndrome extends PureComponent {
       },
     });
     dispatch({
-      type: 'syndrome/querySyndrome',
+      type: 'disease/queryDisease',
       payload: {
         pagesize:pageSize,
         pageindex:1,
@@ -444,7 +518,7 @@ class Syndrome extends PureComponent {
   handleSelectRows = rows => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'syndrome/setStates',
+      type: 'disease/setStates',
       payload: {
         selectedRows:rows
       },
@@ -453,17 +527,17 @@ class Syndrome extends PureComponent {
 
   handleSearch = e => {
     e.preventDefault();
-    const { dispatch, form,syndrome:{pageSize} } = this.props;
+    const { dispatch, form,disease:{pageSize} } = this.props;
     form.validateFields((err, fieldsValue) => {
       const { key } = fieldsValue;
       dispatch({
-        type: 'syndrome/setStates',
+        type: 'disease/setStates',
         payload: {
           searchKey:key,
         },
       });
       dispatch({
-        type: 'syndrome/querySyndrome',
+        type: 'disease/querySymType',
         payload: {
           key,
           pagesize:pageSize,
@@ -474,44 +548,51 @@ class Syndrome extends PureComponent {
   };
 
   handleModalVisible = async(flag, record) => {
-    let newRecord = Object.assign({},record)
+    let newRecord = Object.assign({},record);
     const { dispatch } = this.props;
     await dispatch({
-      type: 'syndrome/setStates',
+      type: 'disease/setStates',
       payload: {
         modalVisible:!!flag,
-        Syndrome:record ? newRecord:ClearSyndrome,
+        Type:record ? newRecord:ClearDisease,
       },
     });
     if(flag && record){
+      console.log('@key',record)
+      dispatch({
+        type:'disease/setState',
+        payload:{
+          Type:record
+        }
+      })
       setInfo.setBaseInfo();
     }
   };
 
   handleDelete = () => {
-    const { dispatch,syndrome:{selectedRows,pageSize,current,searchKey} } = this.props;
+    const { dispatch,disease:{selectedRows,pageSize,current,searchKey} } = this.props;
     let Ids = [];
     selectedRows.map(item => {
       Ids.push(item.Id)
     });
     dispatch({
-      type: 'syndrome/removeSyndrome',
+      type: 'disease/removeDisease',
       payload: {
         Ids:Ids,
       },
       callback:()=>{
         dispatch({
-          type: 'syndrome/setStates',
+          type: 'disease/setStates',
           payload: {
             selectedRows:[],
           },
         });
         dispatch({
-          type: 'syndrome/querySyndrome',
+          type: 'disease/queryDisease',
           payload: {
-            key:searchKey,
             pagesize:pageSize,
             pageindex:current,
+            key:searchKey
           },
         });
       }
@@ -524,26 +605,26 @@ class Syndrome extends PureComponent {
   handleRelateVisible = (flag, record) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'syndrome/setStates',
+      type: 'disease/setStates',
       payload: {
         relateModalVisible:true
       },
     });
 
     dispatch({
-      type: 'synAndSym/changeIdEff',
+      type: 'disAndSyn/changeIdEff',
       payload: record.Id,
       callback:()=>{
         dispatch({
-          type: 'synAndSym/queryRelate',
+          type: 'disAndSyn/queryRelate',
           payload:{
-            SyndromeId:record.Id,
+            DiseaseId:record.Id,
             pagesize:8,
             pageindex:1
           }
         });
         dispatch({
-          type: 'synAndSym/querySym',
+          type: 'disAndSyn/querySyn',
           payload:{
             key:'',
             pagesize:8,
@@ -555,7 +636,7 @@ class Syndrome extends PureComponent {
   };
 
   renderSimpleForm() {
-    const {form: { getFieldDecorator },syndrome:{selectedRows}} = this.props;
+    const {form: { getFieldDecorator },disease:{selectedRows}} = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
@@ -571,7 +652,7 @@ class Syndrome extends PureComponent {
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
-              <Input placeholder="请输入病症类型名或病症类型首字母" style={{ width: 400,marginRight:20 }} />
+              <Input placeholder="请输入疾病名或拼音" style={{ width: 400,marginRight:20 }} />
             )}
             <Button type="primary" htmlType="submit">
                 查询
@@ -586,9 +667,9 @@ class Syndrome extends PureComponent {
   };
 
   render() {
-    const { syndrome: {selectedRows,dataSource,pageSize,current,total }, loading, } = this.props;
+    const { disease: {selectedRows,typeData,pageSize,current,total }, loading, } = this.props;
     const data ={
-      list: dataSource,
+      list: typeData,
       pagination: {
         total: total|| 0,
         pageSize:pageSize,
@@ -596,7 +677,7 @@ class Syndrome extends PureComponent {
       },
     };
     return (
-      <PageHeaderWrapper title="病症类型管理">
+      <PageHeaderWrapper title="类型">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
@@ -605,17 +686,18 @@ class Syndrome extends PureComponent {
               selectedRows={selectedRows || []}
               loading={loading}
               data={data}
+              childrenColumnName={'ChildrenTypes'}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
             />
           </div>
-          <ManaForm {...this.props} />
-          <RelateForm {...this.props} />
+          <ManaForm  />
+          {/*<RelateForm {...this.props} />*/}
         </Card>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Syndrome;
+export default Symtype;

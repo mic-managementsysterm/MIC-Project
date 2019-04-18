@@ -110,7 +110,7 @@ const ManaForm = Form.create()(props => {
       centered
       destroyOnClose
       width={640}
-      title="疾病管理"
+      title="证型管理"
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleCancel()}
@@ -324,7 +324,7 @@ class RelateForm extends PureComponent {
             <div className={styles["syndrome-title"]}>
               <span>未关联证型</span>
               <Search
-                placeholder="根据疾病名称或疾病首字母搜索证型"
+                placeholder="根据证型名称或证型首字母搜索证型"
                 onSearch={value => this.searchSyndrome(value)}
                 style={{ width: 300, marginLeft: 180 }}
               />

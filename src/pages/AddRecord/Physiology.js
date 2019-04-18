@@ -42,6 +42,7 @@ class Physiology extends PureComponent {
         Id:routerParams.RecordAddId
       }
     });
+    console.log('@id',routerParams.RecordAddId)
   }
 
   handleSubmit = () => {

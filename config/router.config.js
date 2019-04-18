@@ -36,6 +36,11 @@ export default [
             name: 'symptomList',
             component: './Disease/Symptom',
           },
+          {
+            path:'/disease/symtype-list',
+            name:'symtypeList',
+            component:'./Disease/Symtype'
+          }
         ],
       },
       //量表管理

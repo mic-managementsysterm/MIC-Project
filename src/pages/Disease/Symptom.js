@@ -186,7 +186,7 @@ class ManaForm extends PureComponent{
         centered
         destroyOnClose
         width={640}
-        title="疾病管理"
+        title="症状管理"
         visible={modalVisible}
         onOk={()=>this.okHandle()}
         onCancel={() => this.handleCancel()}
@@ -414,7 +414,7 @@ class Symptom extends PureComponent {
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
-              <Input placeholder="请输入疾病名或拼音" style={{ width: 400,marginRight:20 }} />
+              <Input placeholder="请输入症状名或拼音" style={{ width: 400,marginRight:20 }} />
             )}
             <Button type="primary" htmlType="submit">
                 查询
