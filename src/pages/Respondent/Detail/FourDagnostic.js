@@ -5,7 +5,6 @@ import DescriptionList from '@/components/DescriptionList';
 import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from  './FourDagnostic.less';
-
 const { Description } = DescriptionList;
 
 @connect(({ detail,routerParams, loading }) => ({
@@ -60,7 +59,7 @@ class FourDagnostic extends Component {
                <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
                  {diagnosisData&&diagnosisData.Diagnoses
                    ? diagnosisData.Diagnoses.map((item, index) => {
-                     return <span key={index}>{item.DiagnoseName}&nbsp;&nbsp;&nbsp;&nbsp;</span>;
+                     return <span key={index}>{item.DiagnoseName}&nbsp;&nbsp;</span>;
                    })
                    : null}
                </Row>
@@ -69,7 +68,7 @@ class FourDagnostic extends Component {
               <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
                 {diagnosisData&&diagnosisData.Symptoms
                   ? diagnosisData.Symptoms.map((item, index) => {
-                    return <span key={index}>{item.SymptomName}&nbsp;&nbsp;&nbsp;&nbsp;</span>;
+                    return <span key={index}>{item.SymptomName}&nbsp;&nbsp;</span>;
                   })
                   : null}
               </Row>

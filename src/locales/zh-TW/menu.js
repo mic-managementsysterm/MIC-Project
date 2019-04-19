@@ -3,6 +3,7 @@ export default {
   'menu.login': '登錄',
   'menu.disease': '疾病管理',
   'menu.disease.diseaseList': '疾病关联',
+  'menu.disease.symtypeList': '类型管理',
   'menu.gauge': '问卷管理',
   'menu.gauge.question': '问卷',
   'menu.gauge.questionAdd': '新增问卷',

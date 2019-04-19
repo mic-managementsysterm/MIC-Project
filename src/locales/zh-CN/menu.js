@@ -5,6 +5,7 @@ export default {
   'menu.disease.diseaseList': '疾病关联',
   'menu.disease.syndromeList': '证型管理',
   'menu.disease.symptomList': '症状管理',
+  'menu.disease.symtypeList': '类型管理',
   'menu.gauge': '问卷管理',
   'menu.gauge.question': '问卷',
   'menu.gauge.questionAdd': '新增问卷',

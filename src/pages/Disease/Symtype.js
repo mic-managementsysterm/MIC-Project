@@ -10,25 +10,28 @@ import {
   Modal,
   message,
   Table,
-  Radio
+  Radio, Cascader,
+  Pagination
 } from 'antd';
-import pinyin from './convertPinYin';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Disease.less';
 import Syndrome from "./Syndrome";
+import Symptom from './Symptom';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const {Search} = Input;
 FormItem.className = styles["ant-form-item"];
-
+let arr=[];
+let newArr=[]
+let arr1=[]
 const ClearDisease = {
-  Id: "",
-  Name: "",
-  PinYin:"",
-  Prevalent:false,
+  Id	:"",
+  TypeName:	"",
+  ParentId:	"",
+  ChildrenTypes:	[]
 };
 const setInfo = {};
 
@@ -42,72 +45,99 @@ const getValue = obj =>
   loading: loading.models.disease,
 }))
 @Form.create()
-class ManaForm extends PureComponent{
-
+class ManaForm extends PureComponent {
   constructor(props){
     super(props);
     this.state={
+      defaultValue:[]
     }
   }
-  onchange=(value)=>{
-    const {dispatch,disease:{Disease}}=this.props
-    Disease.PinYin = pinyin.getCamelChars(value.target.value ).toLowerCase()
-    console.log('@pinyin',Disease)
-    dispatch({
-      type: 'disease/setStates',
-      payload: {
-        Disease: Disease,
-      },
-    })
-    setInfo.setBaseInfo();
+
+  onChange = (value,selectedOptions) => {
+    let {disease:{Type},dispatch} =this.props;
+    Type.ParentId = value[value.length-1];
+    console.log('@value',value,selectedOptions)
+    // Type.SymptomTypeName = value[1];
   }
 
-  render() {
-    const { disease: { Disease, modalVisible, pageSize, current, searchKey }, form, dispatch } = this.props;
+ getParent=(data2, id)=> {
+    for (let i=0;i<data2.length;i++){
+      if (data2[i].Id==id){
+        arr.push(data2[i].Id)
+         newArr=arr.filter((x, index,self)=>self.indexOf(x)===index)
+        break
+      }else {
+        if (data2[i].ChildrenTypes.length!==0){
+          arr.push(data2[i].Id)
+            this.getParent(data2[i].ChildrenTypes,id);
+        } else {
+          arr=[]
+        }
+      }
+    }
+   return newArr;
+
+  }
+
+  render(){
+
+    const { disease:{Type,typeData,modalVisible,pageSize,current,searchKey}, form,dispatch} = this.props;
     setInfo.setBaseInfo = () => {
       Object.keys(form.getFieldsValue()).forEach(key => {
         const obj = {};
-        obj[key] = Disease[key] || null;
-        form.setFieldsValue(obj);
+        console.log('@11',Type)
+        obj[key] = Type[key] || null;
+        form.setFieldsValue(obj)
+        dispatch({
+          type:'disease/setState',
+          payload:{
+            Type:Type
+          }
+        })
       });
     };
 
     const okHandle = () => {
+      arr=[]
+      newArr=[]
+      arr1=[]
       form.validateFields((err, fieldsValue) => {
         if (err) return;
-        Disease.Name = fieldsValue.Name;
-        if (Disease.Id === "") {
+        Type.TypeName = fieldsValue.TypeName;
+        console.log('@id',Type)
+        if(Type.Id === ""){
           dispatch({
-            type: 'disease/addDisease',
+            type: 'disease/addSymType',
             payload: {
-              Name: Disease.Name,
-              PinYin: Disease.PinYin,
-              Prevalent: Disease.Prevalent,
+              Id:Type.Id,
+              TypeName:Type.TypeName,
+              ParentId:Type.ParentId
             },
-            callback: () => {
+            callback:()=>{
               dispatch({
-                type: 'disease/queryDisease',
+                type: 'disease/querySymType',
                 payload: {
-                  pagesize: pageSize,
-                  pageindex: 1,
-                  key: ''
+                  pagesize:pageSize,
+                  pageindex:1,
+                  key:''
                 },
               });
             }
           });
-        } else {
+        }else {
+          console.log('@add',Type)
           dispatch({
-            type: 'disease/updateDisease',
+            type: 'disease/addSymType',
             payload: {
-              ...Disease
+              ...Type
             },
-            callback: () => {
+            callback:()=>{
               dispatch({
-                type: 'disease/queryDisease',
+                type: 'disease/querySymType',
                 payload: {
-                  pagesize: pageSize,
-                  pageindex: current,
-                  key: searchKey
+                  pagesize:pageSize,
+                  pageindex:current,
+                  key:searchKey
                 },
               });
             }
@@ -116,8 +146,8 @@ class ManaForm extends PureComponent{
         dispatch({
           type: 'disease/setStates',
           payload: {
-            modalVisible: false,
-            Disease: ClearDisease,
+            modalVisible:false,
+            Type:ClearDisease,
           },
         });
         form.resetFields();
@@ -125,50 +155,53 @@ class ManaForm extends PureComponent{
     };
 
     const handleCancel = () => {
+      arr=[]
+      newArr=[]
+      arr1=[]
       dispatch({
         type: 'disease/setStates',
         payload: {
-          modalVisible: false,
-          Disease: ClearDisease,
+          modalVisible:false,
+          Type:ClearDisease,
         },
       });
     };
 
+
+    const fieldNames={ label: 'TypeName', value: 'Id', children: 'ChildrenTypes' }
+    const defaultValue=this.getParent(typeData,Type.ParentId)
+    const data=typeData
     return (
       <Modal
         centered
         destroyOnClose
         width={640}
-        title="新增疾病"
+        title="类型管理"
         visible={modalVisible}
         onOk={okHandle}
         onCancel={() => handleCancel()}
       >
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病名">
-          {form.getFieldDecorator('Name', {
-            rules: [{ required: true, message: '请输入疾病名！', min: 1 }],
-          })(<Input placeholder="请输入疾病名" onChange={value => {this.onchange(value)}}/>)}
+
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型名">
+          {form.getFieldDecorator('TypeName', {
+            rules: [{ required: true, message: '请输入类型名！', min: 1 }],
+          })(<Input placeholder="请输入疾病名" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拼音">
-          {form.getFieldDecorator('PinYin', {
-            rules: [{ message: '请输入疾病拼音！' }],
-          })(<Input placeholder="请输入疾病拼音缩写" />)}
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
-          <RadioGroup
-            onChange={value => {
-              Disease.Prevalent = value.target.value
-            }}
-            defaultValue={Disease.Prevalent || false}
-          >
-            <Radio value={true}>是</Radio>
-            <Radio value={false}>否</Radio>
-          </RadioGroup>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病症类型">
+          <Cascader
+            options={typeData}
+            fieldNames={fieldNames}
+            onChange={this.onChange}
+            changeOnSelect
+            defaultValue={Type.ParentId?arr1=defaultValue : null}
+          />
         </FormItem>
       </Modal>
     );
   }
-};
+}
+
+
 
 @connect(({ disAndSyn,disease, loading }) => ({
   disAndSyn,
@@ -283,7 +316,7 @@ class RelateForm extends PureComponent {
   };
 
   handleRelate = () => {
-    const {  disAndSyn:{diseaseId,relateSyn},dispatch } = this.props;
+    const {  disAndSyn:{diseaseId,relateSyn,defaultValue},dispatch } = this.props;
     let synIds = [];
     relateSyn.map(item => {
       synIds.push(item.Id)
@@ -358,13 +391,14 @@ class RelateForm extends PureComponent {
               dataSource={relateSyn}
               columns={this.columns1}
               rowKey={item => item.Id}
+
             />
           </Col>
           <Col span={12} className={styles.breadcrumbTitle}>
             <div className={styles["syndrome-title"]}>
               <span>未关联证型</span>
               <Search
-                placeholder="根据疾病名称或疾病首字母搜索证型"
+                placeholder="根据类型名称搜索类型"
                 onSearch={value => this.searchSyndrome(value)}
                 style={{ width: 300, marginLeft: 180 }}
               />
@@ -392,24 +426,19 @@ class RelateForm extends PureComponent {
   loading: loading.models.disease,
 }))
 @Form.create()
-class Disease extends PureComponent {
+class Symtype extends PureComponent {
   columns = [
     {
-      title: '疾病名称',
-      dataIndex: 'Name',
+      title: '类型名称',
+      dataIndex: 'TypeName',
       width: '40%',
-    },
-    {
-      title: '拼音',
-      dataIndex: 'PinYin',
-      width: '30%',
     },
     {
       title: '操作',
       width: '30%',
       render: (text, record) => {
-        const {disease:{dataSource}} = this.props;
-        return dataSource && dataSource.length >= 1
+        const {disease:{typeData}} = this.props;
+        return typeData && typeData.length >= 1
           ? (
             <div key={record.Id}>
               <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>疾病关联</Button>
@@ -421,42 +450,101 @@ class Disease extends PureComponent {
   ];
 
   componentDidMount(){
-    const { dispatch,disease:{current,pageSize,searchKey} } = this.props;
+    const { dispatch,disease:{typeData,current,pageSize,searchKey,pagination,total,formValues} } = this.props;
+    pagination.total=total
+    pagination.pageSize=pageSize
+    pagination.current=current
+    pagination.change=(pageSize,current)=>{
+      if (searchKey){
+        console.log('@pagination',pagination)
+        pagination.current= 1,
+          pagination.pageSize=pagination.pageSize,
+          // pagination=pagination
+        dispatch({
+          type: 'disease/querySearchSymType',
+          payload: {
+            pagesize:pageSize,
+            pageindex:current,
+            key:searchKey,
+            pagination:pagination
+          },
+        });
+      }
+        pagination.current= pagination.current,
+          pagination.pageSize= pagination.pageSize,
+      dispatch({
+        type: 'disease/querySymType',
+        payload: {
+          pagesize:pageSize,
+          pageindex:current,
+          key:searchKey,
+          pagination:pagination
+        },
+      });
+    }
+
     dispatch({
-      type: 'disease/queryDisease',
+      type: 'disease/querySymType',
       payload: {
         pagesize:pageSize,
         pageindex:current,
-        key:searchKey
+        key:searchKey,
+        pagination:pagination
       },
     });
+    console.log('@typeData',total)
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
+    console.log('@pagination',pagination)
     const { dispatch,disease:{formValues,searchKey} } = this.props;
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
       return newObj;
     }, {});
-
-    const params = {
-      currentPage: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-      ...filters,
-    };
-    if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
+    if (searchKey!==''){
+      console.log('@pagination',pagination)
+      const params = {
+        currentPage: pagination.current,
+        pageSize: pagination.pageSize,
+        ...formValues,
+        ...filters,
+      };
+      if (sorter.field) {
+        params.sorter = `${sorter.field}_${sorter.order}`;
+        console.log('@params',params)
+      }
+      dispatch({
+        type: 'disease/querySearchSymType',
+        payload: {
+          pagesize:params.pageSize,
+          pageindex:params.currentPage,
+          key:searchKey,
+          pagination:pagination
+        },
+      });
     }
-    dispatch({
-      type: 'disease/queryDisease',
-      payload: {
-        pagesize:params.pageSize,
-        pageindex:params.currentPage,
-        key:searchKey
-      },
-    });
+    else {
+      const params = {
+        currentPage: pagination.current,
+        pageSize: pagination.pageSize,
+        ...formValues,
+        ...filters,
+      };
+      if (sorter.field) {
+        params.sorter = `${sorter.field}_${sorter.order}`;
+      }
+      dispatch({
+        type: 'disease/querySymType',
+        payload: {
+          pagesize:params.pageSize,
+          pageindex:params.currentPage,
+          key:searchKey,
+          pagination:pagination
+        },
+      });
+    }
   };
 
   handleFormReset = () => {
@@ -472,7 +560,7 @@ class Disease extends PureComponent {
       },
     });
     dispatch({
-      type: 'disease/queryDisease',
+      type: 'disease/querySymType',
       payload: {
         pagesize:pageSize,
         pageindex:1,
@@ -481,7 +569,8 @@ class Disease extends PureComponent {
     });
   };
 
-  handleSelectRows = rows => {
+  handleSelectRows = (rows) => {
+    console.log('@rows',rows,record)
     const { dispatch } = this.props;
     dispatch({
       type: 'disease/setStates',
@@ -496,20 +585,37 @@ class Disease extends PureComponent {
     const { dispatch, form,disease:{pageSize} } = this.props;
     form.validateFields((err, fieldsValue) => {
       const { key } = fieldsValue;
-      dispatch({
-        type: 'disease/setStates',
-        payload: {
-          searchKey:key,
-        },
-      });
-      dispatch({
-        type: 'disease/queryDisease',
-        payload: {
-          key,
-          pagesize:pageSize,
-          pageindex:1,
-        },
-      });
+      if(key){
+        dispatch({
+          type: 'disease/setStates',
+          payload: {
+            searchKey:key,
+          },
+        });
+        dispatch({
+          type: 'disease/querySearchSymType',
+          payload: {
+            key,
+            pagesize:10,
+            pageindex:1,
+          },
+        });
+      }else {
+        dispatch({
+          type: 'disease/setStates',
+          payload: {
+            searchKey:key,
+          },
+        });
+        dispatch({
+          type: 'disease/querySymType',
+          payload: {
+            key,
+            pagesize:10,
+            pageindex:1,
+          },
+        });
+      }
     });
   };
 
@@ -520,10 +626,17 @@ class Disease extends PureComponent {
       type: 'disease/setStates',
       payload: {
         modalVisible:!!flag,
-        Disease:record ? newRecord:ClearDisease,
+        Type:record ? newRecord:ClearDisease,
       },
     });
     if(flag && record){
+      console.log('@key',record)
+      dispatch({
+        type:'disease/setState',
+        payload:{
+          Type:record
+        }
+      })
       setInfo.setBaseInfo();
     }
   };
@@ -535,7 +648,7 @@ class Disease extends PureComponent {
       Ids.push(item.Id)
     });
     dispatch({
-      type: 'disease/removeDisease',
+      type: 'disease/removeSymType',
       payload: {
         Ids:Ids,
       },
@@ -547,7 +660,7 @@ class Disease extends PureComponent {
           },
         });
         dispatch({
-          type: 'disease/queryDisease',
+          type: 'disease/querySymType',
           payload: {
             pagesize:pageSize,
             pageindex:current,
@@ -626,36 +739,71 @@ class Disease extends PureComponent {
   };
 
   render() {
-    const { disease: {selectedRows,dataSource,pageSize,current,total }, loading, } = this.props;
+    const { disease: {selectedRows,typeData,pageSize,current,total,pageIndex,searchKey,formValues }, loading, } = this.props;
     const data ={
-      list: dataSource,
+      list: typeData,
       pagination: {
         total: total|| 0,
         pageSize:pageSize,
         current:current
       },
     };
+    // const pagination= {
+    //   pageSize: 10,
+    //   showQuickJumper: true,
+    //   hideOnSinglePage: false,
+    //   current: 1,
+    //   total: total,
+    //   onchange: (page, pageSize) => {
+        {/*if (searchKey!=='') {*/}
+          {/*console.log('@pagination', pagination)*/}
+          {/*dispatch({*/}
+    //         type: 'disease/querySearchSymType',
+    //         payload: {
+    //           pagesize: pageSize,
+    //           pageindex: current,
+    //           key: searchKey,
+    //           pagination: pagination
+            {/*},*/}
+          {/*});*/}
+        {/*}*/}
+    //     else {
+          {/*dispatch({*/}
+            {/*type: 'disease/querySymType',*/}
+            {/*payload: {*/}
+              {/*pagesize: pageSize,*/}
+              {/*pageindex: current,*/}
+    //           key: searchKey,
+    //           pagination: pagination
+    //         },
+    //       });
+    //     }
+    //   }
+    // }
     return (
-      <PageHeaderWrapper title="疾病关联">
+      <PageHeaderWrapper title="类型">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <StandardTable
               rowKey='Id'
               selectedRows={selectedRows || []}
+              // pagination={pagination}
               loading={loading}
               data={data}
+              childrenColumnName={'ChildrenTypes'}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-            />
+            >
+            </StandardTable>
           </div>
           <ManaForm  />
-          <RelateForm {...this.props} />
+          {/*<RelateForm {...this.props} />*/}
         </Card>
       </PageHeaderWrapper>
     );
   }
 }
 
-export default Disease;
+export default Symtype;
