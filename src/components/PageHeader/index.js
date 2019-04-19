@@ -41,8 +41,7 @@ export default class PageHeader extends PureComponent {
     return (
       <div className={clsString}>
         <div className={wide ? styles.wide : ''}>
-          <div
-          >
+          <div>
             {hiddenBreadcrumb ? null : <BreadcrumbView {...this.props} />}
             <div className={styles.detail}>
               {logo && <div className={styles.logo}>{logo}</div>}

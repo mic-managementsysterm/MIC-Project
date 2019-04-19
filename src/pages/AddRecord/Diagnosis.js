@@ -389,7 +389,6 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
-
   handleModalVisible = (record) => {
   const { dispatch,disease:{selectedId} } = this.props;
    dispatch({
@@ -502,8 +501,6 @@ class DiagnosisForm extends PureComponent {
     }
   };
 
-
-
   handleSearch=(value)=>{
     const { dispatch } = this.props;
     const key=value;
@@ -525,7 +522,6 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
-
   renderOptionItem=(item)=>{
     return (
       <Option key={item.Id} text={item.Name} data={item}>
@@ -534,15 +530,10 @@ class DiagnosisForm extends PureComponent {
     );
   };
 
-
-
   render() {
     const { getFieldDecorator } = this.props.form;
-    const {
-      disAndSyn:{relateSyn,restSyn,restPagination},
-      disease:{diseaseData,value,DSdata,DSNoData, selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },
-      loading,
-    } = this.props;
+    const { disAndSyn:{relateSyn}, disease:{value,DSdata,selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },loading} = this.props;
+    const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
     const tailFormItemLayout = {
       wrapperCol: {
         xs: {
@@ -555,15 +546,6 @@ class DiagnosisForm extends PureComponent {
         },
       },
     };
-    const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
-    const data1 ={
-      list: DSdata,
-      pagination: {
-        total: total|| 0,
-        pageSize:pageSize,
-        current:current
-      },
-    }
     const uploadButton = (
       <div>
         <Icon type={this.state.uploading ? 'loading' : 'plus'} />
@@ -571,7 +553,7 @@ class DiagnosisForm extends PureComponent {
       </div>
     );
     return (
-      <PageHeaderWrapper title="四诊数据采集">
+      <PageHeaderWrapper title="四诊数据采集" loading={loading}>
         <Spin spinning={this.state.loading} tip="正在提交">
           <div className={styles.content}>
             <Form onSubmit={this.handleSubmit} className={styles.test}>
@@ -586,7 +568,6 @@ class DiagnosisForm extends PureComponent {
                     required: true, message: '请输入主诉!',
                   }],
                 })(
-
                   <Input />
                 )}
               </Form.Item>
@@ -597,9 +578,7 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('XBS', {
-                  rules: [{
-                    required: true, message: '请输入现病史！',
-                  }],
+                  rules: [{ message: '请输入现病史！'}],
                 })(
                   <Input />
                 )}
@@ -611,9 +590,7 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('JWS', {
-                  rules: [{
-                    required: true, message: '请输入既往史!',
-                  }],
+                  rules: [{ message: '请输入既往史!' }],
                 })(
                   <Input />
                 )}
@@ -625,7 +602,7 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('GMS', {
-                  rules: [{ required: true, message: '请输入过敏史!', whitespace: true }],
+                  rules: [{ message: '请输入过敏史!', whitespace: true }],
                 })(
                   <Input />
                 )}
@@ -637,7 +614,7 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('TGJC', {
-                  rules: [{ required: true, message: '请输入体格检查!' }],
+                  rules: [{ message: '请输入体格检查!' }],
                 })(
                   <Input />
                 )}
@@ -660,11 +637,7 @@ class DiagnosisForm extends PureComponent {
                 </AutoComplete>
                 {
                   selectDiseaseRows.map((disease,index)=>{
-                    return <Tag key={disease.Id}
-                                closable
-                                onClose={() => this.handleClose(disease,1)}>
-                      <span onClick = {()=>{this.handleModalVisible(disease.Id)}}>{disease.Name}</span>
-                    </Tag>
+                    return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}><span onClick = {()=>{this.handleModalVisible(disease.Id)}}>{disease.Name}</span></Tag>
                   })
                 }
               </Form.Item>
@@ -764,7 +737,7 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 {getFieldDecorator('SZZP', {
-                  rules: [{ required: true, message: '请选择四诊照片!' }],
+                  rules: [{ message: '请选择四诊照片!' }],
                 })(
                  <div>
                    <Upload
@@ -773,6 +746,7 @@ class DiagnosisForm extends PureComponent {
                      className="avatar-uploader"
                      showUploadList
                      action=""
+                     accept={"image/*"}
                      beforeUpload={this.beforeUpload}
                      onChange= {this.handleChange}
                      onPreview={this.handlePreview}

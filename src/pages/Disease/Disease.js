@@ -12,6 +12,7 @@ import {
   Table,
   Radio
 } from 'antd';
+import pinyin from './convertPinYin';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -39,7 +40,6 @@ const getValue = obj =>
 
 const ManaForm = Form.create()(props => {
   const { disease:{Disease, modalVisible,pageSize,current,searchKey}, form,dispatch} = props;
-
   setInfo.setBaseInfo = () => {
     Object.keys(form.getFieldsValue()).forEach(key => {
       const obj = {};
@@ -52,7 +52,6 @@ const ManaForm = Form.create()(props => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       Disease.Name = fieldsValue.Name;
-      Disease.PinYin = fieldsValue.PinYin;
       if(Disease.Id === ""){
         dispatch({
           type: 'disease/addDisease',
@@ -116,7 +115,7 @@ const ManaForm = Form.create()(props => {
       centered
       destroyOnClose
       width={640}
-      title="疾病管理"
+      title="新增疾病"
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleCancel()}
@@ -124,12 +123,12 @@ const ManaForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病名">
         {form.getFieldDecorator('Name', {
           rules: [{ required: true, message: '请输入疾病名！', min: 1 }],
-        })(<Input placeholder="请输入疾病名" />)}
+        })(<Input placeholder="请输入疾病名" onChange={value => {Disease.PinYin = pinyin.getCamelChars(value.target.value ).toLowerCase()}} />)}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拼音">
         {form.getFieldDecorator('PinYin', {
           rules: [{ message: '请输入疾病拼音！'}],
-        })(<Input placeholder="请输入疾病拼音缩写" />)}
+        })(<Input placeholder="请输入疾病拼音缩写" value={Disease.PinYin} />)}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
         <RadioGroup
