@@ -37,112 +37,138 @@ const getValue = obj =>
     .map(key => obj[key])
     .join(',');
 
+@connect(({ disease,loading }) => ({
+  disease,
+  loading: loading.models.disease,
+}))
+@Form.create()
+class ManaForm extends PureComponent{
 
-const ManaForm = Form.create()(props => {
-  const { disease:{Disease, modalVisible,pageSize,current,searchKey}, form,dispatch} = props;
-  setInfo.setBaseInfo = () => {
-    Object.keys(form.getFieldsValue()).forEach(key => {
-      const obj = {};
-      obj[key] = Disease[key] || null;
-      form.setFieldsValue(obj);
-    });
-  };
-
-  const okHandle = () => {
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-      Disease.Name = fieldsValue.Name;
-      if(Disease.Id === ""){
-        dispatch({
-          type: 'disease/addDisease',
-          payload: {
-            Name:Disease.Name,
-            PinYin:Disease.PinYin,
-            Prevalent:Disease.Prevalent,
-          },
-          callback:()=>{
-            dispatch({
-              type: 'disease/queryDisease',
-              payload: {
-                pagesize:pageSize,
-                pageindex:1,
-                key:''
-              },
-            });
-          }
-        });
-      }else {
-        dispatch({
-          type: 'disease/updateDisease',
-          payload: {
-            ...Disease
-          },
-          callback:()=>{
-            dispatch({
-              type: 'disease/queryDisease',
-              payload: {
-                pagesize:pageSize,
-                pageindex:current,
-                key:searchKey
-              },
-            });
-          }
-        });
-      }
-      dispatch({
-        type: 'disease/setStates',
-        payload: {
-          modalVisible:false,
-          Disease:ClearDisease,
-        },
-      });
-      form.resetFields();
-    });
-  };
-
-  const handleCancel = () => {
+  constructor(props){
+    super(props);
+    this.state={
+    }
+  }
+  onchange=(value)=>{
+    const {dispatch,disease:{Disease}}=this.props
+    Disease.PinYin = pinyin.getCamelChars(value.target.value ).toLowerCase()
+    console.log('@pinyin',Disease)
     dispatch({
       type: 'disease/setStates',
       payload: {
-        modalVisible:false,
-        Disease:ClearDisease,
+        Disease: Disease,
       },
-    });
-  };
+    })
+    setInfo.setBaseInfo();
+  }
 
-  return (
-    <Modal
-      centered
-      destroyOnClose
-      width={640}
-      title="新增疾病"
-      visible={modalVisible}
-      onOk={okHandle}
-      onCancel={() => handleCancel()}
-    >
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病名">
-        {form.getFieldDecorator('Name', {
-          rules: [{ required: true, message: '请输入疾病名！', min: 1 }],
-        })(<Input placeholder="请输入疾病名" onChange={value => {Disease.PinYin = pinyin.getCamelChars(value.target.value ).toLowerCase()}} />)}
-      </FormItem>
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拼音">
-        {form.getFieldDecorator('PinYin', {
-          rules: [{ message: '请输入疾病拼音！'}],
-        })(<Input placeholder="请输入疾病拼音缩写" value={Disease.PinYin} />)}
-      </FormItem>
-      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
-        <RadioGroup
-          onChange={value => {Disease.Prevalent = value.target.value}}
-          defaultValue={Disease.Prevalent || false}
-        >
-          <Radio value={true}>是</Radio>
-          <Radio value={false}>否</Radio>
-        </RadioGroup>
-      </FormItem>
-    </Modal>
-  );
-});
+  render() {
+    const { disease: { Disease, modalVisible, pageSize, current, searchKey }, form, dispatch } = this.props;
+    setInfo.setBaseInfo = () => {
+      Object.keys(form.getFieldsValue()).forEach(key => {
+        const obj = {};
+        obj[key] = Disease[key] || null;
+        form.setFieldsValue(obj);
+      });
+    };
 
+    const okHandle = () => {
+      form.validateFields((err, fieldsValue) => {
+        if (err) return;
+        Disease.Name = fieldsValue.Name;
+        if (Disease.Id === "") {
+          dispatch({
+            type: 'disease/addDisease',
+            payload: {
+              Name: Disease.Name,
+              PinYin: Disease.PinYin,
+              Prevalent: Disease.Prevalent,
+            },
+            callback: () => {
+              dispatch({
+                type: 'disease/queryDisease',
+                payload: {
+                  pagesize: pageSize,
+                  pageindex: 1,
+                  key: ''
+                },
+              });
+            }
+          });
+        } else {
+          dispatch({
+            type: 'disease/updateDisease',
+            payload: {
+              ...Disease
+            },
+            callback: () => {
+              dispatch({
+                type: 'disease/queryDisease',
+                payload: {
+                  pagesize: pageSize,
+                  pageindex: current,
+                  key: searchKey
+                },
+              });
+            }
+          });
+        }
+        dispatch({
+          type: 'disease/setStates',
+          payload: {
+            modalVisible: false,
+            Disease: ClearDisease,
+          },
+        });
+        form.resetFields();
+      });
+    };
+
+    const handleCancel = () => {
+      dispatch({
+        type: 'disease/setStates',
+        payload: {
+          modalVisible: false,
+          Disease: ClearDisease,
+        },
+      });
+    };
+
+    return (
+      <Modal
+        centered
+        destroyOnClose
+        width={640}
+        title="新增疾病"
+        visible={modalVisible}
+        onOk={okHandle}
+        onCancel={() => handleCancel()}
+      >
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病名">
+          {form.getFieldDecorator('Name', {
+            rules: [{ required: true, message: '请输入疾病名！', min: 1 }],
+          })(<Input placeholder="请输入疾病名" onChange={value => {this.onchange(value)}}/>)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拼音">
+          {form.getFieldDecorator('PinYin', {
+            rules: [{ message: '请输入疾病拼音！' }],
+          })(<Input placeholder="请输入疾病拼音缩写" />)}
+        </FormItem>
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
+          <RadioGroup
+            onChange={value => {
+              Disease.Prevalent = value.target.value
+            }}
+            defaultValue={Disease.Prevalent || false}
+          >
+            <Radio value={true}>是</Radio>
+            <Radio value={false}>否</Radio>
+          </RadioGroup>
+        </FormItem>
+      </Modal>
+    );
+  }
+};
 
 @connect(({ disAndSyn,disease, loading }) => ({
   disAndSyn,
@@ -624,7 +650,7 @@ class Disease extends PureComponent {
               onChange={this.handleStandardTableChange}
             />
           </div>
-          <ManaForm {...this.props} />
+          <ManaForm  />
           <RelateForm {...this.props} />
         </Card>
       </PageHeaderWrapper>

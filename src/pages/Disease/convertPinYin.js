@@ -36,6 +36,7 @@ var pinyin = (function (){
           }
         }
       }
+
       return result;
     },
 

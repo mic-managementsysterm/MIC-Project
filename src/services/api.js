@@ -212,6 +212,10 @@ export async function removeSymptom(params) {
 
 
 //类型
+export async function querySearchSymType(params) {
+  return request(`http://10.126.6.112:5010/symptomtype/get/getByTypeName?${stringify(params)}`);
+}
+
 export async function querySymType(params) {
   return request(`http://10.126.6.112:5010/symptomtype/get/getTypes?${stringify(params)}`);
 }
@@ -228,20 +232,9 @@ export async function addSymType(params) {
   });
 }
 
-export async function updateSymType(params) {
-  return request(`http://10.126.6.112:5010/disease/change/update`,{
-    method: 'POST',
-    body: {
-      ...params,
-    },
-    headers:{
-      "Content-Type":"application/x-www-form-urlencoded"
-    }
-  });
-}
 
 export async function removeSymType(params) {
-  return request(`http://10.126.6.112:5010/disease/delete/batchDelete`,{
+  return request(`http://10.126.6.112:5010/symptomtype/delete/deleteTypes`,{
     method: 'POST',
     body: {
       ...params,

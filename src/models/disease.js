@@ -1,9 +1,16 @@
-import { queryDisease, addDisease, removeDisease, updateDisease,queryDisAndSyn,querySymType,addSymType} from '@/services/api';
+import { queryDisease, addDisease, removeDisease, updateDisease,queryDisAndSyn,querySymType,addSymType,querySearchSymType,removeSymType} from '@/services/api';
 
 export default {
   namespace: 'disease',
 
   state: {
+    pagination:{
+      pageSize:10,
+      showQuickJumper:true,
+      hideOnSinglePage:false,
+      current:1,
+      total:0,
+    },
     dataSource:[],
     DSdata:[],
     typeData:[],
@@ -53,6 +60,22 @@ export default {
         if (callback) callback();
       }
     },
+    *querySearchSymType({ payload,callback }, { call, put }) {
+      const response = yield call(querySearchSymType, payload);
+      if(response.Success){
+        yield put({
+          type: 'set',
+          payload: {
+            typeData:response.Data.rows,
+            current:response.Data.pageindex,
+            pageSize:response.Data.pagesize,
+            total:response.Data.total,
+            searchKey:payload.key
+          },
+        });
+        if (callback) callback();
+      }
+    },
     *queryDisAndSyn({ payload,callback }, { call, put }) {
       const response = yield call(queryDisAndSyn, payload);
       if(response.Success){
@@ -91,6 +114,10 @@ export default {
     },
     *removeDisease({ payload, callback }, { call }) {
       yield call(removeDisease, payload);
+      if (callback) callback();
+    },
+    *removeSymType({ payload, callback }, { call }) {
+      yield call(removeSymType, payload);
       if (callback) callback();
     },
     *updateDisease({ payload, callback }, { call }) {
