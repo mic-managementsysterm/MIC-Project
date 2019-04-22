@@ -49,10 +49,10 @@ class ManaForm extends PureComponent{
     this.state={
     }
   }
+
   onchange=(value)=>{
     const {dispatch,disease:{Disease}}=this.props
     Disease.PinYin = pinyin.getCamelChars(value.target.value ).toLowerCase()
-    console.log('@pinyin',Disease)
     dispatch({
       type: 'disease/setStates',
       payload: {
@@ -139,7 +139,7 @@ class ManaForm extends PureComponent{
         centered
         destroyOnClose
         width={640}
-        title="新增疾病"
+        title={Disease.Id === "" ? "新增疾病" : "编辑疾病"}
         visible={modalVisible}
         onOk={okHandle}
         onCancel={() => handleCancel()}
@@ -181,15 +181,18 @@ class RelateForm extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
+      width: 150,
       align: 'center',
     },{
       title: '证型拼音',
       dataIndex: 'PinYin',
+      width: 100,
       align: 'center',
     },{
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
+      width: 150,
       align: 'center',
       render: (text,record)=>(
         record ?
@@ -202,15 +205,18 @@ class RelateForm extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
+      width: 150,
       align: 'center',
     }, {
       title: '证型拼音',
       dataIndex: 'PinYin',
+      width: 100,
       align: 'center',
     },{
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
+      width: 150,
       align: 'center',
       render: (text,record)=>(
         record ?
@@ -358,6 +364,7 @@ class RelateForm extends PureComponent {
               dataSource={relateSyn}
               columns={this.columns1}
               rowKey={item => item.Id}
+              scroll={{ y: 320 }}
             />
           </Col>
           <Col span={12} className={styles.breadcrumbTitle}>
@@ -375,6 +382,7 @@ class RelateForm extends PureComponent {
               columns={this.columns2}
               rowKey={item => item.Id}
               onChange={(p,f,s)=>this.onRestChange(p,f,s)}
+              scroll={{ y: 320 }}
             />
           </Col>
         </Row>
@@ -397,16 +405,17 @@ class Disease extends PureComponent {
     {
       title: '疾病名称',
       dataIndex: 'Name',
-      width: '40%',
+      width: 150,
     },
     {
       title: '拼音',
       dataIndex: 'PinYin',
-      width: '30%',
+      width: 100,
     },
     {
       title: '操作',
-      width: '30%',
+      width: 150,
+      align: 'center',
       render: (text, record) => {
         const {disease:{dataSource}} = this.props;
         return dataSource && dataSource.length >= 1
@@ -648,6 +657,7 @@ class Disease extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              scroll={{ y: 320 }}
             />
           </div>
           <ManaForm  />

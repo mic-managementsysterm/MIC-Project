@@ -11,6 +11,7 @@ import {
   message,
   Table,
 } from 'antd';
+import pinyin from './convertPinYin';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -105,12 +106,23 @@ const ManaForm = Form.create()(props => {
     });
   };
 
+  const onChange=(value)=>{
+    Syndrome.PinYin = pinyin.getCamelChars(value.target.value ).toLowerCase()
+    dispatch({
+      type: 'syndrome/updateSyndrome',
+      payload: {
+        Syndrome: Syndrome,
+      },
+    })
+    setInfo.setBaseInfo();
+  }
+
   return (
     <Modal
       centered
       destroyOnClose
       width={640}
-      title="证型管理"
+      title={Syndrome.Id === "" ? "新增证型" : "编辑证型"}
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleCancel()}
@@ -118,12 +130,12 @@ const ManaForm = Form.create()(props => {
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="证型名">
         {form.getFieldDecorator('Name', {
           rules: [{ required: true, message: '请输入证型名！', min: 1 }],
-        })(<Input placeholder="请输入证型名" />)}
+        })(<Input placeholder="请输入证型名" onChange={value => onChange(value)} />)}
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="证型拼音">
         {form.getFieldDecorator('PinYin', {
           rules: [{ message: '请输入证型拼音缩写！'}],
-        })(<Input placeholder="请输入证型拼音缩写" />)}
+        })(<Input placeholder="请输入证型拼音缩写" value={Syndrome.PinYin} />)}
       </FormItem>
     </Modal>
   );
@@ -357,16 +369,17 @@ class Syndrome extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
-      width: '40%',
+      width: 150,
     },
     {
       title: '拼音',
       dataIndex: 'PinYin',
-      width: '30%',
+      width: 100,
     },
     {
       title: '操作',
-      width: '30%',
+      width: 150,
+      align: 'center',
       render: (text, record) => {
         const {syndrome:{dataSource}} = this.props;
         return dataSource && dataSource.length >= 1
@@ -608,6 +621,7 @@ class Syndrome extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              scroll={{ y: 320 }}
             />
           </div>
           <ManaForm {...this.props} />
