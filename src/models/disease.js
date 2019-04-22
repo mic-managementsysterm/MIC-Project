@@ -50,7 +50,7 @@ export default {
         yield put({
           type: 'set',
           payload: {
-            typeData:response.Data,
+            typeData:response.Data.rows,
             current:response.Data.pageindex,
             pageSize:response.Data.pagesize,
             total:response.Data.total,

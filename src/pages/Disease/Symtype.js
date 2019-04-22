@@ -53,11 +53,9 @@ class ManaForm extends PureComponent {
     }
   }
 
-  onChange = (value,selectedOptions) => {
+  onChange = (value) => {
     let {disease:{Type},dispatch} =this.props;
     Type.ParentId = value[value.length-1];
-    console.log('@value',value,selectedOptions)
-    // Type.SymptomTypeName = value[1];
   }
 
  getParent=(data2, id)=> {
@@ -76,16 +74,13 @@ class ManaForm extends PureComponent {
       }
     }
    return newArr;
-
   }
 
   render(){
-
     const { disease:{Type,typeData,modalVisible,pageSize,current,searchKey}, form,dispatch} = this.props;
     setInfo.setBaseInfo = () => {
       Object.keys(form.getFieldsValue()).forEach(key => {
         const obj = {};
-        console.log('@11',Type)
         obj[key] = Type[key] || null;
         form.setFieldsValue(obj)
         dispatch({
@@ -104,7 +99,6 @@ class ManaForm extends PureComponent {
       form.validateFields((err, fieldsValue) => {
         if (err) return;
         Type.TypeName = fieldsValue.TypeName;
-        console.log('@id',Type)
         if(Type.Id === ""){
           dispatch({
             type: 'disease/addSymType',
@@ -114,6 +108,7 @@ class ManaForm extends PureComponent {
               ParentId:Type.ParentId
             },
             callback:()=>{
+              // this.handleCancel();
               dispatch({
                 type: 'disease/querySymType',
                 payload: {
@@ -125,13 +120,13 @@ class ManaForm extends PureComponent {
             }
           });
         }else {
-          console.log('@add',Type)
           dispatch({
             type: 'disease/addSymType',
             payload: {
               ...Type
             },
             callback:()=>{
+              // this.handleCancel();
               dispatch({
                 type: 'disease/querySymType',
                 payload: {
@@ -167,7 +162,6 @@ class ManaForm extends PureComponent {
       });
     };
 
-
     const fieldNames={ label: 'TypeName', value: 'Id', children: 'ChildrenTypes' }
     const defaultValue=this.getParent(typeData,Type.ParentId)
     const data=typeData
@@ -176,32 +170,31 @@ class ManaForm extends PureComponent {
         centered
         destroyOnClose
         width={640}
-        title="类型管理"
+        title={Type.Id === "" ? "新增四诊类型" : "编辑四诊类型"}
         visible={modalVisible}
         onOk={okHandle}
         onCancel={() => handleCancel()}
       >
 
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型名">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="四诊类型名">
           {form.getFieldDecorator('TypeName', {
             rules: [{ required: true, message: '请输入类型名！', min: 1 }],
-          })(<Input placeholder="请输入疾病名" />)}
+          })(<Input placeholder="请输入四诊类型名" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病症类型">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="四诊类型">
           <Cascader
+            placeholder='请选择四诊类型'
             options={typeData}
             fieldNames={fieldNames}
             onChange={this.onChange}
             changeOnSelect
-            defaultValue={Type.ParentId?arr1=defaultValue : null}
+            defaultValue={Type.ParentId?arr1=defaultValue : undefined}
           />
         </FormItem>
       </Modal>
     );
   }
 }
-
-
 
 @connect(({ disAndSyn,disease, loading }) => ({
   disAndSyn,
@@ -214,15 +207,18 @@ class RelateForm extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
+      width: 150,
       align: 'center',
     },{
       title: '证型拼音',
       dataIndex: 'PinYin',
+      width: 100,
       align: 'center',
     },{
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
+      width: 150,
       align: 'center',
       render: (text,record)=>(
         record ?
@@ -235,15 +231,18 @@ class RelateForm extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
+      width: 150,
       align: 'center',
     }, {
       title: '证型拼音',
       dataIndex: 'PinYin',
+      width: 100,
       align: 'center',
     },{
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
+      width: 150,
       align: 'center',
       render: (text,record)=>(
         record ?
@@ -270,7 +269,7 @@ class RelateForm extends PureComponent {
     if (!repeat){
       relate.push(record)
     } else {
-      message.warning("Already Relate");
+      message.warning("已存在该类型！");
       return
     }
     rest.map(item=>{
@@ -289,7 +288,6 @@ class RelateForm extends PureComponent {
     let {disAndSyn:{relateSyn, restSyn},dispatch} = this.props;
     let relate = relateSyn.slice();
     let rest = restSyn.slice();
-
     rest.map( item=>{
       item.Id === record.Id && (item.disabled =false)
     } );
@@ -351,12 +349,10 @@ class RelateForm extends PureComponent {
 
   onRestChange = (pagination, filtersArg, sorter) => {
     const { dispatch,disAndSyn:{restKey} } = this.props;
-
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
     };
-
     dispatch({
       type: 'disAndSyn/querySyn',
       payload: {
@@ -391,14 +387,14 @@ class RelateForm extends PureComponent {
               dataSource={relateSyn}
               columns={this.columns1}
               rowKey={item => item.Id}
-
+              scroll={{ y: 320 }}
             />
           </Col>
           <Col span={12} className={styles.breadcrumbTitle}>
             <div className={styles["syndrome-title"]}>
               <span>未关联证型</span>
               <Search
-                placeholder="根据类型名称搜索类型"
+                placeholder="根据四诊类型名称搜索类型"
                 onSearch={value => this.searchSyndrome(value)}
                 style={{ width: 300, marginLeft: 180 }}
               />
@@ -409,6 +405,7 @@ class RelateForm extends PureComponent {
               columns={this.columns2}
               rowKey={item => item.Id}
               onChange={(p,f,s)=>this.onRestChange(p,f,s)}
+              scroll={{ y: 320 }}
             />
           </Col>
         </Row>
@@ -416,8 +413,6 @@ class RelateForm extends PureComponent {
     );
   }
 }
-
-
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ disease,disAndSyn, loading }) => ({
@@ -429,19 +424,20 @@ class RelateForm extends PureComponent {
 class Symtype extends PureComponent {
   columns = [
     {
-      title: '类型名称',
+      title: '四诊类型名称',
       dataIndex: 'TypeName',
-      width: '40%',
+      width: 200,
     },
     {
       title: '操作',
-      width: '30%',
+      width: 200,
+      align: 'center',
       render: (text, record) => {
         const {disease:{typeData}} = this.props;
         return typeData && typeData.length >= 1
           ? (
             <div key={record.Id}>
-              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>疾病关联</Button>
+              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>证型关联</Button>
               <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>编辑</Button>
             </div>
           ) : null
@@ -456,7 +452,6 @@ class Symtype extends PureComponent {
     pagination.current=current
     pagination.change=(pageSize,current)=>{
       if (searchKey){
-        console.log('@pagination',pagination)
         pagination.current= 1,
           pagination.pageSize=pagination.pageSize,
           // pagination=pagination
@@ -492,11 +487,9 @@ class Symtype extends PureComponent {
         pagination:pagination
       },
     });
-    console.log('@typeData',total)
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    console.log('@pagination',pagination)
     const { dispatch,disease:{formValues,searchKey} } = this.props;
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
@@ -504,7 +497,6 @@ class Symtype extends PureComponent {
       return newObj;
     }, {});
     if (searchKey!==''){
-      console.log('@pagination',pagination)
       const params = {
         currentPage: pagination.current,
         pageSize: pagination.pageSize,
@@ -513,7 +505,6 @@ class Symtype extends PureComponent {
       };
       if (sorter.field) {
         params.sorter = `${sorter.field}_${sorter.order}`;
-        console.log('@params',params)
       }
       dispatch({
         type: 'disease/querySearchSymType',
@@ -570,7 +561,6 @@ class Symtype extends PureComponent {
   };
 
   handleSelectRows = (rows) => {
-    console.log('@rows',rows,record)
     const { dispatch } = this.props;
     dispatch({
       type: 'disease/setStates',
@@ -630,7 +620,6 @@ class Symtype extends PureComponent {
       },
     });
     if(flag && record){
-      console.log('@key',record)
       dispatch({
         type:'disease/setState',
         payload:{
@@ -671,7 +660,6 @@ class Symtype extends PureComponent {
     });
     message.success('删除成功');
   };
-
 
   // relate
   handleRelateVisible = (flag, record) => {
@@ -724,7 +712,7 @@ class Symtype extends PureComponent {
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
-              <Input placeholder="请输入疾病名或拼音" style={{ width: 400,marginRight:20 }} />
+              <Input placeholder="请输四诊类型名称" style={{ width: 400,marginRight:20 }} />
             )}
             <Button type="primary" htmlType="submit">
                 查询
@@ -748,40 +736,8 @@ class Symtype extends PureComponent {
         current:current
       },
     };
-    // const pagination= {
-    //   pageSize: 10,
-    //   showQuickJumper: true,
-    //   hideOnSinglePage: false,
-    //   current: 1,
-    //   total: total,
-    //   onchange: (page, pageSize) => {
-        {/*if (searchKey!=='') {*/}
-          {/*console.log('@pagination', pagination)*/}
-          {/*dispatch({*/}
-    //         type: 'disease/querySearchSymType',
-    //         payload: {
-    //           pagesize: pageSize,
-    //           pageindex: current,
-    //           key: searchKey,
-    //           pagination: pagination
-            {/*},*/}
-          {/*});*/}
-        {/*}*/}
-    //     else {
-          {/*dispatch({*/}
-            {/*type: 'disease/querySymType',*/}
-            {/*payload: {*/}
-              {/*pagesize: pageSize,*/}
-              {/*pageindex: current,*/}
-    //           key: searchKey,
-    //           pagination: pagination
-    //         },
-    //       });
-    //     }
-    //   }
-    // }
     return (
-      <PageHeaderWrapper title="类型">
+      <PageHeaderWrapper title="四诊类型管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
@@ -795,11 +751,12 @@ class Symtype extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              scroll={{ y: 320 }}
             >
             </StandardTable>
           </div>
           <ManaForm  />
-          {/*<RelateForm {...this.props} />*/}
+          <RelateForm {...this.props} />
         </Card>
       </PageHeaderWrapper>
     );
