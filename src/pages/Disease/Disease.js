@@ -10,7 +10,8 @@ import {
   Modal,
   message,
   Table,
-  Radio
+  Radio,
+  Select
 } from 'antd';
 import pinyin from './convertPinYin';
 import StandardTable from '@/components/StandardTable';
@@ -21,6 +22,7 @@ import Syndrome from "./Syndrome";
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
+const { Option } = Select;
 const {Search} = Input;
 FormItem.className = styles["ant-form-item"];
 
@@ -63,7 +65,7 @@ class ManaForm extends PureComponent{
   }
 
   render() {
-    const { disease: { Disease, modalVisible, pageSize, current, searchKey }, form, dispatch } = this.props;
+    const { disease: { Disease, modalVisible, pageSize, current, searchKey,Prevalent }, form, dispatch } = this.props;
     setInfo.setBaseInfo = () => {
       Object.keys(form.getFieldsValue()).forEach(key => {
         const obj = {};
@@ -90,7 +92,8 @@ class ManaForm extends PureComponent{
                 payload: {
                   pagesize: pageSize,
                   pageindex: 1,
-                  key: ''
+                  Key: '',
+                  Prevalent:2
                 },
               });
             }
@@ -107,7 +110,8 @@ class ManaForm extends PureComponent{
                 payload: {
                   pagesize: pageSize,
                   pageindex: current,
-                  key: searchKey
+                  Key: searchKey,
+                  Prevalent
                 },
               });
             }
@@ -430,19 +434,20 @@ class Disease extends PureComponent {
   ];
 
   componentDidMount(){
-    const { dispatch,disease:{current,pageSize,searchKey} } = this.props;
+    const { dispatch,disease:{current,pageSize,searchKey,Prevalent} } = this.props;
     dispatch({
       type: 'disease/queryDisease',
       payload: {
         pagesize:pageSize,
         pageindex:current,
-        key:searchKey
+        Key:searchKey,
+        Prevalent
       },
     });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,disease:{formValues,searchKey} } = this.props;
+    const { dispatch,disease:{formValues,searchKey,Prevalent} } = this.props;
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
@@ -463,13 +468,14 @@ class Disease extends PureComponent {
       payload: {
         pagesize:params.pageSize,
         pageindex:params.currentPage,
-        key:searchKey
+        Key:searchKey,
+        Prevalent
       },
     });
   };
 
   handleFormReset = () => {
-    const { form, dispatch,disease:{pageSize} } = this.props;
+    const { form, dispatch,disease:{pageSize,Prevalent} } = this.props;
     form.resetFields();
     dispatch({
       type: 'disease/setStates',
@@ -477,7 +483,8 @@ class Disease extends PureComponent {
         formValues:{},
         current:1,
         pageSize:pageSize,
-        searchKey:''
+        searchKey:'',
+        Prevalent:2
       },
     });
     dispatch({
@@ -485,7 +492,8 @@ class Disease extends PureComponent {
       payload: {
         pagesize:pageSize,
         pageindex:1,
-        key:''
+        Key:'',
+        Prevalent:2
       },
     });
   };
@@ -502,7 +510,7 @@ class Disease extends PureComponent {
 
   handleSearch = e => {
     e.preventDefault();
-    const { dispatch, form,disease:{pageSize} } = this.props;
+    const { dispatch, form,disease:{pageSize,Prevalent} } = this.props;
     form.validateFields((err, fieldsValue) => {
       const { key } = fieldsValue;
       dispatch({
@@ -514,7 +522,8 @@ class Disease extends PureComponent {
       dispatch({
         type: 'disease/queryDisease',
         payload: {
-          key,
+          Key:key,
+          Prevalent,
           pagesize:pageSize,
           pageindex:1,
         },
@@ -538,7 +547,7 @@ class Disease extends PureComponent {
   };
 
   handleDelete = () => {
-    const { dispatch,disease:{selectedRows,pageSize,current,searchKey} } = this.props;
+    const { dispatch,disease:{selectedRows,pageSize,current,searchKey,Prevalent} } = this.props;
     let Ids = [];
     selectedRows.map(item => {
       Ids.push(item.Id)
@@ -560,7 +569,8 @@ class Disease extends PureComponent {
           payload: {
             pagesize:pageSize,
             pageindex:current,
-            key:searchKey
+            Key:searchKey,
+            Prevalent
           },
         });
       }
@@ -604,7 +614,16 @@ class Disease extends PureComponent {
   };
 
   renderSimpleForm() {
-    const {form: { getFieldDecorator },disease:{selectedRows}} = this.props;
+    const { dispatch ,form: { getFieldDecorator },disease:{selectedRows,Prevalent}} = this.props;
+    const handlePrevalent = (v) => {
+      dispatch({
+        type: 'disease/set',
+        payload: {
+          Prevalent:v
+        },
+      });
+    };
+
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
@@ -619,6 +638,11 @@ class Disease extends PureComponent {
             )}
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
+            <Select value={Prevalent} style={{ width: 120 }} onChange={v =>handlePrevalent(v)}>
+              <Option value={2}>全部疾病</Option>
+              <Option value={1}>常见疾病</Option>
+              <Option value={0}>非常见疾病</Option>
+            </Select>
             {getFieldDecorator('key')(
               <Input placeholder="请输入疾病名或拼音" style={{ width: 400,marginRight:20 }} />
             )}
