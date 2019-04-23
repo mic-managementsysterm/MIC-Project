@@ -18,14 +18,12 @@ class questionAdd extends React.Component {
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleTitleBlur = this.handleTitleBlur.bind(this);
     this.getTitle = this.getTitle.bind(this);
-
     this.handleAddTopic = this.handleAddTopic.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
     this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleShiftQuestion = this.handleShiftQuestion.bind(this);
     this.handleCopyQuestion = this.handleCopyQuestion.bind(this);
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
-
     this.changeTab = this.changeTab.bind(this);
     this.tabNameChange = this.tabNameChange.bind(this);
     this.deleteTab = this.deleteTab.bind(this);
@@ -115,9 +113,9 @@ class questionAdd extends React.Component {
               onChange={value => this.handleTypeChange(value,questionIndex)}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
-              <Option value={1}>正常/异常</Option>
-              <Option value={2}>填写心率</Option>
-              <Option value={3}>选择心电图结果</Option>
+              <Option value={1}>选择检测结果（单选）</Option>
+              <Option value={2}>填写检测数据</Option>
+              <Option value={3}>选择检查结果（多选）</Option>
               <Option value={4}>填写检测结果</Option>
             </Select>
           </div>

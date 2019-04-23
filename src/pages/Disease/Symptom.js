@@ -12,60 +12,13 @@ import {
   Radio,
   Cascader
 } from 'antd';
+import pinyin from './convertPinYin';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './Symptom.less';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-
-const TypeData = [
-  {
-    value:'see',
-    label:'望',
-    children:[
-      {value: 'abdomenBackLimbsUnguis', label: '腹股沟背静脉'},
-      {value: 'chest', label: '胸部'},
-      {value: 'enunciation', label: '发音'},
-      {value: 'excrement', label: '排泄物'},
-      {value: 'faceShape', label: '面容'},
-      {value: 'headFacialFeatures', label: '头部面部特征'},
-      {value: 'skinHair', label: '毛发'},
-      {value: 'tongueImage', label: '舌象'},
-      {value: 'twolowerorifices', label: '二阴'},
-    ]
-  },
-  {
-    value:'smell',
-    label:'闻',
-    children:[
-      {value: 'soundSmell', label: '嗅觉气味'},
-    ]
-  },
-  {
-    value:'ask',
-    label:'问',
-    children:[
-      {value: 'daxiaobian', label: '大小便'},
-      {value: 'diet', label: '饮食'},
-      {value: 'qingzhi', label: '情志'},
-    ]
-  },
-  {
-    value:'touch',
-    label:'切',
-    children:[
-      {value: 'pluseCondition', label: '脉象'},
-    ]
-  },
-  {
-    value:'other',
-    label:'其他',
-    children:[
-      {value: 'other', label: '其他'},
-    ]
-  },
-];
 const setInfo={};
 
 FormItem.className = styles["ant-form-item"];
@@ -89,7 +42,6 @@ const getValue = obj =>
 }))
 @Form.create()
 class ManaForm extends PureComponent{
-
   constructor(props){
     super(props);
     this.setBaseInfo = this.setBaseInfo.bind(this)
@@ -173,11 +125,17 @@ class ManaForm extends PureComponent{
     });
   };
 
-  onChange = (value) => {
-    let {symptom:{Symptom}} =this.props;
-    Symptom.Type = value[0];
-    Symptom.SymptomTypeName = value[1];
-  };
+  onChangeText=(value)=>{
+    const {dispatch,symptom:{Symptom}}=this.props
+    Symptom.PinYin = pinyin.getCamelChars(value.target.value ).toLowerCase()
+    dispatch({
+      type: 'symptom/set',
+      payload: {
+        Symptom: Symptom,
+      },
+    })
+    setInfo.setBaseInfo();
+  }
 
   render(){
     const {form,symptom:{Symptom,modalVisible}} = this.props;
@@ -186,7 +144,7 @@ class ManaForm extends PureComponent{
         centered
         destroyOnClose
         width={640}
-        title="疾病管理"
+        title={Symptom.Id === "" ? "新增症状" : "编辑症状"}
         visible={modalVisible}
         onOk={()=>this.okHandle()}
         onCancel={() => this.handleCancel()}
@@ -194,12 +152,12 @@ class ManaForm extends PureComponent{
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="症状名">
           {form.getFieldDecorator('Name', {
             rules: [{ required: true, message: '请输入症状名！', min: 1 }],
-          })(<Input placeholder="请输入症状名" />)}
+          })(<Input placeholder="请输入症状名" onChange={value => this.onChangeText(value)} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="拼音">
           {form.getFieldDecorator('PinYin', {
             rules: [{ required: true, message: '请输入症状首字母！'}],
-          })(<Input placeholder="请输入症状首字母" />)}
+          })(<Input placeholder="请输入症状首字母" value={Symptom.PinYin} />)}
         </FormItem>
         <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="是否常用">
           <RadioGroup
@@ -209,13 +167,6 @@ class ManaForm extends PureComponent{
             <Radio value={true}>是</Radio>
             <Radio value={false}>否</Radio>
           </RadioGroup>
-        </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="病症类型">
-          <Cascader
-            options={TypeData}
-            onChange={this.onChange}
-            defaultValue={Symptom.SymptomTypeName?[Symptom.Type,Symptom.SymptomTypeName] : null}
-          />
         </FormItem>
       </Modal>
     );
@@ -236,16 +187,17 @@ class Symptom extends PureComponent {
     {
       title: '症状名称',
       dataIndex: 'Name',
-      width: '40%',
+      width: 150,
     },
     {
       title: '拼音',
       dataIndex: 'PinYin',
-      width: '30%',
+      width: 100,
     },
     {
       title: '操作',
-      width: '30%',
+      width: 150,
+      align: 'center',
       render: (text, record) => {
         const {symptom:{dataSource}} = this.props;
         return dataSource && dataSource.length >= 1
@@ -414,7 +366,7 @@ class Symptom extends PureComponent {
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
-              <Input placeholder="请输入疾病名或拼音" style={{ width: 400,marginRight:20 }} />
+              <Input placeholder="请输入症状名或拼音" style={{ width: 400,marginRight:20 }} />
             )}
             <Button type="primary" htmlType="submit">
                 查询
@@ -451,6 +403,7 @@ class Symptom extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              scroll={{ y: 320 }}
             />
           </div>
           <ManaForm />

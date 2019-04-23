@@ -12,7 +12,7 @@ import {
   DatePicker,
   Modal,
   message,
-  Radio,
+  Radio, Table,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -219,11 +219,15 @@ class Respondent extends PureComponent {
     {
       title: '姓名',
       dataIndex: 'Name',
+      width: 100,
+      align: 'center',
       render: text => <a onClick={() => this.previewItem(text)}>{text}</a>,
     },
     {
       title: '性别',
       dataIndex: 'Gender',
+      width: 100,
+      align: 'center',
       render: (text,record) =>{
         return record.Gender === 0 ? '男':'女'
       }
@@ -231,17 +235,25 @@ class Respondent extends PureComponent {
     {
       title: '出生日期',
       dataIndex: 'Born',
+      width: 100,
+      align: 'center',
     },
     {
       title: '居住地址',
       dataIndex: 'Address',
+      width: 100,
+      align: 'center',
     },
     {
       title: '上次操作时间',
-      dataIndex: 'UpdatedAt'
+      dataIndex: 'UpdatedAt',
+      width: 100,
+      align: 'center',
     },
     {
       title: '操作',
+      width: 100,
+      align: 'center',
       render: (text, record) => {
         return record
           ? (
@@ -457,6 +469,7 @@ class Respondent extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              scroll={{ y: 320 }}
             />
           </div>
         </Card>
