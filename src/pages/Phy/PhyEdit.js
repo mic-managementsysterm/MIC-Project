@@ -402,7 +402,7 @@ class questionAdd extends React.Component {
       )
     });
     return(
-      <Tabs onChange={this.changeTab} activeKey={currentTab}>
+      <Tabs onChange={this.changeTab} activeKey={currentTab} tabPosition='left'>
         {tabComponents}
       </Tabs>
     )
