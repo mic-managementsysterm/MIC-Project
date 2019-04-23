@@ -4,6 +4,8 @@ export default {
   namespace: 'disease',
 
   state: {
+    // 是否常见
+    Prevalent:2,
     pagination:{
       pageSize:10,
       showQuickJumper:true,
@@ -102,7 +104,8 @@ export default {
             current:response.Data.pageindex,
             pageSize:response.Data.pagesize,
             total:response.Data.total,
-            searchKey:payload.key
+            searchKey:payload.key,
+            Prevalent:payload.Prevalent
           },
         });
         if (callback) callback();

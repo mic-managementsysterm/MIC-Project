@@ -10,7 +10,7 @@ export default {
     pageSize:10,
     total:0,
     searchKey:'',
-
+    Prevalent:2,
 
     modalVisible: false,
     selectedRows: [],
@@ -36,7 +36,8 @@ export default {
             current:response.Data.pageindex,
             pageSize:response.Data.pagesize,
             total:response.Data.total,
-            searchKey:payload.key
+            searchKey:payload.key,
+            Prevalent:payload.Prevalent
           },
         });
       }

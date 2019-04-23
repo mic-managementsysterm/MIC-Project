@@ -44,7 +44,7 @@ export async function changePwd(params) {
 
 // 疾病
 export async function queryDisease(params) {
-  return request(`http://10.126.6.112:5010/disease/get/find?${stringify(params)}`);
+  return request(`http://10.126.6.112:5010/disease/get/findWithPrevalent?${stringify(params)}`);
 }
 //疾病或 症状
 export async function queryDisAndSyn(params) {
@@ -170,7 +170,7 @@ export async function updateRelateSym(params) {
 
 // 症状
 export async function querySymptom(params) {
-  return request(`http://10.126.6.112:5010/symptom/get/find?${stringify(params)}`);
+  return request(`http://10.126.6.112:5010/symptom/get/findWithPrevalent?${stringify(params)}`);
 }
 
 export async function addSymptom(params) {

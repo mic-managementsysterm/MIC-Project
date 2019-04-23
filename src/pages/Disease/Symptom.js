@@ -10,7 +10,7 @@ import {
   Modal,
   message,
   Radio,
-  Cascader
+  Select
 } from 'antd';
 import pinyin from './convertPinYin';
 import StandardTable from '@/components/StandardTable';
@@ -19,6 +19,7 @@ import styles from './Symptom.less';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
+const { Option } = Select;
 const setInfo={};
 
 FormItem.className = styles["ant-form-item"];
@@ -61,7 +62,7 @@ class ManaForm extends PureComponent{
   };
 
   okHandle = () => {
-    const {dispatch,form,symptom:{Symptom,pageSize,searchKey,current}} = this.props;
+    const {dispatch,form,symptom:{Symptom,pageSize,searchKey,Prevalent,current}} = this.props;
     if(!Symptom.SymptomTypeName){
       message.error('症状类型尚未选择');
       return
@@ -87,7 +88,8 @@ class ManaForm extends PureComponent{
               payload: {
                 pageindex:1,
                 pagesize:pageSize,
-                key:''
+                Key:'',
+                Prevalent
               },
             });
           }
@@ -105,7 +107,8 @@ class ManaForm extends PureComponent{
               payload: {
                 pagesize:pageSize,
                 pageindex:current,
-                key:searchKey
+                Key:searchKey,
+                Prevalent
               },
             });
           }
@@ -211,19 +214,20 @@ class Symptom extends PureComponent {
   ];
 
   componentDidMount(){
-    const { dispatch,symptom:{current,pageSize,searchKey} } = this.props;
+    const { dispatch,symptom:{current,pageSize,searchKey,Prevalent} } = this.props;
     dispatch({
       type: 'symptom/querySymptom',
       payload: {
         pagesize:pageSize,
         pageindex:current,
-        key:searchKey
+        Key:searchKey,
+        Prevalent
       },
     });
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,symptom:{formValues,searchKey} } = this.props;
+    const { dispatch,symptom:{formValues,searchKey,Prevalent} } = this.props;
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
@@ -244,7 +248,8 @@ class Symptom extends PureComponent {
       payload: {
         pagesize:params.pageSize,
         pageindex:params.currentPage,
-        key:searchKey
+        Key:searchKey,
+        Prevalent
       },
     });
   };
@@ -266,7 +271,8 @@ class Symptom extends PureComponent {
       payload: {
         pagesize:pageSize,
         pageindex:1,
-        key:''
+        Key:'',
+        Prevalent:2
       },
     });
   };
@@ -283,7 +289,7 @@ class Symptom extends PureComponent {
 
   handleSearch = e => {
     e.preventDefault();
-    const { dispatch, form,symptom:{pageSize} } = this.props;
+    const { dispatch, form,symptom:{pageSize,Prevalent} } = this.props;
     form.validateFields((err, fieldsValue) => {
       const { key } = fieldsValue;
       dispatch({
@@ -295,7 +301,8 @@ class Symptom extends PureComponent {
       dispatch({
         type: 'symptom/querySymptom',
         payload: {
-          key,
+          Key:key,
+          Prevalent,
           pagesize:pageSize,
           pageindex:1,
         },
@@ -319,7 +326,7 @@ class Symptom extends PureComponent {
   };
 
   handleDelete = () => {
-    const { dispatch,symptom:{selectedRows,pageSize,searchKey,current} } = this.props;
+    const { dispatch,symptom:{selectedRows,pageSize,searchKey,Prevalent,current} } = this.props;
     let Ids = [];
     selectedRows.map(item => {
       Ids.push(item.Id)
@@ -341,7 +348,8 @@ class Symptom extends PureComponent {
           payload: {
             pagesize:pageSize,
             pageindex:current,
-            key:searchKey
+            Key:searchKey,
+            Prevalent
           },
         });
       }
@@ -350,7 +358,15 @@ class Symptom extends PureComponent {
   };
 
   renderSimpleForm() {
-    const {form: { getFieldDecorator },symptom:{selectedRows}} = this.props;
+    const {dispatch,form: { getFieldDecorator },symptom:{selectedRows,Prevalent}} = this.props;
+    const handlePrevalent = (v) => {
+      dispatch({
+        type: 'symptom/set',
+        payload: {
+          Prevalent:v
+        },
+      });
+    };
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
@@ -365,6 +381,11 @@ class Symptom extends PureComponent {
             )}
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
+            <Select value={Prevalent} style={{ width: 120 }} onChange={v =>handlePrevalent(v)}>
+              <Option value={2}>全部症状</Option>
+              <Option value={1}>常见症状</Option>
+              <Option value={0}>非常见症状</Option>
+            </Select>
             {getFieldDecorator('key')(
               <Input placeholder="请输入症状名或拼音" style={{ width: 400,marginRight:20 }} />
             )}
