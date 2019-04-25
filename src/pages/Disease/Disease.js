@@ -247,7 +247,7 @@ class RelateForm extends PureComponent {
     if (!repeat){
       relate.push(record)
     } else {
-      message.warning("Already Relate");
+      message.warning("已关联该证型！");
       return
     }
     rest.map(item=>{
@@ -409,16 +409,30 @@ class Disease extends PureComponent {
     {
       title: '疾病名称',
       dataIndex: 'Name',
-      width: 150,
+      width: '30%',
+      align: 'center'
     },
     {
       title: '拼音',
       dataIndex: 'PinYin',
-      width: 100,
+      width: '20%',
+      align: 'center'
+    },
+    {
+      title: '是否常见',
+      width: '20%',
+      align: 'center',
+      render: (text, record) => {
+        const {disease:{dataSource}} = this.props;
+        return dataSource && dataSource.length >= 1
+          ? (
+            <div key={record.Id}>{record.Prevalent ? '是' : '否'}</div>
+          ) : null
+      },
     },
     {
       title: '操作',
-      width: 150,
+      width: '30%',
       align: 'center',
       render: (text, record) => {
         const {disease:{dataSource}} = this.props;
@@ -628,7 +642,7 @@ class Disease extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
           <Col md={8} lg={8} xl={8}>
-            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)} style={{ marginRight: 5 }}>
               新建
             </Button>
             {selectedRows && selectedRows.length > 0 && (
@@ -638,7 +652,7 @@ class Disease extends PureComponent {
             )}
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
-            <Select value={Prevalent} style={{ width: 120 }} onChange={v =>handlePrevalent(v)}>
+            <Select value={Prevalent} style={{ width: 120, marginRight: 5 }} onChange={v =>handlePrevalent(v)}>
               <Option value={2}>全部疾病</Option>
               <Option value={1}>常见疾病</Option>
               <Option value={0}>非常见疾病</Option>
@@ -681,7 +695,6 @@ class Disease extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              scroll={{ y: 320 }}
             />
           </div>
           <ManaForm  />
