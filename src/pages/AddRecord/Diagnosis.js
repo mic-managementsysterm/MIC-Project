@@ -63,7 +63,7 @@ class DiagnosisForm extends PureComponent {
   }
 
   format = () => {
-    const {data,imgNew} =this.state;
+    const {data,imgUrl} =this.state;
     let medicalSymtoms = [];
     let medicalImages = [];
     data.map((value,index)=>{
@@ -74,7 +74,7 @@ class DiagnosisForm extends PureComponent {
         SymptomLevel:1,
       })
     });
-    imgNew.map((value)=>{
+    imgUrl.map((value)=>{
       medicalImages.push({
         Img:value
       })
