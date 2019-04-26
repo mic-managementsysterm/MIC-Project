@@ -6,6 +6,7 @@ import {
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
+import { service } from "@/services/config";
 
 import styles from './Diagnosis.less';
 
@@ -746,7 +747,7 @@ class DiagnosisForm extends PureComponent {
                     </div>
                     <Upload
                       name="file"
-                      action='http://10.126.6.118:5010/file/upload/image'
+                      action={`${service}/file/upload/image`}
                       listType="picture-card"
                       className="avatar-uploader"
                       showUploadList
