@@ -153,15 +153,18 @@ class RelateForm extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
+      width: 150,
       align: 'center',
     },{
       title: '证型拼音',
       dataIndex: 'PinYin',
+      width: 100,
       align: 'center',
     },{
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
+      width: 150,
       align: 'center',
       render: (text,record)=>(
         record ?
@@ -174,15 +177,18 @@ class RelateForm extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
+      width: 150,
       align: 'center',
     }, {
       title: '证型拼音',
       dataIndex: 'PinYin',
+      width: 100,
       align: 'center',
     },{
       title: '操作',
       dataIndex: 'operate',
       key: 'operate',
+      width: 150,
       align: 'center',
       render: (text,record)=>(
         record ?
@@ -330,6 +336,7 @@ class RelateForm extends PureComponent {
               dataSource={relateSym}
               columns={this.columns1}
               rowKey={item => item.Id}
+              scroll={{ y: 320 }}
             />
           </Col>
           <Col span={12} className={styles.breadcrumbTitle}>
@@ -347,6 +354,7 @@ class RelateForm extends PureComponent {
               columns={this.columns2}
               rowKey={item => item.Id}
               onChange={(p,f,s)=>this.onRestChange(p,f,s)}
+              scroll={{ y: 320 }}
             />
           </Col>
         </Row>
@@ -369,17 +377,16 @@ class Syndrome extends PureComponent {
     {
       title: '证型名称',
       dataIndex: 'Name',
-      width: 150,
+      width: '40%',
     },
     {
       title: '拼音',
       dataIndex: 'PinYin',
-      width: 100,
+      width: '30%',
     },
     {
       title: '操作',
-      width: 150,
-      align: 'center',
+      width: '30%',
       render: (text, record) => {
         const {syndrome:{dataSource}} = this.props;
         return dataSource && dataSource.length >= 1
@@ -573,7 +580,7 @@ class Syndrome extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
           <Col md={8} lg={8} xl={8}>
-            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)} style={{  marginRight: 5 }}>
               新建
             </Button>
             {selectedRows && selectedRows.length > 0 && (
@@ -621,7 +628,6 @@ class Syndrome extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              scroll={{ y: 320 }}
             />
           </div>
           <ManaForm {...this.props} />
