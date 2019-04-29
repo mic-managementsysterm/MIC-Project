@@ -6,7 +6,7 @@ import {
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
-import { service } from "@/services/config";
+import { service, diagnosisImgCount } from "@/services/config";
 
 import styles from './Diagnosis.less';
 
@@ -53,8 +53,6 @@ class DiagnosisForm extends PureComponent {
       previewImage: '',
       current:1,
       total:0,
-      count: 0,
-      show: false
     }
   }
 
@@ -520,7 +518,7 @@ class DiagnosisForm extends PureComponent {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { disAndSyn:{relateSyn}, disease:{value,DSdata,selectDiseaseRows,selectRelateRows,modalVisible },loading} = this.props;
-    const { diagnoseData, data, previewVisible, previewImage,fileList,count,show } =this.state;
+    const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
     const tailFormItemLayout = {
       wrapperCol: {
         xs: {
@@ -727,24 +725,6 @@ class DiagnosisForm extends PureComponent {
                   rules: [{ message: '请选择四诊照片!' }],
                 })(
                   <div>
-                    <div style={{ display: 'flex' }}>
-                      <Select
-                        placeholder="请选择上传图片张数"
-                        style={{ width: 180, marginRight: 5 }}
-                        onChange={selectVlaue =>this.setState({ count: selectVlaue, show: true })}
-                      >
-                        <Select.Option value="1">1</Select.Option>
-                        <Select.Option value="2">2</Select.Option>
-                        <Select.Option value="3">3</Select.Option>
-                        <Select.Option value="4">4</Select.Option>
-                        <Select.Option value="5">5</Select.Option>
-                        <Select.Option value="6">6</Select.Option>
-                        <Select.Option value="7">7</Select.Option>
-                        <Select.Option value="8">8</Select.Option>
-                        <Select.Option value="9">9</Select.Option>
-                      </Select>
-                      { show ? <div style={{ marginTop: -5 }}>只允许上传<a style={{ fontWeight: 600 }}>{count}</a>张照片</div> : null }
-                    </div>
                     <Upload
                       name="file"
                       action={`${service}/file/upload/image`}
@@ -757,7 +737,7 @@ class DiagnosisForm extends PureComponent {
                       onPreview={this.handlePreview}
                       onRemove={this.onRemove}
                     >
-                      {fileList.length >= count ? null: uploadButton}
+                      {fileList.length >= diagnosisImgCount ? null: uploadButton}
                     </Upload>
                     <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
                       <img alt="example" style={{ width: '100%' }} src={previewImage} />

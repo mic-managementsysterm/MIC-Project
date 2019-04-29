@@ -74,7 +74,7 @@ export default {
       if(payload.type === "Score"){
         newInfos[payload.index].Score = payload.value;
       }else {
-        newInfos[payload.index].Images = [];
+        // newInfos[payload.index].Images = [];
         newInfos[payload.index].Images.push(payload.value);
       }
 

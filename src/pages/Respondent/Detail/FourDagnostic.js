@@ -4,6 +4,7 @@ import { Card, Divider,Row } from 'antd';
 import DescriptionList from '@/components/DescriptionList';
 import DescriptionDetail from '@/components/DescriptionDetail';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { service } from "@/services/config";
 import styles from  './FourDagnostic.less';
 const { Description } = DescriptionList;
 
@@ -75,7 +76,7 @@ class FourDagnostic extends Component {
             </Description>
             <Description term="四诊照片" className={styles.term}>
               {diagnosisData.MedicalImgs && diagnosisData.MedicalImgs ? diagnosisData.MedicalImgs.map(img => <img
-                src={`http://localhost:5010${img.Img}`} className={styles.img}/>) : null
+                src={`${service}${img.Img}`} className={styles.img}/>) : null
               }
             </Description>
           </DescriptionDetail>
