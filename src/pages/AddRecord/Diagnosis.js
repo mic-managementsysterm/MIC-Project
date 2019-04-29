@@ -251,16 +251,17 @@ class DiagnosisForm extends PureComponent {
   handleCancel = () => this.setState({ previewVisible: false })
 
   handlePreview = (file) => {
+
     this.setState({
       previewImage: file.thumbUrl,
       previewVisible: true,
     });
   }
 
-  onRemove = () =>{
-    this.setState({
-      fileList:[],
-    })
+  onRemove = (file) =>{
+    this.setState((preState)=>({
+      imgUrl:preState.imgUrl.filter( item=> item !== file.response.Data)
+    }))
   }
 
   // auto

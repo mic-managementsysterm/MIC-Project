@@ -47,7 +47,6 @@ export default {
             TopicId: item.Id,
             Order: item.Order,
             Score: 0,
-
             Images: []
           });
           newTopics.push({
