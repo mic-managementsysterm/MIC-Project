@@ -78,7 +78,7 @@ class AddRecord extends Component {
       addQues: { newQues, Topics },
     } = this.props;
     newQues.Infos[index].Images.push({ Img: img });
-    Topics[index].insertImg = img;
+    Topics[index].insertImgs = img;
   };
 
   renderSelect = (itemin,index, total) => {
@@ -137,9 +137,7 @@ class AddRecord extends Component {
       return isImage && isLt2M;
     };
     const onChange = info => {
-      const { imgUrl } = this.state;
       if (info.file.status === 'done') {
-        Topics[index].insertImg = [...imgUrl,info.file.response.Data];
         dispatch({
                 type: 'addQues/setInfos',
                 payload: {
@@ -149,33 +147,14 @@ class AddRecord extends Component {
                 },
               });
       }
-      // if (info.file.status === 'done') {
-      //   // if (info.fileList.length > 1) {
-      //   //   info.fileList.splice(0, 1);
-      //   // }
-      //   let reader = new FileReader();
-      //   reader.readAsDataURL(info.file.originFileObj);
-      //   reader.onload = event => {
-      //     Topics[index].insertImg = event.target.result;
-      //     dispatch({
-      //       type: 'addQues/setInfos',
-      //       payload: {
-      //         index: index,
-      //         type: 'Images',
-      //         value: { Url: event.target.result },
-      //       },
-      //     });
-      //   };
-      // }
     };
-    const onRemove = () => {
-      Topics[index].insertImg = '';
+    const onRemove = (file) => {
       dispatch({
-        type: 'addQues/setInfos',
+        type: 'addQues/delImage',
         payload: {
           index: index,
           type: 'Images',
-          value: '',
+          value: file.response.Data,
         },
       });
     };
@@ -208,18 +187,11 @@ class AddRecord extends Component {
                 src={`${service}${item.Image}`}
               />
             ) : null}
-            {/*{item.Images && item.Image ? item.Image.map(img => <img*/}
-              {/*src={`${service}${img.Url}`} className={styles.image}/>) : null*/}
-            {/*}*/}
-            {item.insertImg ? (
-              <img
-                className={styles.image}
-                src={`${service}${item.insertImg}`}
-              />
-            ) : null}
-            {/*{item.insertImg && item.insertImg ? item.insertImg.map(img => <img*/}
-              {/*src={`${service}${img.Url}`}/>) : null*/}
-            {/*}*/}
+            {item.insertImgs.map( image => <img
+              alt=''
+              className={styles.image}
+              src={`${service}${image.Url}`}
+            /> )}
           </Row>
           <Row>
             {this.renderSelect(item, index, item.TotalScore)}
@@ -231,7 +203,7 @@ class AddRecord extends Component {
               action={`${service}/file/upload/image`}
               beforeUpload={file => beforeUpload(file)}
               onChange={info => onChange(info)}
-              onRemove={() => onRemove()}
+              onRemove={(file) => onRemove(file)}
             >
               <Button>
                 <span>选择图片</span>

@@ -52,7 +52,7 @@ export default {
           });
           newTopics.push({
             ...item,
-            insertImg:""
+            insertImgs:[]
           })
         });
       }
@@ -71,16 +71,39 @@ export default {
     },
     setInfos(state, { payload }) {
       let newInfos = state.newQues.Infos.slice();
+      let newTopics = state.Topics.slice();
       if(payload.type === "Score"){
         newInfos[payload.index].Score = payload.value;
       }else {
         // newInfos[payload.index].Images = [];
         newInfos[payload.index].Images.push(payload.value);
+        newTopics[payload.index].insertImgs.push(payload.value);
       }
 
       return {
         ...state,
         newQues:{...state.newQues,Infos:newInfos},
+        Topics:newTopics
+      };
+    },
+    delImage(state, { payload }) {
+      let newInfos = state.newQues.Infos.slice();
+      let newTopics = state.Topics.slice();
+      state.newQues.Infos[payload.index].Images.map( (image,index) => {
+        if(image.Url === payload.value){
+          newInfos[payload.index].Images.splice(index,1)
+        }
+      })
+      state.Topics[payload.index].insertImgs.map( (image,index) => {
+        if(image.Url === payload.value){
+          newTopics[payload.index].insertImgs.splice(index,1)
+        }
+      })
+
+      return {
+        ...state,
+        newQues:{...state.newQues,Infos:newInfos},
+        Topics:newTopics
       };
     }
   },
