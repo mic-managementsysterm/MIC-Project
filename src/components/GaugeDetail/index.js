@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Col} from 'antd';
+import { service } from "@/services/config";
 import styles from './index.less';
 
 class GaugeDetail extends Component{
@@ -27,7 +28,7 @@ class GaugeDetail extends Component{
                   </ul>
                 </Col>
                 {item.Images && item.Images ? item.Images.map(img => <img
-                  src={`http://localhost:5010${img.Url}`} className={styles.img}/>) : null
+                  src={`${service}${img.Url}`} className={styles.img}/>) : null
                 }
               </Row>
             </div>

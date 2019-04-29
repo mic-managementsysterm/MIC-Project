@@ -174,6 +174,10 @@ export async function querySymptom(params) {
   return request(`${service}/symptom/get/findWithPrevalent?${stringify(params)}`);
 }
 
+export async function findSymptom(params) {
+  return request(`${service}/symptom/get/find?${stringify(params)}`);
+}
+
 export async function addSymptom(params) {
   return request(`${service}/symptom/change/add`,{
     method: 'POST',
@@ -233,9 +237,29 @@ export async function addSymType(params) {
   });
 }
 
-
 export async function removeSymType(params) {
   return request(`${service}/symptomtype/delete/deleteTypes`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    traditional:true
+  });
+}
+
+export async function queryRelateSymptom(params) {
+  return request(`${service}/symptomtype/get/getRelateSymptom?${stringify(params)}`)
+}
+
+export async function queryRestSymptom(params) {
+  return request(`${service}/symptom/get/getRestType?${stringify(params)}`)
+}
+
+export async function updateRelateSymptom(params) {
+  return request(`${service}/symptomtype/change/addOrUpdateRelationship`,{
     method: 'POST',
     body: {
       ...params,
@@ -433,6 +457,18 @@ export async function queryPhy(params) {
 
 export async function addOrUpdatePhy(params) {
   return request(`${service}/gaugerecord/change/add`,{
+    method: 'POST',
+    body: {
+      ...params,
+    },
+    headers:{
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+  });
+}
+
+export async function addOrUpdatePic(params) {
+  return request(`${service}/file/upload/image`,{
     method: 'POST',
     body: {
       ...params,

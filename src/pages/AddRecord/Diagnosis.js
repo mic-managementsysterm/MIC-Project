@@ -1,14 +1,17 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, Table, message, Col, Row,Tag,Icon,Radio,Upload
+  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, message, Col, Row,Tag,Icon,Radio,Upload,Select
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
+import { service, diagnosisImgCount } from "@/services/config";
+
 import styles from './Diagnosis.less';
-const TabPane = Tabs.TabPane;
-const Option = AutoComplete.Option;
+
+const { TabPane} = Tabs;
+const { Option } = AutoComplete;
 
 @connect(({ addMedical,routerParams, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
   addMedical,
@@ -20,6 +23,18 @@ const Option = AutoComplete.Option;
   routerParams,
 }))
 class DiagnosisForm extends PureComponent {
+  columns1= [
+    {
+      title: '证型名称',
+      dataIndex: 'Name',
+      align: 'center',
+    },{
+      title: '证型拼音',
+      dataIndex: 'PinYin',
+      align: 'center',
+    },
+  ];
+
   constructor(props){
     super(props)
     this.state={
@@ -32,7 +47,7 @@ class DiagnosisForm extends PureComponent {
       fourDiagnoseData: [],
       fourDiagnoseType:'see',
       data: [],
-      base64: [],
+      imgUrl: [],
       fileList: [],
       previewVisible: false,
       previewImage: '',
@@ -41,26 +56,13 @@ class DiagnosisForm extends PureComponent {
     }
   }
 
-  columns1= [
-    {
-      title: '证型名称',
-      dataIndex: 'Name',
-      align: 'center',
-    },{
-      title: '证型拼音',
-      dataIndex: 'PinYin',
-      align: 'center',
-    },
-    ];
-
   componentDidMount() {
-    const { dispatch ,disease:{current,pageSize,searchKey}} = this.props;
     this.handleSelectRows([])
     this.handleSelectRelateRows([])
   }
 
   format = () => {
-    const {data,base64} =this.state;
+    const {data,imgUrl} =this.state;
     let medicalSymtoms = [];
     let medicalImages = [];
     data.map((value,index)=>{
@@ -71,7 +73,7 @@ class DiagnosisForm extends PureComponent {
         SymptomLevel:1,
       })
     });
-    base64.map((value)=>{
+    imgUrl.map((value)=>{
       medicalImages.push({
         Img:value
       })
@@ -87,8 +89,7 @@ class DiagnosisForm extends PureComponent {
     let upload = {};
     const {disease:{DSNoData}}=this.props
     let data=[]
-    let d=[]
-    DSNoData.map((item,index)=>{
+    DSNoData.map((item)=>{
       const row={DiagnoseName:item.Name||item.DiagnoseName,DiagnoseId:item.Id||item.DiagnoseId,ParentId:item.ParentId||''}
       data= data.concat(row)
     })
@@ -217,18 +218,11 @@ class DiagnosisForm extends PureComponent {
     })
   };
 
-  // 获取base64
-  getBase64 = (img, callback) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
-  }
-
   beforeUpload = file => {
-    const isJPG = file.type === 'image/jpeg';
-    if (!isJPG) {
+    const isImage = file.type.indexOf('image') !==-1;
+    if (!isImage) {
       message.error({
-        title: '只能上传JPG格式的图片',
+        title: '只能上传图片',
       });
       return;
     }
@@ -236,38 +230,38 @@ class DiagnosisForm extends PureComponent {
     if (!isLt2M) {
       message.error('图片大小不超过2MB!');
     }
-    return isJPG && isLt2M;
+    return isImage && isLt2M;
   };
 
   handleChange = (info) => {
-    const { base64 } = this.state;
-    let base = base64;
+    const { imgUrl } = this.state;
     if (info.file.status === 'uploading') {
       this.setState({ uploading: true });
-      return;
     }
     if (info.file.status === 'done') {
+      let imgNew = [...imgUrl,info.file.response.Data]
       this.setState({
-        fileList: info.fileList,
+        imgUrl:imgNew,
+        uploading:false,
+        fileList:info.fileList
       })
-      this.getBase64(info.file.originFileObj, imageUrl =>{
-        base.push(imageUrl);
-        this.setState({
-          base64: base,
-          uploading:false,
-          imageUrl:null
-        })
-      });
     }
   }
 
   handleCancel = () => this.setState({ previewVisible: false })
 
   handlePreview = (file) => {
+
     this.setState({
       previewImage: file.thumbUrl,
       previewVisible: true,
     });
+  }
+
+  onRemove = (file) =>{
+    this.setState((preState)=>({
+      imgUrl:preState.imgUrl.filter( item=> item !== file.response.Data)
+    }))
   }
 
   // auto
@@ -328,17 +322,11 @@ class DiagnosisForm extends PureComponent {
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch,disease:{formValues,searchKey} } = this.props;
-    const filters = Object.keys(filtersArg).reduce((obj, key) => {
-      const newObj = { ...obj };
-      newObj[key] = getValue(filtersArg[key]);
-      return newObj;
-    }, {});
 
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
       ...formValues,
-      ...filters,
     };
     if (sorter.field) {
       params.sorter = `${sorter.field}_${sorter.order}`;
@@ -353,9 +341,8 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
-
   handleSelectRows = (rows,int) => {
-    const { dispatch,disease:{DSdata,selectDiseaseRows,DSNoData} } = this.props;
+    const { dispatch,disease:{selectDiseaseRows,DSNoData} } = this.props;
     if (int===0) {
       const row=rows.map(i=>{return{...i}})
       const row2=rows.map(i=>{return{...i}});
@@ -380,7 +367,7 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleSelectRelateRows=rows=>{
-    const { dispatch ,disease:{selectRelateRows}} = this.props;
+    const { dispatch } = this.props;
     dispatch({
       type: 'disease/setStates',
       payload: {
@@ -390,7 +377,7 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleModalVisible = (record) => {
-  const { dispatch,disease:{selectedId} } = this.props;
+  const { dispatch,} = this.props;
    dispatch({
     type: 'disease/setStates',
     payload: {
@@ -418,7 +405,6 @@ class DiagnosisForm extends PureComponent {
       payload: {
         modalVisible:false,
         relateSyn:[]
-        // Disease:ClearDisease,
       },
     });
    let rows=[]
@@ -427,10 +413,10 @@ class DiagnosisForm extends PureComponent {
 
   handleRelateOk=()=>{
     const { dispatch ,disease:{selectRelateRows,selectDiseaseRows,selectedId,DSNoData}} = this.props;
-    selectDiseaseRows.slice().map((item,index)=>{
-      selectRelateRows.slice().map((d,index)=>{
+    selectDiseaseRows.slice().map((item)=>{
+      selectRelateRows.slice().map((d)=>{
         if (item.Id===selectedId) {
-          item.Name=item.Name+'('+d.Name+')'
+          item.Name=`${item.Name}(${d.Name})`
           const row=[{ParentId:selectedId,DiagnoseId:d.Id,DiagnoseName:d.Name}]
           const rows=row.slice()
           dispatch({
@@ -455,15 +441,15 @@ class DiagnosisForm extends PureComponent {
 }
 
   handleClose=(removedTag,int)=>{
-    const { dispatch ,disease:{selectDiseaseRows,selectRelateRows}} = this.props;
+    const { disease:{selectDiseaseRows,selectRelateRows}} = this.props;
     if (int===1) {
-      const tags = selectDiseaseRows.filter(function(disease, index) {
+      const tags = selectDiseaseRows.filter(function(disease ) {
         return disease.Id!==removedTag.Id;
       });
       this.handleSelectRows(tags,1)
     }
      else {
-      const rows = selectRelateRows.filter(function(relate, index) {
+      const rows = selectRelateRows.filter(function(relate) {
         return relate.Id!==removedTag.Id;
       });
 
@@ -532,7 +518,7 @@ class DiagnosisForm extends PureComponent {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { disAndSyn:{relateSyn}, disease:{value,DSdata,selectDiseaseRows,selectRelateRows,pageSize,current,total,modalVisible },loading} = this.props;
+    const { disAndSyn:{relateSyn}, disease:{value,DSdata,selectDiseaseRows,selectRelateRows,modalVisible },loading} = this.props;
     const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
     const tailFormItemLayout = {
       wrapperCol: {
@@ -630,14 +616,14 @@ class DiagnosisForm extends PureComponent {
                   value={value}
                   placeholder="请输入中医诊断"
                   onSelect={this.select}
-                  onSearch={(value)=>this.handleSearch(value)}
+                  onSearch={(searchVlaue)=>this.handleSearch(searchVlaue)}
                   optionLabelProp="text"
                 >
                   <Input />
                 </AutoComplete>
                 {
-                  selectDiseaseRows.map((disease,index)=>{
-                    return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}><span onClick = {()=>{this.handleModalVisible(disease.Id)}}>{disease.Name}</span></Tag>
+                  selectDiseaseRows.map((disease)=>{
+                    return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}><span onClick={()=>{this.handleModalVisible(disease.Id)}}>{disease.Name}</span></Tag>
                   })
                 }
               </Form.Item>
@@ -687,7 +673,7 @@ class DiagnosisForm extends PureComponent {
                           <Input />
                         </AutoComplete>
                         <Radio.Group
-                          onChange={value => { this.onTyChange(value.target.value)}}
+                          onChange={event => { this.onTyChange(event.target.value)}}
                           defaultValue="see"
                         >
                           <Radio value="see">望</Radio>
@@ -739,24 +725,25 @@ class DiagnosisForm extends PureComponent {
                 {getFieldDecorator('SZZP', {
                   rules: [{ message: '请选择四诊照片!' }],
                 })(
-                 <div>
-                   <Upload
-                     name="avatar"
-                     listType="picture-card"
-                     className="avatar-uploader"
-                     showUploadList
-                     action=""
-                     accept={"image/*"}
-                     beforeUpload={this.beforeUpload}
-                     onChange= {this.handleChange}
-                     onPreview={this.handlePreview}
-                   >
-                     {fileList.length >= 2 ? null: uploadButton}
-                   </Upload>
-                   <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                     <img alt="example" style={{ width: '100%' }} src={previewImage} />
-                   </Modal>
-                 </div>
+                  <div>
+                    <Upload
+                      name="file"
+                      action={`${service}/file/upload/image`}
+                      listType="picture-card"
+                      className="avatar-uploader"
+                      showUploadList
+                      accept="image/*"
+                      beforeUpload={this.beforeUpload}
+                      onChange={this.handleChange}
+                      onPreview={this.handlePreview}
+                      onRemove={this.onRemove}
+                    >
+                      {fileList.length >= diagnosisImgCount ? null: uploadButton}
+                    </Upload>
+                    <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                      <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                    </Modal>
+                  </div>
                 )}
               </Form.Item>
               <Form.Item {...tailFormItemLayout} className={styles.form}>

@@ -196,21 +196,21 @@ class ManaForm extends PureComponent {
   }
 }
 
-@connect(({ disAndSyn,disease, loading }) => ({
-  disAndSyn,
-  loading: loading.models.disAndSyn,
+@connect(({ symptomRelate,disease, loading }) => ({
+  symptomRelate,
+  loading: loading.models.symptomRelate,
   relateModalVisible: disease.relateModalVisible,
 }))
 @Form.create()
 class RelateForm extends PureComponent {
   columns1= [
     {
-      title: '证型名称',
+      title: '症状名称',
       dataIndex: 'Name',
       width: 150,
       align: 'center',
     },{
-      title: '证型拼音',
+      title: '症状拼音',
       dataIndex: 'PinYin',
       width: 100,
       align: 'center',
@@ -229,12 +229,12 @@ class RelateForm extends PureComponent {
 
   columns2=[
     {
-      title: '证型名称',
+      title: '症状名称',
       dataIndex: 'Name',
       width: 150,
       align: 'center',
     }, {
-      title: '证型拼音',
+      title: '症状拼音',
       dataIndex: 'PinYin',
       width: 100,
       align: 'center',
@@ -251,13 +251,8 @@ class RelateForm extends PureComponent {
       ),
     }];
 
-  formLayout = {
-    labelCol: { span: 7 },
-    wrapperCol: { span: 13 },
-  };
-
   addSyn = ( record ) => {
-    let { disAndSyn:{relateSyn, restSyn},dispatch } = this.props;
+    let { symptomRelate:{relateSyn, restSyn},dispatch } = this.props;
     let relate = relateSyn.slice();
     let rest = restSyn.slice();
     let repeat =false;
@@ -269,14 +264,14 @@ class RelateForm extends PureComponent {
     if (!repeat){
       relate.push(record)
     } else {
-      message.warning("已存在该类型！");
+      message.warning("已存在该症状！");
       return
     }
     rest.map(item=>{
       item.Id ===record.Id && (item.disabled = true)
     });
     dispatch({
-      type: 'disAndSyn/setStates',
+      type: 'symptomRelate/setStates',
       payload: {
         restSyn:rest,
         relateSyn:relate,
@@ -285,7 +280,7 @@ class RelateForm extends PureComponent {
   };
 
   deleteSyn = ( record ) => {
-    let {disAndSyn:{relateSyn, restSyn},dispatch} = this.props;
+    let {symptomRelate:{relateSyn, restSyn},dispatch} = this.props;
     let relate = relateSyn.slice();
     let rest = restSyn.slice();
     rest.map( item=>{
@@ -293,7 +288,7 @@ class RelateForm extends PureComponent {
     } );
     relate = relate.filter(item => item.Id !== record.Id);
     dispatch({
-      type: 'disAndSyn/setStates',
+      type: 'symptomRelate/setStates',
       payload: {
         restSyn:rest,
         relateSyn:relate,
@@ -304,7 +299,7 @@ class RelateForm extends PureComponent {
   searchSyndrome = (value) => {
     const { dispatch }  = this.props;
     dispatch({
-      type: 'disAndSyn/querySyn',
+      type: 'symptomRelate/querySyn',
       payload: {
         key:value,
         pagesize:8,
@@ -314,16 +309,16 @@ class RelateForm extends PureComponent {
   };
 
   handleRelate = () => {
-    const {  disAndSyn:{diseaseId,relateSyn,defaultValue},dispatch } = this.props;
+    const {  symptomRelate:{SymptomId,relateSyn,defaultValue},dispatch } = this.props;
     let synIds = [];
     relateSyn.map(item => {
       synIds.push(item.Id)
     });
     dispatch({
-      type: 'disAndSyn/updateRelate',
+      type: 'symptomRelate/updateRelate',
       payload: {
-        DiseaseId:diseaseId,
-        SyndromeIds:synIds,
+        SymptomId:SymptomId,
+        TypeIds:synIds,
       },
     });
     this.handleCancel()
@@ -332,9 +327,9 @@ class RelateForm extends PureComponent {
   handleCancel = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'disAndSyn/setStates',
+      type: 'symptomRelate/setStates',
       payload: {
-        diseaseId:"",
+        SymptomId:"",
         relateSyn:[],
         restSyn:[]
       },
@@ -348,13 +343,13 @@ class RelateForm extends PureComponent {
   };
 
   onRestChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,disAndSyn:{restKey} } = this.props;
+    const { dispatch,symptomRelate:{restKey} } = this.props;
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
     };
     dispatch({
-      type: 'disAndSyn/querySyn',
+      type: 'symptomRelate/querySyn',
       payload: {
         pagesize:params.pageSize,
         pageindex:params.currentPage,
@@ -364,12 +359,12 @@ class RelateForm extends PureComponent {
   };
 
   render() {
-    const { relateModalVisible, disAndSyn:{relateSyn,restSyn,restPagination} } = this.props;
+    const { relateModalVisible, symptomRelate:{relateSyn,restSyn,restPagination} } = this.props;
     return (
       <Modal
         centered
         width={1200}
-        title='关联证型'
+        title='关联症状'
         okText='完成'
         cancelText='取消'
         visible={relateModalVisible}
@@ -381,7 +376,7 @@ class RelateForm extends PureComponent {
       >
         <Row className="breadcrumb">
           <Col span={12} className="breadcrumb-title">
-            <div className={styles["syndrome-title"]}>已关联证型</div>
+            <div className={styles["syndrome-title"]}>已关联症状</div>
             <Table
               pagination={{pageSize:8}}
               dataSource={relateSyn}
@@ -392,9 +387,9 @@ class RelateForm extends PureComponent {
           </Col>
           <Col span={12} className={styles.breadcrumbTitle}>
             <div className={styles["syndrome-title"]}>
-              <span>未关联证型</span>
+              <span>未关联症状</span>
               <Search
-                placeholder="根据四诊类型名称搜索类型"
+                placeholder="根据症状名称或症状首字母搜索症状"
                 onSearch={value => this.searchSyndrome(value)}
                 style={{ width: 300, marginLeft: 180 }}
               />
@@ -415,9 +410,9 @@ class RelateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ disease,disAndSyn, loading }) => ({
+@connect(({ disease,symptomRelate, loading }) => ({
   disease,
-  disAndSyn,
+  symptomRelate,
   loading: loading.models.disease,
 }))
 @Form.create()
@@ -426,18 +421,16 @@ class Symtype extends PureComponent {
     {
       title: '四诊类型名称',
       dataIndex: 'TypeName',
-      width: 200,
     },
     {
       title: '操作',
-      width: 200,
       align: 'center',
       render: (text, record) => {
         const {disease:{typeData}} = this.props;
         return typeData && typeData.length >= 1
           ? (
             <div key={record.Id}>
-              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>证型关联</Button>
+              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>症状关联</Button>
               <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>编辑</Button>
             </div>
           ) : null
@@ -672,19 +665,19 @@ class Symtype extends PureComponent {
     });
 
     dispatch({
-      type: 'disAndSyn/changeIdEff',
+      type: 'symptomRelate/changeIdEff',
       payload: record.Id,
       callback:()=>{
         dispatch({
-          type: 'disAndSyn/queryRelate',
+          type: 'symptomRelate/queryRelate',
           payload:{
-            DiseaseId:record.Id,
+            SymptomTypeId:record.Id,
             pagesize:8,
             pageindex:1
           }
         });
         dispatch({
-          type: 'disAndSyn/querySyn',
+          type: 'symptomRelate/querySyn',
           payload:{
             key:'',
             pagesize:8,
@@ -701,7 +694,7 @@ class Symtype extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
           <Col md={8} lg={8} xl={8}>
-            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)} style={{  marginRight: 5 }}>
               新建
             </Button>
             {selectedRows && selectedRows.length > 0 && (
@@ -751,7 +744,6 @@ class Symtype extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              scroll={{ y: 320 }}
             >
             </StandardTable>
           </div>

@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import { Row, Button, List, Radio, Upload, Spin, message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
+import { service, queImgCount } from "@/services/config";
 import styles from './AddQuestionnaire.less';
 
 const { Group } = Radio;
@@ -75,7 +76,7 @@ class AddRecord extends Component {
       addQues: { newQues, Topics },
     } = this.props;
     newQues.Infos[index].Images.push({ Img: img });
-    Topics[index].insertImg = img;
+    Topics[index].insertImgs = img;
   };
 
   renderSelect = (itemin,index, total) => {
@@ -120,44 +121,39 @@ class AddRecord extends Component {
       dispatch,
     } = this.props;
     const beforeUpload = file => {
-      const isJPG = file.type === 'image/jpeg';
-      if (!isJPG) {
-        message.error('只允许上传JPG格式图片!');
+      const isImage = file.type.indexOf('image') !==-1;
+      if (!isImage) {
+        message.error({
+          title: '只能上传图片',
+        });
+        return;
       }
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isLt2M) {
-        message.error('图片大小不能超过2MB!');
+        message.error('图片大小不超过2MB!');
       }
-      return isJPG && isLt2M;
+      return isImage && isLt2M;
     };
     const onChange = info => {
+      info.fileList.splice(queImgCount);
       if (info.file.status === 'done') {
-        if (info.fileList.length > 1) {
-          info.fileList.splice(0, 1);
-        }
-        let reader = new FileReader();
-        reader.readAsDataURL(info.file.originFileObj);
-        reader.onload = event => {
-          Topics[index].insertImg = event.target.result;
-          dispatch({
-            type: 'addQues/setInfos',
-            payload: {
-              index: index,
-              type: 'Images',
-              value: { Url: event.target.result },
-            },
-          });
-        };
+        dispatch({
+                type: 'addQues/setInfos',
+                payload: {
+                  index: index,
+                  type: 'Images',
+                  value: {Url:info.file.response.Data},
+                },
+              });
       }
     };
-    const onRemove = () => {
-      Topics[index].insertImg = '';
+    const onRemove = (file) => {
       dispatch({
-        type: 'addQues/setInfos',
+        type: 'addQues/delImage',
         payload: {
           index: index,
           type: 'Images',
-          value: '',
+          value: file.response.Data,
         },
       });
     };
@@ -186,36 +182,34 @@ class AddRecord extends Component {
           <Row>
             {item.Image ? (
               <img
-                alt="ex"
                 className={styles.image}
-                // src={`http://210.41.215.16:3306${item.Image}`}
-                src={require('../../assets/img/cognition.jpg')}
+                src={`${service}${item.Image}`}
               />
             ) : null}
-            {item.insertImg ? (
-              <img
-                alt="ex"
+            <Row>
+              {item.insertImgs.map( image => <img
+                alt=''
                 className={styles.image}
-                // src={`http://210.41.215.16:3306${item.Image}`}
-                src={item.insertImg}
-              />
-            ) : null}
+                src={`${service}${image.Url}`}
+              /> )}
+            </Row>
           </Row>
           <Row>
             {this.renderSelect(item, index, item.TotalScore)}
             <Upload
-              name="topicImg"
+              name="file"
               multiple={false}
-              accept=".jpg,.jpeg,.png"
+              accept="image/*"
               className="topic-insertImg"
-              action=""
+              action={`${service}/file/upload/image`}
               beforeUpload={file => beforeUpload(file)}
               onChange={info => onChange(info)}
-              onRemove={() => onRemove()}
+              onRemove={(file) => onRemove(file)}
             >
               <Button>
                 <span>选择图片</span>
               </Button>
+              <span>(最多只能上传 <a style={{ fontWeight: 600 }}>{queImgCount}</a>张图片！)</span>
             </Upload>
           </Row>
         </div>

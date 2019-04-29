@@ -219,14 +219,14 @@ class Respondent extends PureComponent {
     {
       title: '姓名',
       dataIndex: 'Name',
-      width: 100,
+      width: '10%',
       align: 'center',
       render: text => <a onClick={() => this.previewItem(text)}>{text}</a>,
     },
     {
       title: '性别',
       dataIndex: 'Gender',
-      width: 100,
+      width: '10%',
       align: 'center',
       render: (text,record) =>{
         return record.Gender === 0 ? '男':'女'
@@ -235,24 +235,24 @@ class Respondent extends PureComponent {
     {
       title: '出生日期',
       dataIndex: 'Born',
-      width: 100,
+      width: '20%',
       align: 'center',
     },
     {
       title: '居住地址',
       dataIndex: 'Address',
-      width: 100,
+      width: '20%',
       align: 'center',
     },
     {
       title: '上次操作时间',
       dataIndex: 'UpdatedAt',
-      width: 100,
+      width: '20%',
       align: 'center',
     },
     {
       title: '操作',
-      width: 100,
+      width: '20%',
       align: 'center',
       render: (text, record) => {
         return record
@@ -421,7 +421,7 @@ class Respondent extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
           <Col md={8} lg={8} xl={8}>
-            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)} style={{ marginRight: 5 }}>
               新建
             </Button>
             {selectedRows && selectedRows.length >=1 && (
@@ -469,7 +469,6 @@ class Respondent extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              scroll={{ y: 320 }}
             />
           </div>
         </Card>

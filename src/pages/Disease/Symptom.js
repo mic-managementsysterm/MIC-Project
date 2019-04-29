@@ -190,16 +190,30 @@ class Symptom extends PureComponent {
     {
       title: '症状名称',
       dataIndex: 'Name',
-      width: 150,
+      width: '30%',
+      align: 'center'
     },
     {
       title: '拼音',
       dataIndex: 'PinYin',
-      width: 100,
+      width: '20%',
+      align: 'center'
+    },
+    {
+      title: '是否常见',
+      width: '20%',
+      align: 'center',
+      render: (text, record) => {
+        const {symptom:{dataSource}} = this.props;
+        return dataSource && dataSource.length >= 1
+          ? (
+            <div key={record.Id}>{record.Prevalent ? '是' : '否'}</div>
+          ) : null
+      },
     },
     {
       title: '操作',
-      width: 150,
+      width: '30%',
       align: 'center',
       render: (text, record) => {
         const {symptom:{dataSource}} = this.props;
@@ -371,7 +385,7 @@ class Symptom extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row type="flex" justify="space-between">
           <Col md={8} lg={8} xl={8}>
-            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+            <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)} style={{ marginRight: 5 }}>
               新建
             </Button>
             {selectedRows && selectedRows.length > 0 && (
@@ -381,7 +395,7 @@ class Symptom extends PureComponent {
             )}
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
-            <Select value={Prevalent} style={{ width: 120 }} onChange={v =>handlePrevalent(v)}>
+            <Select value={Prevalent} style={{ width: 120, marginRight: 5 }} onChange={v =>handlePrevalent(v)}>
               <Option value={2}>全部症状</Option>
               <Option value={1}>常见症状</Option>
               <Option value={0}>非常见症状</Option>
@@ -424,7 +438,6 @@ class Symptom extends PureComponent {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              scroll={{ y: 320 }}
             />
           </div>
           <ManaForm />

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Spin , DatePicker, Button, Input, Checkbox, Icon,InputNumber,Upload ,Row,message } from 'antd';
-import { UploadChangeParam } from 'antd/lib/upload/interface';
+import { service, diagnosisImgCount } from "@/services/config";
 import router from 'umi/router';
 import { connect } from 'dva';
 const list=[]
@@ -32,8 +32,8 @@ class questionAdd extends React.Component {
       questions:{
         Id:         null,
         Name:       '这里是标题',
-        TotalScore: 1,
-        PassScore:  1,
+        TotalScore: '',
+        PassScore:  '',
         Topics:     [
           {
             Id:              null,
@@ -134,13 +134,10 @@ class questionAdd extends React.Component {
     reader.readAsDataURL(img);
   }
   beforeUpload(file) {
-    const isJPG = file.type === 'image/jpeg';
-    const isJPEG = file.type === 'image/jpeg';
-    const isGIF = file.type === 'image/gif';
-    const isPNG = file.type === 'image/png';
-    if (!(isJPG || isJPEG || isGIF || isPNG)) {
+    const isImage = file.type.indexOf('image') !==-1;
+    if (!isImage) {
       message.error({
-        title: '只能上传JPG 、JPEG 、GIF、 PNG格式的图片~',
+        title: '只能上传图片',
       });
       return;
     }
@@ -151,7 +148,7 @@ class questionAdd extends React.Component {
       });
       return;
     }
-    return (isJPG || isJPEG || isGIF || isPNG) && isLt2M && this.checkImageWH(file);
+    return isImage && isLt2M && this.checkImageWH(file);
   }
   //返回一个 promise：检测通过则返回resolve；失败则返回reject，并阻止图片上传
   checkImageWH(file) {
@@ -327,15 +324,21 @@ class questionAdd extends React.Component {
           if (info.fileList.length>1){
             info.fileList.splice(0,1);
           }
-          this.getBase64(info.file.originFileObj, imageUrl =>{
-            const base64Img=imageUrl
-            this.state.questions.Topics[questionIndex].Image=imageUrl,
-              this.setState({
-                questions:this.state.questions,
-                loading:false,
-                imageUrl:null
-              })
-          });
+          this.state.questions.Topics[questionIndex].Image=info.file.response.Data,
+            this.setState({
+              questions:this.state.questions,
+              loading:false,
+              imageUrl:null
+            })
+          // this.getBase64(info.file.originFileObj, imageUrl =>{
+          //   const base64Img=imageUrl
+          //   this.state.questions.Topics[questionIndex].Image=imageUrl,
+          //     this.setState({
+          //       questions:this.state.questions,
+          //       loading:false,
+          //       imageUrl:null
+          //     })
+          // });
         }
       }
       if (question.Type === 0||1) {
@@ -346,17 +349,19 @@ class questionAdd extends React.Component {
               <Input value={question.GroupName} style={{ borderStyle: 'none', width: '90%', marginLeft: 3,marginBottom: 10}} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
             </div>
             <span>Q{questionIndex + 1}</span>
-            <Input value={question.Title} style={{ borderStyle: 'none', width: '90%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
+            <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
             <Row style={{float:'right'}}>
               <span >总分：</span>
               <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
             </Row>
             <div style={{marginTop:5}}>
               <Upload
-                name="avatar"
+                name="file"
+                action={`${service}/file/upload/image`}
                 listType="picture-card"
                 className="avatar-uploader"
                 showUploadList={false}
+                accept="image/*"
                 data={file => ({ // data里存放的是接口的请求参数
                   // param1: myParam1,
                   // param2: myParam2,
@@ -369,7 +374,7 @@ class questionAdd extends React.Component {
                 onChange={handleChange}>
                 {
                   question.Image? <div >
-                    <img style={{width:250,height:250}}  src={question.Image} alt=""/>
+                    <img style={{width:250,height:250}}  src={`${service}${question.Image}`} alt=""/>
                   </div>:uploadButton
                 }
               </Upload>
