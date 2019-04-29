@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import { Row, Button, List, Radio, Upload, Spin, message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
-import { service } from "@/services/config";
+import { service, queImgCount } from "@/services/config";
 import styles from './AddQuestionnaire.less';
 
 const { Group } = Radio;
@@ -135,6 +135,7 @@ class AddRecord extends Component {
       return isImage && isLt2M;
     };
     const onChange = info => {
+      info.fileList.splice(queImgCount);
       if (info.file.status === 'done') {
         dispatch({
                 type: 'addQues/setInfos',
@@ -185,16 +186,18 @@ class AddRecord extends Component {
                 src={`${service}${item.Image}`}
               />
             ) : null}
-            {item.insertImgs.map( image => <img
-              alt=''
-              className={styles.image}
-              src={`${service}${image.Url}`}
-            /> )}
+            <Row>
+              {item.insertImgs.map( image => <img
+                alt=''
+                className={styles.image}
+                src={`${service}${image.Url}`}
+              /> )}
+            </Row>
           </Row>
           <Row>
             {this.renderSelect(item, index, item.TotalScore)}
             <Upload
-              // name="topicImg"
+              name="file"
               multiple={false}
               accept="image/*"
               className="topic-insertImg"
@@ -206,6 +209,7 @@ class AddRecord extends Component {
               <Button>
                 <span>选择图片</span>
               </Button>
+              <span>(最多只能上传 <a style={{ fontWeight: 600 }}>{queImgCount}</a>张图片！)</span>
             </Upload>
           </Row>
         </div>

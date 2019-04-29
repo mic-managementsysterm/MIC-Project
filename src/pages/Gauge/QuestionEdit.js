@@ -1,8 +1,10 @@
 import React from 'react';
-import { Spin, DatePicker, Button, Input, Checkbox, Icon, InputNumber, Upload, Row, message, Modal } from 'antd';
+import {Spin , DatePicker, Button, Input, Checkbox, Icon,InputNumber,Upload ,Row,message } from 'antd';
+import { service, diagnosisImgCount } from "@/services/config";
 import router from 'umi/router';
 import { connect } from 'dva';
-import { service, queImgCount } from "@/services/config";
+const list=[]
+const fileList=[]
 
 @connect(({question,loading})=>({
   question,
@@ -23,14 +25,15 @@ class questionAdd extends React.Component {
     this.handleRemoveQuestion = this.handleRemoveQuestion.bind(this);
     this.handleSaveQuestionnaire = this.handleSaveQuestionnaire.bind(this);
     this.beforeUpload=this.beforeUpload.bind(this);
+    this.checkImageWH=this.checkImageWH.bind(this)
     this.state = {
       titleEditable:false,
       addAreaVisible:false,
       questions:{
         Id:         null,
         Name:       '这里是标题',
-        TotalScore: 1,
-        PassScore:  1,
+        TotalScore: '',
+        PassScore:  '',
         Topics:     [
           {
             Id:              null,
@@ -48,10 +51,7 @@ class questionAdd extends React.Component {
       }
       ,
       defaultGroupName:null,
-      imgUrl: [],
-      fileList: [],
-      previewVisible: false,
-      previewImage: '',
+      fileList:[],
       indexCurrent:null,
       loading1:false,
       loading2:false,
@@ -75,7 +75,7 @@ class questionAdd extends React.Component {
       },callback:()=>{
         const {question:{question}}=this.props
         this.setState({
-          questions:question,
+          questions:question
         })
       }
     })
@@ -128,7 +128,11 @@ class questionAdd extends React.Component {
       addAreaVisible: false
     });
   }
-
+  getBase64(img, callback) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
+  }
   beforeUpload(file) {
     const isImage = file.type.indexOf('image') !==-1;
     if (!isImage) {
@@ -139,24 +143,32 @@ class questionAdd extends React.Component {
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error('图片大小不超过2MB!');
+      message.error({
+        title: '超过2M限制 不允许上传~',
+      });
+      return;
     }
-    return isImage && isLt2M;
+    return isImage && isLt2M && this.checkImageWH(file);
   }
-
-  handleCancel = () => this.setState({ previewVisible: false })
-
-  handlePreview = (file) => {
-    this.setState({
-      previewImage: file.thumbUrl,
-      previewVisible: true,
+  //返回一个 promise：检测通过则返回resolve；失败则返回reject，并阻止图片上传
+  checkImageWH(file) {
+    let self = this;
+    return new Promise(function(resolve, reject) {
+      let filereader = new FileReader();
+      filereader.onload = e => {
+        let src = e.target.result;
+        const image = new Image();
+        image.onload = function() {
+          // 获取图片的宽高，并存放到file对象中
+          file.width = this.width;
+          file.height = this.height;
+          resolve();
+        };
+        image.onerror = reject;
+        image.src = src;
+      };
+      filereader.readAsDataURL(file);
     });
-  }
-
-  onRemove = () =>{
-    this.setState({
-      fileList:[],
-    })
   }
 
   handleAddCheckbox() {
@@ -181,6 +193,7 @@ class questionAdd extends React.Component {
       addAreaVisible: false
     });
   }
+
 
   handleQuestionChange(e, questionIndex,int) {
     let { questions } = this.state;
@@ -224,6 +237,7 @@ class questionAdd extends React.Component {
     });
   }
 
+
   handleSaveQuestionnaire(body) {
     this.setState({
       showLoading:true
@@ -253,6 +267,7 @@ class questionAdd extends React.Component {
       }
     )
   }
+
 
   onChangeInt=(value,quesIndex)=>{
     let { questions } = this.state;
@@ -287,34 +302,45 @@ class questionAdd extends React.Component {
     );
   }
 
+
   getQuestions() {
-    const { questions, uploading, previewVisible,previewImage } = this.state;
+    let questions = this.state.questions;
+    const { TextArea } = Input;
     return questions.Topics.map((question, questionIndex, array) => {
-      console.log('@question',question)
       const uploadButton = (
         <div >
-          <Icon type={uploading ? 'loading' : 'plus'} />
+          <Icon type={this.state.loading ? 'loading' : 'plus'} />
           <div className="ant-upload-text">Upload</div>
         </div>
       );
       const handleChange = (info) => {
-        const { imgUrl } = this.state;
+        const {indexCurrent}=this.state
         if (info.file.status === 'uploading') {
           this.setState({ loading: true });
           return;
         }
         if (info.file.status === 'done') {
-          let imgNew = [...imgUrl,info.file.response.Data];
-          this.state.questions.Topics[questionIndex].Image=imgNew,
-          this.setState({
-            imgUrl:imgNew,
-            uploading:false,
-            fileList:info.fileList,
-            questions:this.state.questions,
-          })
+          // Get this url from response in real world.
+          if (info.fileList.length>1){
+            info.fileList.splice(0,1);
+          }
+          this.state.questions.Topics[questionIndex].Image=info.file.response.Data,
+            this.setState({
+              questions:this.state.questions,
+              loading:false,
+              imageUrl:null
+            })
+          // this.getBase64(info.file.originFileObj, imageUrl =>{
+          //   const base64Img=imageUrl
+          //   this.state.questions.Topics[questionIndex].Image=imageUrl,
+          //     this.setState({
+          //       questions:this.state.questions,
+          //       loading:false,
+          //       imageUrl:null
+          //     })
+          // });
         }
       }
-
       if (question.Type === 0||1) {
         return (
           <div className="questionsWrap" style={{ padding: 30 }} key={questionIndex}>
@@ -323,32 +349,35 @@ class questionAdd extends React.Component {
               <Input value={question.GroupName} style={{ borderStyle: 'none', width: '90%', marginLeft: 3,marginBottom: 10}} onChange={(e) => this.handleQuestionChange(e, questionIndex,2)}></Input>
             </div>
             <span>Q{questionIndex + 1}</span>
-            <Input value={question.Title} style={{ borderStyle: 'none', width: '90%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
+            <Input value={question.Title} style={{ borderStyle: 'none', width: '97%', marginLeft: 3 }} onChange={(e) => this.handleQuestionChange(e, questionIndex,1)} />
             <Row style={{float:'right'}}>
               <span >总分：</span>
               <InputNumber style={{marginTop:5}} min={1} max={10} value={question.TotalScore} onChange={(value)=>this.onChangeInt(value,questionIndex)}/>
             </Row>
             <div style={{marginTop:5}}>
               <Upload
+                name="file"
+                action={`${service}/file/upload/image`}
                 listType="picture-card"
                 className="avatar-uploader"
-                showUploadList
+                showUploadList={false}
                 accept="image/*"
-                action={`${service}/file/upload/image`}
+                data={file => ({ // data里存放的是接口的请求参数
+                  // param1: myParam1,
+                  // param2: myParam2,
+                  photoCotent: file, // file 是当前正在上传的图片
+                  photoWidth: file.height, // 通过  handleBeforeUpload 获取 图片的宽高
+                  photoHeight: file.width,
+                })}
+                // action="//jsonplaceholder.typicode.com/posts/"
                 beforeUpload={this.beforeUpload}
-                onChange={handleChange}
-                onPreview={this.handlePreview}
-                onRemove={this.onRemove}
-              >
+                onChange={handleChange}>
                 {
-                  question.Image ? <div >
-                    <img src={question.Image} alt=""/>
-                  </div>:( question.Image && question.Image.length >= queImgCount ? null : uploadButton)
+                  question.Image? <div >
+                    <img style={{width:250,height:250}}  src={`${service}${question.Image}`} alt=""/>
+                  </div>:uploadButton
                 }
               </Upload>
-              <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                <img alt="example" style={{ width: '100%' }} src={previewImage} />
-              </Modal>
             </div>
             {this.getQuestionOperator(questionIndex,questions.Topics)}
           </div>
@@ -359,6 +388,7 @@ class questionAdd extends React.Component {
       }
     })
   }
+
 
   getQuestionOperator(questionIndex, array) {
     return (
@@ -383,15 +413,21 @@ class questionAdd extends React.Component {
 
   getFooter() {
     const disabledDate = (current) => current && current.valueOf() < Date.now();
+
     return (
       <div style={{ padding: 20 }}>
+        {/*<div style={{ float: 'left' }}>*/}
+        {/*<span>问卷截止日期：</span>*/}
+        {/*<DatePicker onChange={this.handleDatePick} disabledDate={disabledDate} />*/}
+        {/*<span style={{ marginLeft: 16 }}>你选择的日期为: {this.state.questions.CreatedAt }</span>*/}
+        {/*</div>*/}
         <div style={{ float: 'right' }}>
           <Button onClick={()=>this.handleSaveQuestionnaire(this.state.questions)}>保存问卷</Button>
+          {/*<Button type="primary" style={{ marginLeft: 16 }} onClick={this.handleReleaseQuestionnaire}>发布问卷</Button>*/}
         </div>
       </div>
     );
   }
-
   onChangeTotalInt=(value)=>{
     const {questions}=this.state
     questions.TotalScore=value;
@@ -399,7 +435,6 @@ class questionAdd extends React.Component {
       questions:questions
     })
   }
-
   onChangePassInt=(value)=>{
     const {questions}=this.state
     questions.PassScore=value;
@@ -407,7 +442,6 @@ class questionAdd extends React.Component {
       questions:questions
     })
   }
-
   render() {
     const {question:{showLoading}}=this.props
     return (
