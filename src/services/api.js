@@ -251,7 +251,7 @@ export async function removeSymType(params) {
 }
 
 export async function queryRelateSymptom(params) {
-  return request(`${service}/symptom/get/getRelateType?${stringify(params)}`)
+  return request(`${service}/symptomtype/get/getRelateSymptom?${stringify(params)}`)
 }
 
 export async function queryRestSymptom(params) {

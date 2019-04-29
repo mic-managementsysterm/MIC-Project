@@ -671,7 +671,7 @@ class Symtype extends PureComponent {
         dispatch({
           type: 'symptomRelate/queryRelate',
           payload:{
-            SymptomId:record.Id,
+            SymptomTypeId:record.Id,
             pagesize:8,
             pageindex:1
           }
