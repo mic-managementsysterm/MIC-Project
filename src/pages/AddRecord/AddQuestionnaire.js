@@ -3,7 +3,7 @@ import { connect } from 'dva';
 import { Row, Button, List, Radio, Upload, Spin, message } from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import router from 'umi/router';
-import { service, queImgCount } from "@/services/config";
+import { service } from "@/services/config";
 import styles from './AddQuestionnaire.less';
 
 const { Group } = Radio;
@@ -18,8 +18,6 @@ class AddRecord extends Component {
     super(props);
     this.state = {
       loading: false,
-      imgUrl: [],
-      fileList: []
     };
   }
 
