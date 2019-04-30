@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, message, Col, Row,Tag,Icon,Radio,Upload,Select
+  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, message, Col, Row, Tag, Icon, Radio, Upload, Select, Table,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -12,6 +12,7 @@ import styles from './Diagnosis.less';
 
 const { TabPane} = Tabs;
 const { Option } = AutoComplete;
+const {Search} = Input;
 
 @connect(({ addMedical,routerParams, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
   addMedical,
@@ -32,8 +33,20 @@ class DiagnosisForm extends PureComponent {
       title: '证型拼音',
       dataIndex: 'PinYin',
       align: 'center',
-    },
-  ];
+    }];
+
+  columns2=[
+    {
+      title: '证型名称',
+      dataIndex: 'Name',
+      width: 150,
+      align: 'center',
+    }, {
+      title: '证型拼音',
+      dataIndex: 'PinYin',
+      width: 100,
+      align: 'center',
+    }];
 
   constructor(props){
     super(props)
@@ -126,7 +139,7 @@ class DiagnosisForm extends PureComponent {
   handleMore = () =>{
     const {dispatch} =this.props;
     this.setState({
-      visible: true
+      visible: !this.state.visible
     });
     dispatch({
       type: 'addMedical/getSym',
@@ -516,9 +529,21 @@ class DiagnosisForm extends PureComponent {
     );
   };
 
+  searchSyndrome = (value) => {
+    const { dispatch }  = this.props;
+    dispatch({
+      type: 'disAndSyn/querySyn',
+      payload: {
+        key:value,
+        pagesize:8,
+        pageindex:1
+      },
+    });
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { disAndSyn:{relateSyn}, disease:{value,DSdata,selectDiseaseRows,selectRelateRows,modalVisible },loading} = this.props;
+    const { disAndSyn:{relateSyn,restSyn,restPagination}, disease:{value,DSdata,selectDiseaseRows,selectRelateRows,modalVisible },loading} = this.props;
     const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
     const tailFormItemLayout = {
       wrapperCol: {
@@ -631,7 +656,7 @@ class DiagnosisForm extends PureComponent {
                 <Modal
                   centered
                   destroyOnClose
-                  width={640}
+                  width={1000}
                   title="关联证型"
                   visible={modalVisible}
                   onOk={()=>{this.handleRelateOk()}}
@@ -646,6 +671,24 @@ class DiagnosisForm extends PureComponent {
                     columns={this.columns1}
                     rowKey={item => item.Id}
                   />
+                  {/*<Row className={styles["breadcrumb"]}>*/}
+                      {/*<div className={styles["search"]}>*/}
+                        {/*<Search*/}
+                          {/*placeholder="根据疾病名称或疾病首字母搜索证型"*/}
+                          {/*onSearch={value => this.searchSyndrome(value)}*/}
+                          {/*// style={{ width: 300}}*/}
+                        {/*/>*/}
+                      {/*</div>*/}
+                      {/*<StandardTable*/}
+                        {/*selectedRows={selectRelateRows}*/}
+                        {/*pagination={restPagination}*/}
+                        {/*dataSource={restSyn}*/}
+                        {/*onSelectRow={this.handleSelectRelateRows}*/}
+                        {/*onChange={this.handleStandardTableChange}*/}
+                        {/*columns={this.columns2}*/}
+                        {/*rowKey={item => item.Id}*/}
+                      {/*/>*/}
+                  {/*</Row>*/}
                 </Modal>
               </Form.Item>
               <Form.Item
@@ -674,7 +717,7 @@ class DiagnosisForm extends PureComponent {
                         </AutoComplete>
                         <Radio.Group
                           onChange={event => { this.onTyChange(event.target.value)}}
-                          defaultValue="see"
+                          // defaultValue="see"
                         >
                           <Radio value="see">望</Radio>
                           <Radio value="smell">闻</Radio>

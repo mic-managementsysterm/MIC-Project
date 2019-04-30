@@ -357,8 +357,6 @@ class RelateForm extends PureComponent {
         destroyOnClose
         onOk={() => this.handleRelate()}
         onCancel={()=> this.handleCancel()}
-        className={styles.formModal}
-        maskStyle={{backgroundColor:'rgba(0,0,0,.3)'}}
       >
         <Row className="breadcrumb">
           <Col span={12} className="breadcrumb-title">
