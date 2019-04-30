@@ -334,22 +334,37 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,disease:{formValues,searchKey} } = this.props;
+    const { dispatch,disAndSyn:{restKey} } = this.props;
 
     const params = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
-      ...formValues,
     };
-    if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
-    }
+
     dispatch({
-      type: 'disease/queryDisAndSyn',
+      type: 'disAndSyn/querySyn',
       payload: {
         pagesize:params.pageSize,
         pageindex:params.currentPage,
-        key:searchKey
+        key:restKey
+      },
+    });
+  };
+
+  onRestChange = (pagination, filtersArg, sorter) => {
+    const { dispatch,disAndSyn:{restKey} } = this.props;
+
+    const params = {
+      currentPage: pagination.current,
+      pageSize: pagination.pageSize,
+    };
+
+    dispatch({
+      type: 'disAndSyn/querySyn',
+      payload: {
+        pagesize:params.pageSize,
+        pageindex:params.currentPage,
+        key:restKey
       },
     });
   };
@@ -389,26 +404,29 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
-  handleModalVisible = (record) => {
-  const { dispatch,} = this.props;
-   dispatch({
-    type: 'disease/setStates',
-    payload: {
-      modalVisible:true,
-      selectedId:record
-      // Disease:record ? newRecord:ClearDisease,
-    },callback:()=>{
-      dispatch({
-        type:'disAndSyn/queryRelate',
-        payload:{
-          DiseaseId:record,
-          pagesize:8,
-          pageindex:1
-        }
-      })
-    },
-  });
-
+  handleModalVisible = (record,type) => {
+  const { dispatch} = this.props;
+   if (type === 1) {
+     dispatch({
+       type: 'disease/setStates',
+       payload: {
+         modalVisible:true,
+         selectedId:record
+         // Disease:record ? newRecord:ClearDisease,
+       },callback:()=>{
+         dispatch({
+           type: 'disAndSyn/querySyn',
+           payload:{
+             key:'',
+             pagesize:8,
+             pageindex:1,
+           }
+         });
+       },
+     });
+   }else {
+     message.info('证型不需要关联！')
+   }
   };
 
  handleCancelRelate = () => {
@@ -473,7 +491,7 @@ class DiagnosisForm extends PureComponent {
   select=(value,option)=>{
     const { disease:{DSNoData}, dispatch} = this.props;
     if (DSNoData.length===0){
-      this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id}],0)
+      this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id,Type: option.props.data.Type}],0)
       dispatch({
         type: 'disease/setStates',
         payload: {
@@ -489,7 +507,7 @@ class DiagnosisForm extends PureComponent {
         }
       });
       if(!flag){
-        this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id}],0);
+        this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id,Type: option.props.data.Type}],0);
         dispatch({
           type: 'disease/setStates',
           payload: {
@@ -648,7 +666,7 @@ class DiagnosisForm extends PureComponent {
                 </AutoComplete>
                 {
                   selectDiseaseRows.map((disease)=>{
-                    return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}><span onClick={()=>{this.handleModalVisible(disease.Id)}}>{disease.Name}</span></Tag>
+                    return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}><span onClick={()=>{this.handleModalVisible(disease.Id,disease.Type)}}>{disease.Name}</span></Tag>
                   })
                 }
               </Form.Item>
@@ -662,33 +680,33 @@ class DiagnosisForm extends PureComponent {
                   onOk={()=>{this.handleRelateOk()}}
                   onCancel={() => this.handleCancelRelate()}
                 >
-                  <StandardTable
-                    selectedRows={selectRelateRows}
-                    pagination={{pageSize:8}}
-                    dataSource={relateSyn}
-                    onSelectRow={this.handleSelectRelateRows}
-                    onChange={this.handleStandardTableChange}
-                    columns={this.columns1}
-                    rowKey={item => item.Id}
-                  />
-                  {/*<Row className={styles["breadcrumb"]}>*/}
-                      {/*<div className={styles["search"]}>*/}
-                        {/*<Search*/}
-                          {/*placeholder="根据疾病名称或疾病首字母搜索证型"*/}
-                          {/*onSearch={value => this.searchSyndrome(value)}*/}
-                          {/*// style={{ width: 300}}*/}
-                        {/*/>*/}
-                      {/*</div>*/}
-                      {/*<StandardTable*/}
-                        {/*selectedRows={selectRelateRows}*/}
-                        {/*pagination={restPagination}*/}
-                        {/*dataSource={restSyn}*/}
-                        {/*onSelectRow={this.handleSelectRelateRows}*/}
-                        {/*onChange={this.handleStandardTableChange}*/}
-                        {/*columns={this.columns2}*/}
-                        {/*rowKey={item => item.Id}*/}
-                      {/*/>*/}
-                  {/*</Row>*/}
+                  {/*<StandardTable*/}
+                    {/*selectedRows={selectRelateRows}*/}
+                    {/*pagination={{pageSize:8}}*/}
+                    {/*dataSource={relateSyn}*/}
+                    {/*onSelectRow={this.handleSelectRelateRows}*/}
+                    {/*onChange={this.handleStandardTableChange}*/}
+                    {/*columns={this.columns1}*/}
+                    {/*rowKey={item => item.Id}*/}
+                  {/*/>*/}
+                  <Row className={styles["breadcrumb"]}>
+                      <div className={styles["search"]}>
+                        <Search
+                          placeholder="根据疾病名称或疾病首字母搜索证型"
+                          onSearch={value => this.searchSyndrome(value)}
+                          // style={{ width: 300}}
+                        />
+                      </div>
+                      <StandardTable
+                        selectedRows={selectRelateRows}
+                        pagination={restPagination}
+                        dataSource={restSyn}
+                        onSelectRow={this.handleSelectRelateRows}
+                        onChange={this.handleStandardTableChange}
+                        columns={this.columns2}
+                        rowKey={item => item.Id}
+                      />
+                  </Row>
                 </Modal>
               </Form.Item>
               <Form.Item
@@ -717,8 +735,9 @@ class DiagnosisForm extends PureComponent {
                         </AutoComplete>
                         <Radio.Group
                           onChange={event => { this.onTyChange(event.target.value)}}
-                          // defaultValue="see"
+                          defaultValue=""
                         >
+                          <Radio value="">全部</Radio>
                           <Radio value="see">望</Radio>
                           <Radio value="smell">闻</Radio>
                           <Radio value="ask">问</Radio>
