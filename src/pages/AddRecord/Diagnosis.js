@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import {
-  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, message, Col, Row,Tag,Icon,Radio,Upload,Select
+  Form, Input, Spin, Button, AutoComplete, Modal, Tabs, List, message, Col, Row, Tag, Icon, Radio, Upload
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -12,28 +12,26 @@ import styles from './Diagnosis.less';
 
 const { TabPane} = Tabs;
 const { Option } = AutoComplete;
+const {Search} = Input;
 
-@connect(({ addMedical,routerParams, getDisease,getSyndrome,disease,disAndSyn, loading }) => ({
+@connect(({ addMedical,routerParams, loading }) => ({
   addMedical,
-  getDisease,
-  getSyndrome,
-  disease,
-  disAndSyn,
-  loading: loading.models.addMedical && loading.models.getDisease&&loading.models.getSyndrome&&loading.models.disease&&loading.models.disAndSyn,
   routerParams,
+  loading: loading.models.addMedical,
 }))
 class DiagnosisForm extends PureComponent {
-  columns1= [
+  columns2=[
     {
       title: '证型名称',
       dataIndex: 'Name',
+      width: 150,
       align: 'center',
-    },{
+    }, {
       title: '证型拼音',
       dataIndex: 'PinYin',
+      width: 100,
       align: 'center',
-    },
-  ];
+    }];
 
   constructor(props){
     super(props)
@@ -54,11 +52,6 @@ class DiagnosisForm extends PureComponent {
       current:1,
       total:0,
     }
-  }
-
-  componentDidMount() {
-    this.handleSelectRows([])
-    this.handleSelectRelateRows([])
   }
 
   format = () => {
@@ -87,11 +80,23 @@ class DiagnosisForm extends PureComponent {
       loading:true
     });
     let upload = {};
-    const {disease:{DSNoData}}=this.props
+    const {addMedical:{diagData}}=this.props
     let data=[]
-    DSNoData.map((item)=>{
-      const row={DiagnoseName:item.Name||item.DiagnoseName,DiagnoseId:item.Id||item.DiagnoseId,ParentId:item.ParentId||''}
-      data= data.concat(row)
+    diagData.map((item)=>{
+      data.push({
+        DiagnoseName:item.diagnose.Name,
+        DiagnoseId:item.diagnose.Id,
+        ParentId:null
+      })
+      if(item.children.length > 0){
+        item.children.map(children => {
+          data.push({
+            DiagnoseName:children.Name,
+            DiagnoseId:children.Id,
+            ParentId:item.diagnose.Id
+          })
+        })
+      }
     })
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
@@ -105,16 +110,17 @@ class DiagnosisForm extends PureComponent {
         upload.Diagnoses = data;
         upload.Symptoms = formatParams.medicalSymtoms;
         upload.MedicalImgs = formatParams.medicalImages;
-        this.props.dispatch({
-          type: 'addMedical/upload',
-          payload:upload,
-          callback:()=>{
-            this.setState({
-              loading:false
-            });
-            router.go(-2);
-          }
-        });
+        console.log("upload",upload)
+        // this.props.dispatch({
+        //   type: 'addMedical/upload',
+        //   payload:upload,
+        //   callback:()=>{
+        //     this.setState({
+        //       loading:false
+        //     });
+        //     router.go(-2);
+        //   }
+        // });
       }else {
         this.setState({
           loading:false
@@ -123,11 +129,10 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
+  // tab部分
   handleMore = () =>{
     const {dispatch} =this.props;
-    this.setState({
-      visible: true
-    });
+    this.setState(state => !state.visible);
     dispatch({
       type: 'addMedical/getSym',
       payload: {
@@ -165,6 +170,7 @@ class DiagnosisForm extends PureComponent {
     });
   };
 
+  // 绘制tab
   renderRow = () =>{
     const { fourDiagnoseData,data,current,total,fourDiagnoseType } = this.state;
     const pageChange = (page) => {
@@ -210,14 +216,10 @@ class DiagnosisForm extends PureComponent {
       />
     )
   };
+  // tab部分
 
-  renderTag = (data) =>{
-    return data.map(disease=>{
-      return (<Tag key={disease.Id} closable>{disease.Name}</Tag>
-      )
-    })
-  };
 
+  // 图片
   beforeUpload = file => {
     const isImage = file.type.indexOf('image') !==-1;
     if (!isImage) {
@@ -248,22 +250,25 @@ class DiagnosisForm extends PureComponent {
     }
   }
 
-  handleCancel = () => this.setState({ previewVisible: false })
-
   handlePreview = (file) => {
+
     this.setState({
       previewImage: file.thumbUrl,
       previewVisible: true,
     });
   }
 
-  onRemove = () =>{
-    this.setState({
-      fileList:[],
-    })
-  }
+  handleCancel = () => this.setState({ previewVisible: false })
 
-  // auto
+  onRemove = (file) =>{
+    this.setState((preState)=>({
+      imgUrl:preState.imgUrl.filter( item=> item !== file.response.Data)
+    }))
+  }
+  // 图片
+
+
+  // 四诊信息
   renderOption = (item) => {
     return (
       <Option key={item.Id} text={item.Name} data={item}>
@@ -319,191 +324,146 @@ class DiagnosisForm extends PureComponent {
     this.setState({data:da})
   };
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,disease:{formValues,searchKey} } = this.props;
+  renderTag = (data) =>{
+    return data.map(disease=>{
+      return (<Tag key={disease.Id} closable>{disease.Name}</Tag>
+      )
+    })
+  };
+  // 四诊信息
 
-    const params = {
-      currentPage: pagination.current,
-      pageSize: pagination.pageSize,
-      ...formValues,
-    };
-    if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.order}`;
-    }
+
+  // table
+  searchSyndrome = (value) => {
+    const { dispatch }  = this.props;
     dispatch({
-      type: 'disease/queryDisAndSyn',
+      type: 'addMedical/querySyn',
       payload: {
-        pagesize:params.pageSize,
-        pageindex:params.currentPage,
-        key:searchKey
+        key:value,
+        pagesize:8,
+        pageindex:1
       },
     });
   };
 
-  handleSelectRows = (rows,int) => {
-    const { dispatch,disease:{selectDiseaseRows,DSNoData} } = this.props;
-    if (int===0) {
-      const row=rows.map(i=>{return{...i}})
-      const row2=rows.map(i=>{return{...i}});
-      const row3=selectDiseaseRows.concat(row).map(i=>{return{...i}});
-      const row4=DSNoData.concat(row2).map(i=>{return{...i}});
-      dispatch({
-        type: 'disease/setStates',
-        payload:{
-          selectDiseaseRows:selectDiseaseRows.length===0?row:row3,
-          DSNoData:DSNoData.length===0?row2:row4
-        },
-      });
-    }else {
-      dispatch({
-        type: 'disease/setStates',
-        payload: {
-          selectDiseaseRows:rows.slice(),
-          DSNoData:rows.slice(),
-        },
-      });
-    }
+  handleStandardTableChange = (pagination, ) => {
+    const { dispatch,addMedical:{synSearchKey} } = this.props;
+    const params = {
+      currentPage: pagination.current,
+      pageSize: pagination.pageSize,
+    };
+    dispatch({
+      type: 'addMedical/querySyn',
+      payload: {
+        pagesize:params.pageSize,
+        pageindex:params.currentPage,
+        key:synSearchKey
+      },
+    });
   };
 
-  handleSelectRelateRows=rows=>{
+  handleSelectRelateRows = rows =>{
     const { dispatch } = this.props;
     dispatch({
-      type: 'disease/setStates',
+      type: 'addMedical/set',
       payload: {
         selectRelateRows:rows.slice()
       },
     });
   };
 
-  handleModalVisible = (record) => {
-  const { dispatch,} = this.props;
-   dispatch({
-    type: 'disease/setStates',
-    payload: {
-      modalVisible:true,
-      selectedId:record
-      // Disease:record ? newRecord:ClearDisease,
-    },callback:()=>{
+  handleModalVisible = (diag) => {
+    const { dispatch} = this.props;
+    if (diag.diagnose.Type === 1) {
       dispatch({
-        type:'disAndSyn/queryRelate',
+        type: 'addMedical/querySyn',
         payload:{
-          DiseaseId:record,
+          key:'',
           pagesize:8,
-          pageindex:1
-        }
-      })
-    },
-  });
-
+          pageindex:1,
+        },
+        callback:()=>{
+          dispatch({
+            type: 'addMedical/set',
+            payload: {
+              modalVisible:true,
+              selectDiagnose:diag.diagnose,
+              selectRelateRows:diag.children
+            },
+          });
+        },
+      });
+    }else {
+      message.info('证型不需要关联！')
+    }
   };
 
- handleCancelRelate = () => {
-   const {dispatch}=this.props
+  handleCancelRelate = () => {
+    const {dispatch}=this.props
     dispatch({
-      type: 'disease/setStates',
+      type: 'addMedical/set',
       payload: {
         modalVisible:false,
-        relateSyn:[]
+        selectRelateRows:[]
       },
     });
-   let rows=[]
-   this.handleSelectRelateRows(rows)
   };
 
   handleRelateOk=()=>{
-    const { dispatch ,disease:{selectRelateRows,selectDiseaseRows,selectedId,DSNoData}} = this.props;
-    selectDiseaseRows.slice().map((item)=>{
-      selectRelateRows.slice().map((d)=>{
-        if (item.Id===selectedId) {
-          item.Name=`${item.Name}(${d.Name})`
-          const row=[{ParentId:selectedId,DiagnoseId:d.Id,DiagnoseName:d.Name}]
-          const rows=row.slice()
-          dispatch({
-            type: 'disease/setStates',
-            payload: {
-              modalVisible:false,
-              selectDiseaseRows:selectDiseaseRows,
-              DSNoData:DSNoData.concat(rows)
-            },
-          });
-        }
-      })
+    const { dispatch ,addMedical:{diagData,selectDiagnose,selectRelateRows}} = this.props;
+    let diagDataTmp = diagData.slice();
+    let rowsTmp = selectRelateRows.slice();
+
+    diagData.slice().map((diag,index)=>{
+      if (diag.diagnose.Id === selectDiagnose.Id) {
+        diagDataTmp[index].children= rowsTmp
+      }
     })
+    dispatch({
+      type: 'addMedical/set',
+      payload: {
+        modalVisible:false,
+        diagData:diagDataTmp,
+        selectRelateRows:[]
+      },
+    });
+  }
+
+  // table
+
+
+  // 中医诊断
+  select=(value,option)=>{
+    const { addMedical:{diagData}, dispatch} = this.props;
+    let flag = false;
+    diagData.map((d)=>{
+      if (d.Id === option.props.data.Id) {
+        flag = true;
+      }
+    });
+    if(!flag){
+      this.handleSelectRows(option.props.data);
+    }else {
+      message.error('请勿重复选择');
+    }
     dispatch({
       type: 'disease/setStates',
       payload: {
-        modalVisible:false,
-        // Disease:ClearDisease,
+        value:''
       },
     });
-    this.handleSelectRelateRows([])
-}
-
-  handleClose=(removedTag,int)=>{
-    const { disease:{selectDiseaseRows,selectRelateRows}} = this.props;
-    if (int===1) {
-      const tags = selectDiseaseRows.filter(function(disease ) {
-        return disease.Id!==removedTag.Id;
-      });
-      this.handleSelectRows(tags,1)
-    }
-     else {
-      const rows = selectRelateRows.filter(function(relate) {
-        return relate.Id!==removedTag.Id;
-      });
-
-      this.handleSelectRelateRows(rows,1)
-    }
-  }
-
-  select=(value,option)=>{
-    const { disease:{DSNoData}, dispatch} = this.props;
-    if (DSNoData.length===0){
-      this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id}],0)
-      dispatch({
-        type: 'disease/setStates',
-        payload: {
-          value:''
-        },
-      });
-    } else {
-      let flag = false;
-      DSNoData.map((d)=>{
-        if (d.Id === option.props.text) {
-          message.error('请勿重复选择');
-          flag = true;
-        }
-      });
-      if(!flag){
-        this.handleSelectRows([{Name:option.props.data.Name,Id:option.props.data.Id}],0);
-        dispatch({
-          type: 'disease/setStates',
-          payload: {
-            value:''
-          },
-        });
-      }
-    }
   };
 
   handleSearch=(value)=>{
     const { dispatch } = this.props;
     const key=value;
     dispatch({
-      type: 'disease/setStates',
+      type: 'addMedical/queryDisAndSyn',
       payload: {
-        searchKey:key,
-        value:value,
-      },callback:()=>{
-        dispatch({
-          type: 'disease/queryDisAndSyn',
-          payload: {
-            key,
-            pagesize:10,
-            pageindex:1,
-          },
-        });
-      },
+        key,
+        pagesize:10,
+        pageindex:1,
+      }
     });
   };
 
@@ -515,9 +475,52 @@ class DiagnosisForm extends PureComponent {
     );
   };
 
+  // tagClose
+  handleClose=(removedTag)=>{
+    const { dispatch,addMedical:{diagData}} = this.props;
+    const newDiagData = diagData.filter( item =>
+      item.diagnose.Id !== removedTag.Id
+    );
+    dispatch({
+      type: 'addMedical/set',
+      payload: {
+        diagData:newDiagData,
+      },
+    });
+  }
+
+  handleSelectRows = (rowItem) => {
+    const { dispatch,addMedical:{diagData} } = this.props;
+    let newDiag = diagData.slice();
+
+    newDiag.push({
+      diagnose:rowItem,
+      children:[]
+    });
+
+    dispatch({
+      type: 'addMedical/set',
+      payload: {
+        diagData:newDiag,
+      },
+    });
+  };
+
+  renderRelate = (arr) => {
+    if(arr.length === 0){
+      return ''
+    }
+    let arrTmp = arr.map(item => item.Name);
+    return `(${arrTmp.join('、')})`
+  };
+  // 中医诊断
+
+
+
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { disAndSyn:{relateSyn}, disease:{value,DSdata,selectDiseaseRows,selectRelateRows,modalVisible },loading} = this.props;
+    const {addMedical:{diagSearchValue,diagData,modalVisible,diaAndSynData,
+      selectRelateRows,synData,synCurrent,synPageSize,synTotal},loading} = this.props;
     const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
     const tailFormItemLayout = {
       wrapperCol: {
@@ -611,8 +614,8 @@ class DiagnosisForm extends PureComponent {
                 className={styles.form}
               >
                 <AutoComplete
-                  dataSource={DSdata.map(this.renderOptionItem)}
-                  value={value}
+                  dataSource={diaAndSynData.map(this.renderOptionItem)}
+                  value={diagSearchValue}
                   placeholder="请输入中医诊断"
                   onSelect={this.select}
                   onSearch={(searchVlaue)=>this.handleSearch(searchVlaue)}
@@ -621,8 +624,15 @@ class DiagnosisForm extends PureComponent {
                   <Input />
                 </AutoComplete>
                 {
-                  selectDiseaseRows.map((disease)=>{
-                    return <Tag key={disease.Id} closable onClose={() => this.handleClose(disease,1)}><span onClick={()=>{this.handleModalVisible(disease.Id)}}>{disease.Name}</span></Tag>
+                  diagData.length !== 0 && diagData.slice().map((item)=>{
+                    return (
+                      <Tag key={item.diagnose.Id} closable onClose={() => this.handleClose(item.diagnose,1)}>
+                        <span onClick={()=>{this.handleModalVisible(item)}}>
+                          {item.diagnose.Name}
+                          {this.renderRelate(item.children)}
+                        </span>
+                      </Tag>
+                      )
                   })
                 }
               </Form.Item>
@@ -630,21 +640,33 @@ class DiagnosisForm extends PureComponent {
                 <Modal
                   centered
                   destroyOnClose
-                  width={640}
+                  width={1000}
                   title="关联证型"
                   visible={modalVisible}
                   onOk={()=>{this.handleRelateOk()}}
                   onCancel={() => this.handleCancelRelate()}
                 >
-                  <StandardTable
-                    selectedRows={selectRelateRows}
-                    pagination={{pageSize:8}}
-                    dataSource={relateSyn}
-                    onSelectRow={this.handleSelectRelateRows}
-                    onChange={this.handleStandardTableChange}
-                    columns={this.columns1}
-                    rowKey={item => item.Id}
-                  />
+                  <Row className={styles.breadcrumb}>
+                    <div className={styles.search}>
+                      <Search
+                        placeholder="根据疾病名称或疾病首字母搜索证型"
+                        onSearch={searchValue => this.searchSyndrome(searchValue)}
+                      />
+                    </div>
+                    <StandardTable
+                      selectedRows={selectRelateRows}
+                      pagination={{
+                        total:synTotal,
+                        pageSize:synPageSize,
+                        current:synCurrent,
+                      }}
+                      dataSource={synData}
+                      onSelectRow={(rows)=>this.handleSelectRelateRows(rows)}
+                      onChange={this.handleStandardTableChange}
+                      columns={this.columns2}
+                      rowKey={item => item.Id}
+                    />
+                  </Row>
                 </Modal>
               </Form.Item>
               <Form.Item
@@ -673,8 +695,9 @@ class DiagnosisForm extends PureComponent {
                         </AutoComplete>
                         <Radio.Group
                           onChange={event => { this.onTyChange(event.target.value)}}
-                          defaultValue="see"
+                          defaultValue=""
                         >
+                          <Radio value="">全部</Radio>
                           <Radio value="see">望</Radio>
                           <Radio value="smell">闻</Radio>
                           <Radio value="ask">问</Radio>
