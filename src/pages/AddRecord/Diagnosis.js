@@ -13,6 +13,19 @@ import styles from './Diagnosis.less';
 const { TabPane} = Tabs;
 const { Option } = AutoComplete;
 const {Search} = Input;
+const clearState ={
+  diagSearchValue:'',
+  diagData:[],
+  diaAndSynData:[],
+  selectDiagnose:null,
+  selectRelateRows:[],
+  modalVisible:false,
+  synData:[],
+  synSearchKey:'',
+  synCurrent:1,
+  synPageSize:8,
+  synTotal:0,
+};
 
 @connect(({ addMedical,routerParams, loading }) => ({
   addMedical,
@@ -52,6 +65,16 @@ class DiagnosisForm extends PureComponent {
       current:1,
       total:0,
     }
+  }
+
+  componentWillUnmount(){
+    const {dispatch} =this.props;
+    dispatch({
+      type: 'addMedical/set',
+      payload: {
+        ...clearState
+      },
+    });
   }
 
   format = () => {
