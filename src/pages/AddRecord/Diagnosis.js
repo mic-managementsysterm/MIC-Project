@@ -373,7 +373,7 @@ class DiagnosisForm extends PureComponent {
   };
 
   handleModalVisible = (diag) => {
-    const { dispatch} = this.props;
+    const { dispatch } = this.props;
     if (diag.diagnose.Type === 1) {
       dispatch({
         type: 'addMedical/querySyn',
@@ -469,7 +469,7 @@ class DiagnosisForm extends PureComponent {
 
   renderOptionItem=(item)=>{
     return (
-      <Option key={item.Id} text={item.Name} data={item}>
+      <Option key={item.Name} text={item.Name} data={item}>
         {item.Name}
       </Option>
     );
@@ -519,7 +519,7 @@ class DiagnosisForm extends PureComponent {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const {addMedical:{diagSearchValue,diagData,modalVisible,diaAndSynData,
+    const {addMedical:{diagData,modalVisible,diaAndSynData,
       selectRelateRows,synData,synCurrent,synPageSize,synTotal},loading} = this.props;
     const { diagnoseData, data, previewVisible, previewImage,fileList } =this.state;
     const tailFormItemLayout = {
@@ -615,7 +615,7 @@ class DiagnosisForm extends PureComponent {
               >
                 <AutoComplete
                   dataSource={diaAndSynData.map(this.renderOptionItem)}
-                  value={diagSearchValue}
+                  // value={diagSearchValue}
                   placeholder="请输入中医诊断"
                   onSelect={this.select}
                   onSearch={(searchVlaue)=>this.handleSearch(searchVlaue)}
