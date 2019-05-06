@@ -110,17 +110,16 @@ class DiagnosisForm extends PureComponent {
         upload.Diagnoses = data;
         upload.Symptoms = formatParams.medicalSymtoms;
         upload.MedicalImgs = formatParams.medicalImages;
-        console.log("upload",upload)
-        // this.props.dispatch({
-        //   type: 'addMedical/upload',
-        //   payload:upload,
-        //   callback:()=>{
-        //     this.setState({
-        //       loading:false
-        //     });
-        //     router.go(-2);
-        //   }
-        // });
+        this.props.dispatch({
+          type: 'addMedical/upload',
+          payload:upload,
+          callback:()=>{
+            this.setState({
+              loading:false
+            });
+            router.go(-2);
+          }
+        });
       }else {
         this.setState({
           loading:false
@@ -232,6 +231,7 @@ class DiagnosisForm extends PureComponent {
     if (!isLt2M) {
       message.error('图片大小不超过2MB!');
     }
+    /* eslint consistent-return:0 */
     return isImage && isLt2M;
   };
 
