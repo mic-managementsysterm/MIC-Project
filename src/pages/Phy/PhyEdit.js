@@ -114,9 +114,9 @@ class questionAdd extends React.Component {
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
               <Option value={1}>选择检测结果（单选）</Option>
-              <Option value={2}>填写检测数据</Option>
+              <Option value={2}>填写检测数据(文本框)</Option>
               <Option value={3}>选择检查结果（多选）</Option>
-              <Option value={4}>填写检测结果</Option>
+              <Option value={4}>填写检测结果（文本域）</Option>
             </Select>
           </div>
           {this.getQuestionOperator(questionIndex,question)}

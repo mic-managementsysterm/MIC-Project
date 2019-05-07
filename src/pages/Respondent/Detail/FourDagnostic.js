@@ -14,6 +14,7 @@ const { Description } = DescriptionList;
   loading: loading.effects['detail/fetchDiagnosisDetail'],
 }))
 class FourDagnostic extends Component {
+
   componentDidMount() {
     const { dispatch,routerParams } = this.props;
     dispatch({
@@ -23,6 +24,14 @@ class FourDagnostic extends Component {
       },
     });
   }
+
+  renderRelate = (arr) => {
+    if(arr.length === 0){
+      return ''
+    }
+    let arrTmp = arr.map(item => item.DiagnoseName);
+    return `(${arrTmp.join('、')})`
+  };
 
   render() {
     const { detail = {}, loading } = this.props;
@@ -59,8 +68,8 @@ class FourDagnostic extends Component {
             <Description term="中医诊断" className={styles.term}>
                <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
                  {diagnosisData&&diagnosisData.Diagnoses
-                   ? diagnosisData.Diagnoses.map((item, index) => {
-                     return <span key={index}>{item.DiagnoseName}&nbsp;&nbsp;</span>;
+                   ? diagnosisData.Diagnoses.map(item => {
+                     return <span key={item.Id}>{item.DiagnoseName}{this.renderRelate(item.Syndromes)}&nbsp;&nbsp;</span>;
                    })
                    : null}
                </Row>
@@ -68,8 +77,8 @@ class FourDagnostic extends Component {
             <Description term="四诊信息" className={styles.term}>
               <Row style={{ color: '#0e0c0ca6',fontSize: 14,padding: 5 }}>
                 {diagnosisData&&diagnosisData.Symptoms
-                  ? diagnosisData.Symptoms.map((item, index) => {
-                    return <span key={index}>{item.SymptomName}&nbsp;&nbsp;</span>;
+                  ? diagnosisData.Symptoms.map(item => {
+                    return <span key={item.SymptomId}>{item.SymptomName}&nbsp;&nbsp;</span>;
                   })
                   : null}
               </Row>

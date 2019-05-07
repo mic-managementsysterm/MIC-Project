@@ -170,20 +170,20 @@ class ManaForm extends PureComponent {
         centered
         destroyOnClose
         width={640}
-        title={Type.Id === "" ? "新增四诊类型" : "编辑四诊类型"}
+        title={Type.Id === "" ? "新增类型" : "编辑类型"}
         visible={modalVisible}
         onOk={okHandle}
         onCancel={() => handleCancel()}
       >
 
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="四诊类型名">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型名">
           {form.getFieldDecorator('TypeName', {
             rules: [{ required: true, message: '请输入类型名！', min: 1 }],
-          })(<Input placeholder="请输入四诊类型名" />)}
+          })(<Input placeholder="请输入类型名" />)}
         </FormItem>
-        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="四诊类型">
+        <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="类型">
           <Cascader
-            placeholder='请选择四诊类型'
+            placeholder='请选择类型'
             options={typeData}
             fieldNames={fieldNames}
             onChange={this.onChange}
@@ -419,7 +419,7 @@ class RelateForm extends PureComponent {
 class Symtype extends PureComponent {
   columns = [
     {
-      title: '四诊类型名称',
+      title: '类型名称',
       dataIndex: 'TypeName',
     },
     {
@@ -430,7 +430,7 @@ class Symtype extends PureComponent {
         return typeData && typeData.length >= 1
           ? (
             <div key={record.Id}>
-              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>症状关联</Button>
+              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>关联症状</Button>
               <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>编辑</Button>
             </div>
           ) : null
@@ -705,7 +705,7 @@ class Symtype extends PureComponent {
           </Col>
           <span className={styles.submitButtons} style={{alignItems:"flex-end",justifyContent:'flex-end'}}>
             {getFieldDecorator('key')(
-              <Input placeholder="请输四诊类型名称" style={{ width: 400,marginRight:20 }} />
+              <Input placeholder="请输类型名称" style={{ width: 400,marginRight:20 }} />
             )}
             <Button type="primary" htmlType="submit">
                 查询
@@ -730,7 +730,7 @@ class Symtype extends PureComponent {
       },
     };
     return (
-      <PageHeaderWrapper title="四诊类型管理">
+      <PageHeaderWrapper title="类型管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
