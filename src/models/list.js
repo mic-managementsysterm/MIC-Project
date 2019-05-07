@@ -117,8 +117,19 @@ export default {
       let {QuestionnaireRecords, MedicalRecords, GaugeRecords} = action.payload;
       let newRecords = [];
       newRecords.push(...format(QuestionnaireRecords),...format(MedicalRecords),...format(GaugeRecords));
-      // newRecords.push(...format(MedicalRecords));
-      // newRecords.push(...format(GaugeRecords));
+      let compare = (a,b) => {
+        let aTime = new Date(a.CreatedAt);
+        let bTime = new Date(b.CreatedAt);
+        let compareResult = aTime - bTime;
+        if(compareResult>0){
+          return -1
+        }
+        if(compareResult<0){
+          return 1
+        }
+        return 0
+      }
+      newRecords = newRecords.sort(compare)
       return {
         ...state,
         records: newRecords,
