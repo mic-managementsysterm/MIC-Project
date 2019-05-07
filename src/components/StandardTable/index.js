@@ -35,17 +35,17 @@ class StandardTable extends PureComponent {
     }
 
     // 添加 selectedRows 判断 实现默认勾选效果
-    if(nextProps.selectedRows){
-      if(Object.prototype.toString.call(nextProps.rowKey) === "[object Function]"){
-        return {
-          selectedRowKeys: nextProps.selectedRows.map(row => nextProps.rowKey(row))
-        };
-      }
-      const key = nextProps.rowKey || 'key';
-      return {
-        selectedRowKeys: nextProps.selectedRows.map(row => row[key])
-      };
-    }
+    // if(nextProps.selectedRows){
+    //   if(Object.prototype.toString.call(nextProps.rowKey) === "[object Function]"){
+    //     return {
+    //       selectedRowKeys: nextProps.selectedRows.map(row => nextProps.rowKey(row))
+    //     };
+    //   }
+    //   const key = nextProps.rowKey || 'key';
+    //   return {
+    //     selectedRowKeys: nextProps.selectedRows.map(row => row[key])
+    //   };
+    // }
 
     return null
   }

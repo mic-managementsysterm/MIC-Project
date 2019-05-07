@@ -430,7 +430,7 @@ class Symtype extends PureComponent {
         return typeData && typeData.length >= 1
           ? (
             <div key={record.Id}>
-              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>症状关联</Button>
+              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>关联症状</Button>
               <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>编辑</Button>
             </div>
           ) : null

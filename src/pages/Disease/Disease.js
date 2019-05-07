@@ -436,7 +436,7 @@ class Disease extends PureComponent {
         return dataSource && dataSource.length >= 1
           ? (
             <div key={record.Id}>
-              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>疾病关联</Button>
+              <Button onClick={() => this.handleRelateVisible(true,record)} className={styles.btn}>关联证型</Button>
               <Button onClick={() => this.handleModalVisible(true,record)} className={styles.btn}>编辑</Button>
             </div>
           ) : null
