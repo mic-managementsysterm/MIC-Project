@@ -48,7 +48,7 @@ export default {
       const response = yield call(querySyndrome, payload);
       const {Data:{rows,pagesize,pageindex,total}} = response;
       yield put({
-        type: 'set',
+        type: 'setDisable',
         payload: {
           synData:rows,
           synSearchKey:payload.key,
@@ -59,6 +59,15 @@ export default {
       });
       if (callback) callback();
     },
+    *setStates({ payload,callback }, { put }) {
+      yield put({
+        type: 'set',
+        payload: {
+          ...payload
+        },
+      });
+      if(callback) callback();
+    },
   },
 
   reducers: {
@@ -66,6 +75,23 @@ export default {
       return {
         ...state,
         ...action.payload,
+      };
+    },
+    setDisable(state, {payload}) {
+      const { synData } = payload;
+      const { selectRelateRows } = state;
+      let newSynData = synData.slice();
+      let selectKeys = selectRelateRows.map(item => item.Id);
+      synData.map( (syn,index) => {
+        if(selectKeys.indexOf(syn.Id) !== -1){
+          newSynData[index].disabled = true;
+        }
+      })
+
+      return {
+        ...state,
+        ...payload,
+        synData:newSynData
       };
     },
   },
