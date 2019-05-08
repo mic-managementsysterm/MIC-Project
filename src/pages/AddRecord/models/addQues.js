@@ -28,8 +28,8 @@ export default {
       });
     },
     *uploadQues({ payload,callback }, { call, }) {
-      yield call(addOrUpdateQues, payload);
-      if(callback) callback()
+      const response = yield call(addOrUpdateQues, payload);
+      if(callback) callback(response)
     },
   },
   reducers: {

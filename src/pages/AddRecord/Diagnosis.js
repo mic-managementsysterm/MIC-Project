@@ -144,6 +144,9 @@ class DiagnosisForm extends PureComponent {
               });
               router.go(-2);
             } else {
+              this.setState({
+                loading:false
+              });
               message.error('上传失败，请重新上传！')
             }
           }

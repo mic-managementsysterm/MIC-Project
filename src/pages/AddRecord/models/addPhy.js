@@ -22,8 +22,8 @@ export default {
       });
     },
     *uploadPhy({ payload, callback }, { call }) {
-      yield call(addOrUpdatePhy, payload);
-      if (callback) callback()
+      const response =  yield call(addOrUpdatePhy, payload);
+      if (callback) callback(response)
     },
   },
 

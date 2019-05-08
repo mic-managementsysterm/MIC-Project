@@ -52,11 +52,18 @@ class Physiology extends PureComponent {
     dispatch({
       type: 'addPhy/uploadPhy',
       payload: {...newPhy},
-      callback:()=>{
-        this.setState({
-          loading:false
-        });
-        router.go(-2);
+      callback:(res)=>{
+        if (res.Success){
+          this.setState({
+            loading:false
+          });
+          router.go(-2);
+        } else {
+          this.setState({
+            loading:false
+          });
+          message.error('上传失败，请重新上传！')
+        }
       },
     });
   };
@@ -240,7 +247,6 @@ class Physiology extends PureComponent {
             {this.renderTopic(Topics)}
             <FormItem {...submitFormLayout} className={styles.form}>
               <Button type="primary" htmlType="submit" onClick={()=>this.handleSubmit()} style={{marginTop: 10, marginBottom: 10}}>提交</Button>
-              {/*<Button onClick={()=>this.handleSubmit()} style={{marginTop: 10, marginBottom: 10}}>提交</Button>*/}
             </FormItem>
           </Form>
         </div>
