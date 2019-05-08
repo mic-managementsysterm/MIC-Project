@@ -62,11 +62,18 @@ class AddRecord extends Component {
       payload: {
         ...newQues,
       },
-      callback: () => {
-        this.setState({
-          loading: false,
-        });
-        router.go(-2);
+      callback: (res) => {
+        if(res.Success){
+          this.setState({
+            loading: false,
+          });
+          router.go(-2);
+        } else {
+          this.setState({
+            loading:false
+          });
+          message.error('上传失败，请重新上传！')
+        }
       },
     });
   };
